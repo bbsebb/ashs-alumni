@@ -1,0 +1,181 @@
+@startuml module-interactions
+!theme plain
+title Interactions entre modules - ASHS Alumni
+
+participant "Utilisateur" as user
+participant "MGU\n(Gestion Utilisateurs)" as mgu
+participant "MGC\n(Gestion Contacts)" as mgc
+participant "MIV\n(Invitation/Validation)" as miv
+participant "MGE\n(Gestion Événements)" as mge
+participant "MAD\n(Administration)" as mad
+participant "Historisation" as hist
+participant "Service SMS" as sms
+
+== Séquence 1 : Création d'un contact ==
+
+user -> mgu : Authentification
+activate mgu
+mgu -> mgu : Vérification session
+mgu --> user : Session validée
+deactivate mgu
+
+user -> mgc : Demande création contact
+activate mgc
+mgc -> mgc : Validation des données
+mgc -> mgc : Vérification doublons
+alt Doublon détecté
+    mgc --> user : Erreur "Contact existant"
+else Pas de doublon
+    mgc -> mgc : Création du contact
+    mgc -> hist : Enregistrement historique
+    activate hist
+    hist -> hist : Sauvegarde action
+    deactivate hist
+    
+    alt Numéro de téléphone valide
+        mgc -> miv : Déclenchement invitation
+        activate miv
+        miv -> miv : Génération token
+        miv -> sms : Envoi SMS
+        activate sms
+        sms --> miv : Confirmation envoi
+        deactivate sms
+        miv --> mgc : SMS envoyé
+        deactivate miv
+        mgc --> user : Contact créé, SMS envoyé
+    else Pas de numéro valide
+        mgc -> mgc : Statut "Non joignable"
+        mgc --> user : Contact créé, validation manuelle requise
+    end
+end
+deactivate mgc
+
+== Séquence 2 : Validation d'un contact via SMS ==
+
+user -> miv : Clic sur lien SMS
+activate miv
+miv -> miv : Vérification token
+alt Token valide
+    miv -> mgc : Récupération données contact
+    activate mgc
+    mgc --> miv : Données contact
+    deactivate mgc
+    miv --> user : Formulaire de validation
+    user -> miv : Confirmation/correction données
+    miv -> mgc : Mise à jour contact
+    activate mgc
+    mgc -> mgc : Statut "Validé"
+    mgc -> hist : Enregistrement validation
+    activate hist
+    hist -> hist : Sauvegarde action
+    deactivate hist
+    mgc --> miv : Contact validé
+    deactivate mgc
+    miv -> mgu : Possibilité création compte
+    activate mgu
+    mgu --> user : Formulaire création compte
+    deactivate mgu
+    deactivate miv
+else Token invalide/expiré
+    miv --> user : Erreur "Lien invalide"
+    deactivate miv
+end
+
+== Séquence 3 : Inscription à un événement ==
+
+user -> mgu : Authentification
+activate mgu
+mgu -> mgu : Vérification session
+mgu -> mgc : Vérification contact validé
+activate mgc
+mgc --> mgu : Contact validé confirmé
+deactivate mgc
+mgu --> user : Accès autorisé
+deactivate mgu
+
+user -> mge : Consultation événements
+activate mge
+mge --> user : Liste événements
+user -> mge : Sélection événement
+mge -> mge : Vérification conditions
+alt Conditions OK (ouvert, places disponibles)
+    mge --> user : Formulaire inscription
+    user -> mge : Confirmation inscription
+    mge -> mge : Enregistrement inscription
+    mge -> hist : Historique inscription
+    activate hist
+    hist -> hist : Sauvegarde action
+    deactivate hist
+    mge --> user : Inscription confirmée
+else Conditions non remplies
+    mge --> user : Erreur (fermé/complet)
+end
+deactivate mge
+
+== Séquence 4 : Gestion administrative ==
+
+user -> mad : Connexion administrateur
+activate mad
+mad -> mgu : Vérification droits admin
+activate mgu
+mgu --> mad : Droits confirmés
+deactivate mgu
+
+mad --> user : Tableau de bord admin
+
+alt Gestion des contacts
+    user -> mad : Action sur contact
+    mad -> mgc : Modification contact
+    activate mgc
+    mgc -> mgc : Application modification
+    mgc -> hist : Enregistrement action
+    activate hist
+    hist -> hist : Sauvegarde avec identité admin
+    deactivate hist
+    mgc --> mad : Modification effectuée
+    deactivate mgc
+    mad --> user : Confirmation
+    
+else Gestion des événements
+    user -> mad : Création/modification événement
+    mad -> mge : Action sur événement
+    activate mge
+    mge -> mge : Application modification
+    mge -> hist : Enregistrement action
+    activate hist
+    hist -> hist : Sauvegarde action
+    deactivate hist
+    mge --> mad : Action effectuée
+    deactivate mge
+    mad --> user : Confirmation
+    
+else Consultation historiques
+    user -> mad : Demande historiques
+    mad -> hist : Récupération historiques
+    activate hist
+    hist --> mad : Données historiques
+    deactivate hist
+    mad --> user : Affichage historiques
+end
+deactivate mad
+
+note over mgc, miv
+  <b>Règle importante :</b>
+  Toute création/modification de contact
+  déclenche automatiquement l'historisation
+  avec l'identité de l'utilisateur
+end note
+
+note over mgu, mgc
+  <b>Association obligatoire :</b>
+  Un utilisateur doit toujours être
+  associé à un contact validé (relation 1:1)
+end note
+
+note over mge, mgu
+  <b>Contrôle d'accès :</b>
+  Seuls les utilisateurs avec contact validé
+  peuvent s'inscrire aux événements
+end note
+
+@enduml

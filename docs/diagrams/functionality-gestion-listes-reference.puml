@@ -1,0 +1,113 @@
+@startuml Fonctionnalité - Gestion des listes de référence
+
+title Fonctionnalité : Gestion des listes de référence
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #FFF8E1
+    BorderColor #FF8F00
+    FontColor #E65100
+}
+
+|Administrateur|
+start
+:Accéder à la gestion des listes de référence;
+:Choisir le type de liste à gérer;
+
+if (Type de liste ?) then (Liste "à ne pas contacter")
+  :Accéder à la liste "à ne pas contacter";
+  :Choisir l'action à effectuer;
+  
+  if (Action choisie ?) then (Ajouter contact)
+    :Rechercher un contact existant;
+    
+    if (Contact trouvé ?) then (oui)
+      if (Contact déjà dans la liste ?) then (oui)
+        :Afficher message "Contact déjà présent";
+      else (non)
+        :Ajouter à la liste "à ne pas contacter";
+        :Changer le statut du contact à "Non sollicité";
+        :Enregistrer l'historique;
+      endif
+    else (non)
+      :Créer nouveau contact avec statut "Non sollicité";
+      :Ajouter directement à la liste;
+    endif
+    
+  elseif (Action choisie ?) then (Supprimer contact)
+    :Sélectionner contact à supprimer;
+    :Confirmer la suppression;
+    
+    if (Suppression confirmée ?) then (oui)
+      :Retirer de la liste "à ne pas contacter";
+      :Changer le statut du contact (selon contexte);
+      :Enregistrer l'historique;
+    else (non)
+    endif
+    
+  elseif (Action choisie ?) then (Import CSV)
+    :Sélectionner fichier CSV;
+    :Valider le format du fichier;
+    
+    if (Format valide ?) then (non)
+      :Afficher erreurs de format;
+      :Proposer un modèle de fichier;
+    else (oui)
+      :Traiter chaque ligne du fichier;
+      :Vérifier les doublons;
+      :Importer les nouveaux contacts;
+      :Générer rapport d'import;
+    endif
+    
+  else (Export CSV)
+    :Générer fichier CSV de la liste;
+    :Inclure les informations autorisées;
+    :Proposer le téléchargement;
+  endif
+
+else (Liste "anciens participants")
+  :Accéder à la liste "anciens participants";
+  :Choisir l'action à effectuer;
+  
+  if (Action choisie ?) then (Ajouter participant)
+    :Saisir les informations du participant;
+    :Vérifier les doublons;
+    
+    if (Doublon détecté ?) then (oui)
+      :Proposer de fusionner les informations;
+      :Mettre à jour l'historique de participation;
+    else (non)
+      :Créer nouvelle entrée;
+      :Enregistrer l'historique de participation;
+    endif
+    
+  elseif (Action choisie ?) then (Modifier participant)
+    :Sélectionner participant à modifier;
+    :Modifier les informations autorisées;
+    :Enregistrer les modifications;
+    :Mettre à jour l'historique;
+    
+  elseif (Action choisie ?) then (Import CSV historique)
+    :Sélectionner fichier CSV d'une édition précédente;
+    :Valider le format et les données;
+    :Traiter l'import en lot;
+    :Générer rapport d'import;
+    
+  else (Export données participation)
+    :Choisir les critères d'export;
+    :Générer fichier d'export;
+    :Proposer le téléchargement;
+  endif
+endif
+
+:Enregistrer l'action dans l'audit;
+:Afficher confirmation de l'action;
+
+if (Effectuer une autre action ?) then (oui)
+  :Retourner au menu des listes;
+else (non)
+  :Retourner au tableau de bord admin;
+endif
+
+stop
+
+@enduml

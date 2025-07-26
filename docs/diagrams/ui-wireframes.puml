@@ -1,0 +1,124 @@
+@startuml ui-wireframes
+!theme plain
+title Maquettes d'interface - ASHS Alumni
+
+' Utilisation de SALT pour les wireframes (syntaxe PlantUML dédiée)
+salt
+{
+  {T
+    + Page d'accueil (non connecté)
+    ++ Header | Logo ASHS Alumni | [Se connecter] | [S'inscrire]
+    ++ Contenu principal
+    +++ Présentation ASHS Alumni
+    +++ Événements publics
+    +++ Témoignages
+    ++ Footer | Contact | Mentions légales | RGPD
+    --
+    + Page de connexion
+    ++ Header | Logo ASHS Alumni | [Retour accueil]
+    ++ Formulaire de connexion
+    +++ "Email" | { . }
+    +++ "Mot de passe" | { . }
+    +++ [Se connecter]
+    +++ "Mot de passe oublié ?"
+    +++ "Pas encore inscrit ? S'inscrire spontanément"
+    --
+    + Tableau de bord utilisateur
+    ++ Header connecté | Logo ASHS Alumni | [Mon profil] | [Contacts] | [Événements] | [Déconnexion]
+    ++ Contenu principal
+    +++ "Bienvenue [Prénom]"
+    +++ Mes informations
+    ++++ "Nom, Prénom, Email"
+    ++++ "Rôles dans l'équipe 1"
+    ++++ [Modifier mon profil]
+    +++ Événements à venir
+    ++++ "Liste des événements"
+    ++++ "Mes inscriptions"
+    +++ Actions rapides
+    ++++ [Ajouter un contact]
+    ++++ [Consulter les contacts]
+    --
+    + Gestion des contacts
+    ++ Header | Navigation principale
+    ++ Filtres et recherche
+    +++ "Recherche par nom" | { . }
+    +++ "Filtre par statut" | { ^Tous^ }
+    +++ "Filtre par rôle" | { ^Tous^ }
+    +++ [Ajouter un contact]
+    ++ Liste des contacts
+    +++ {#
+    . | Nom | Prénom | Email | Téléphone* | Statut | Rôles | Actions
+    1 | Dupont | Jean | j.dupont@... | 06 XX XX XX 12 | Validé | Joueur | [Modifier] [Historique]
+    2 | Martin | Marie | m.martin@... | 07 XX XX XX 34 | En attente | Coach | [Modifier] [Historique]
+    }
+    +++ Pagination (25 par page) | [<] [1] [2] [3] [>]
+    ++ Actions en lot (Admin)
+    +++ [Exporter CSV]
+    +++ [Actions multiples]
+    --
+    + Formulaire de contact
+    ++ Header | [Retour à la liste]
+    ++ Informations personnelles
+    +++ "Nom*" | { . }
+    +++ "Prénom*" | { . }
+    +++ "Genre*" | { ^Masculin^ }
+    +++ "Date de naissance*" | { . }
+    +++ "Email*" | { . }
+    +++ "Téléphone" | { . }
+    ++ Rôles dans l'équipe 1*
+    +++ [X] Joueur
+    +++ [ ] Coach
+    +++ [ ] Président
+    +++ [ ] Contributeur
+    ++ Actions
+    +++ [Enregistrer] [Annuler]
+    ++ Historique (si existant)
+    +++ "Historique des modifications"
+    --
+    + Détail d'un événement
+    ++ Header | Navigation
+    ++ Informations événement
+    +++ "Titre de l'événement"
+    +++ "Date et heure"
+    +++ "Lieu"
+    +++ "Description"
+    +++ "Places disponibles : X/Y"
+    ++ Inscription
+    +++ [S'inscrire à l'événement]
+    +++ "Commentaire (optionnel)" | { . }
+    ++ Liste des participants
+    +++ "Participants inscrits :"
+    +++ {#
+    . | Nom | Prénom | Téléphone* | Date inscription
+    1 | Dupont | Jean | 06 XX XX XX 12 | 15/07/2025
+    2 | Martin | Marie | 07 XX XX XX 34 | 16/07/2025
+    }
+    +++ "* Numéros partiellement masqués"
+  }
+}
+
+note as N1
+  <b>Règles d'affichage des contacts :</b>
+  • Téléphones partiellement masqués (06 XX XX XX 12)
+  • Contacts "Non sollicités" invisibles pour les utilisateurs standards
+  • Historique accessible au clic sur chaque contact
+  • Filtres dynamiques par statut et rôle
+end note
+
+note as N2
+  <b>Conditions d'inscription aux événements :</b>
+  • Utilisateur connecté requis
+  • Contact validé obligatoire
+  • Respect des places disponibles
+  • Respect de la date limite d'inscription
+end note
+
+note as N3
+  <b>Validation des formulaires :</b>
+  • Messages d'erreur contextuels en temps réel
+  • Indicateurs visuels pour champs obligatoires (*)
+  • Vérification automatique des doublons
+  • Sauvegarde automatique en brouillon
+end note
+
+@enduml

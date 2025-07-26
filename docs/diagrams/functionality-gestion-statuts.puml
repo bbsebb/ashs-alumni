@@ -1,0 +1,84 @@
+@startuml Fonctionnalité - Gestion des statuts
+
+title Fonctionnalité : Gestion des statuts des contacts
+skinparam backgroundColor #FAFAFA
+skinparam state {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+skinparam arrow {
+    Color #7B1FA2
+    FontColor #4A148C
+}
+
+note top
+  **Description :** Gestion du cycle de vie des statuts des contacts
+  **Acteurs :** Système, Utilisateur, Administrateur, Contact externe
+end note
+
+state "En attente" as EN_ATTENTE {
+  EN_ATTENTE : Contact créé mais non validé
+  EN_ATTENTE : - Peut être modifié par tout utilisateur
+  EN_ATTENTE : - En attente de validation
+}
+
+state "Validé" as VALIDE {
+  VALIDE : Contact confirmé avec compte utilisateur associé
+  VALIDE : - Association 1:1 avec un utilisateur
+  VALIDE : - Peut s'inscrire aux événements
+}
+
+state "Non sollicité/Refusé" as NON_SOLLICITE {
+  NON_SOLLICITE : Contact qui ne souhaite pas être contacté
+  NON_SOLLICITE : - Invisible pour les utilisateurs standards
+  NON_SOLLICITE : - Pas de SMS envoyés
+}
+
+state "Non joignable" as NON_JOIGNABLE {
+  NON_JOIGNABLE : Contact sans numéro de téléphone valide
+  NON_JOIGNABLE : - Validation manuelle requise
+  NON_JOIGNABLE : - Pas de SMS possible
+}
+
+[*] --> EN_ATTENTE : Création contact\navec téléphone valide
+[*] --> NON_JOIGNABLE : Création contact\nsans téléphone valide
+
+EN_ATTENTE --> VALIDE : Processus complet d'inscription SMS\n(validation + création compte utilisateur)\n**OU** Validation admin
+EN_ATTENTE --> NON_SOLLICITE : Clic lien refus SMS\n**OU** Action admin
+EN_ATTENTE --> NON_JOIGNABLE : Détection téléphone invalide\n(automatique)
+
+VALIDE --> NON_SOLLICITE : Action admin uniquement
+NON_JOIGNABLE --> VALIDE : Validation admin uniquement\n(après ajout téléphone valide)
+NON_SOLLICITE --> VALIDE : Action admin uniquement\n(réhabilitation)
+
+note right of EN_ATTENTE
+  **Transitions depuis "En attente" :**
+  - Validation automatique via SMS + inscription
+  - Refus explicite (lien SMS)
+  - Validation manuelle admin
+  - Passage automatique à "Non joignable"
+end note
+
+note right of VALIDE
+  **État "Validé" :**
+  - Seul statut permettant l'inscription aux événements
+  - Compte utilisateur obligatoirement associé
+  - Seuls les admins peuvent changer ce statut
+end note
+
+note bottom of NON_SOLLICITE
+  **État "Non sollicité" :**
+  - Contact invisible pour utilisateurs standards
+  - Aucun SMS envoyé
+  - Réhabilitation possible par admin uniquement
+end note
+
+note bottom of NON_JOIGNABLE
+  **État "Non joignable" :**
+  - Validation manuelle par admin requise
+  - Peut devenir "Validé" si téléphone ajouté
+  - Pas d'envoi SMS automatique
+end note
+
+@enduml

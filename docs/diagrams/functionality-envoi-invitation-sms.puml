@@ -1,0 +1,159 @@
+@startuml Fonctionnalité - Envoi d'invitation SMS
+
+title Fonctionnalité : Envoi d'invitation SMS
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #E0F2F1
+    BorderColor #00695C
+    FontColor #004D40
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+note top
+  **Description :** Envoi automatique d'un SMS d'invitation lors de la création d'un contact avec numéro valide
+  **Acteurs :** Système, Service SMS externe
+  **Déclencheurs :** Création contact avec téléphone valide, Aucun doublon détecté
+end note
+
+start
+
+partition "Système" {
+  :Déclenchement automatique;
+  note right
+    **Déclencheurs :**
+    - Création nouveau contact
+    - Numéro de téléphone valide
+    - Aucun doublon détecté
+    - Contact en statut "En attente"
+  end note
+
+  :Vérifier les conditions d'envoi;
+
+  if (Numéro de téléphone français valide ?) then (non)
+    :Marquer contact comme "Non joignable";
+    :Enregistrer dans l'historique;
+    stop
+  else (oui)
+  endif
+
+  :Vérifier limitation SMS;
+  note right
+    **Règle :** 1 SMS par numéro
+    par période de 24h
+  end note
+
+  if (SMS déjà envoyé dans les 24h ?) then (oui)
+    :Enregistrer tentative bloquée;
+    :Notifier l'utilisateur créateur;
+    stop
+  else (non)
+  endif
+
+  :Générer token de validation unique;
+  note right
+    **Token de validation :**
+    - UUID unique et non prédictible
+    - Validité : 30 jours
+    - Associé au contact
+  end note
+
+  :Générer token de refus unique;
+  note right
+    **Token de refus :**
+    - UUID unique
+    - Validité : permanente
+    - Action : statut "Non sollicité"
+  end note
+
+  :Construire les liens personnalisés;
+  note right
+    **Liens générés :**
+    - Lien validation : /validate/{token_validation}
+    - Lien refus : /refuse/{token_refus}
+  end note
+
+  :Composer le message SMS;
+  note right
+    **Contenu SMS :**
+    "Bonjour [Prénom],
+    Vous êtes invité(e) à rejoindre la communauté ASHS Alumni.
+    Validez votre contact : [lien_personnalisé]
+    Pour refuser : [lien_refus]"
+    
+    **Contrainte :** < 160 caractères
+  end note
+
+  :Envoyer SMS via service externe;
+}
+
+partition "Service SMS externe" {
+  :Traiter la demande d'envoi;
+
+  if (Envoi réussi ?) then (non)
+    :Retourner erreur;
+    
+    partition "Système" {
+      :Enregistrer l'échec;
+      :Incrémenter compteur de retry;
+      
+      if (Nombre de tentatives < 3 ?) then (oui)
+        :Programmer nouvelle tentative;
+        note right
+          **Retry automatique :**
+          - Tentative 1 : immédiate
+          - Tentative 2 : après 5 minutes
+          - Tentative 3 : après 30 minutes
+        end note
+      else (non)
+        :Marquer comme échec définitif;
+        :Notifier l'administrateur;
+      endif
+    }
+    
+    stop
+  else (oui)
+    :Retourner confirmation d'envoi;
+  endif
+}
+
+partition "Système" {
+  :Enregistrer le succès de l'envoi;
+  note right
+    **Informations enregistrées :**
+    - ID SMS du fournisseur
+    - Horodatage d'envoi
+    - Statut : SENT
+    - Tokens générés
+  end note
+
+  :Mettre à jour le statut du contact;
+  note right
+    **Contact reste "En attente"**
+    en attendant la validation
+  end note
+
+  :Enregistrer dans l'historique;
+  note right
+    **Historique inclut :**
+    - Action : Envoi SMS invitation
+    - Utilisateur déclencheur
+    - Horodatage
+    - Numéro destinataire (partiel)
+  end note
+
+  :Programmer vérification de livraison;
+  note right
+    **Vérification différée :**
+    - Après 1 heure : statut de livraison
+    - Mise à jour du statut SMS
+    - Log des échecs de livraison
+  end note
+}
+
+stop
+
+@enduml

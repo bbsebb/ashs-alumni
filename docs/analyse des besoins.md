@@ -71,8 +71,8 @@ Le diagramme suivant illustre le processus d'invitation et de validation des con
     - **Cas particulier :** Pour les contacts sans numéro de téléphone valide, la vérification de doublon se base sur la combinaison nom/prénom/email.
 
 - **Invitation par SMS (pour les contacts joignables) :**
-    - Envoi automatique d'un SMS avec un lien personnalisé, menant directement à la fiche contact à valider.
-    - **Important :** La validation du contact via SMS permet uniquement de s'inscrire sur l'application. L'inscription à la soirée est une étape séparée qui ne peut être effectuée qu'après avoir validé son contact et être devenu un utilisateur inscrit.
+    - Envoi automatique d'un SMS avec un lien personnalisé, menant directement au processus d'inscription.
+    - **Important :** Le processus via SMS inclut la validation du contact ET la création du compte utilisateur. Le contact ne devient "validé" qu'après la création réussie du compte utilisateur et son association au contact. L'inscription à la soirée est une étape séparée qui ne peut être effectuée qu'après ce processus complet.
     - L'envoi de SMS n'a lieu que si aucun doublon n'est détecté lors de la création du contact et si le contact possède un numéro de téléphone valide.
     - **Contacts non joignables :** Les contacts sans numéro de téléphone valide reçoivent automatiquement le statut "non joignable" et nécessitent une validation manuelle par un administrateur.
 
@@ -83,7 +83,7 @@ Le diagramme suivant illustre le processus d'invitation et de validation des con
 #### 3. Statut des contacts
 - Statuts possibles pour chaque contact :
     - **En attente** (ajouté mais pas encore validé)
-    - **Validé** (inscription confirmée)
+    - **Validé** (contact confirmé avec compte utilisateur associé)
     - **Non sollicité/refusé** : liste administrateur, non contactés, invisibles pour les autres.
     - **Non joignable** : contact qui n'a pas de numéro de téléphone ou pas de numéro de téléphone valide, ne peut pas recevoir de SMS de validation.
 
@@ -135,7 +135,7 @@ Le diagramme suivant illustre le processus d'inscription à un événement :
 - **Règle fondamentale** : Tout utilisateur inscrit sur la plateforme doit avoir un contact validé associé
 - **Prévention des doublons** : Vérification obligatoire avant ajout d'un nouveau contact (par téléphone ou combinaison nom/prénom/email)
 - **Validation des contacts** : 
-  - Contacts avec téléphone valide : validation automatique par SMS
+  - Contacts avec téléphone valide : processus complet d'inscription via SMS (validation + création compte utilisateur)
   - Contacts sans téléphone valide : statut "non joignable" et validation manuelle par administrateur
 - **Séparation des processus** : La validation du contact et l'inscription à la soirée sont deux étapes distinctes
 

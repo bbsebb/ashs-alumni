@@ -1,0 +1,98 @@
+@startuml Fonctionnalité - Création d'un contact
+
+title Fonctionnalité : Création d'un contact
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+start
+
+partition "Utilisateur" {
+  :Accéder au formulaire de création de contact;
+  note right
+    **Pré-conditions :**
+    - Utilisateur authentifié
+    - Contact validé associé
+  end note
+
+  :Saisir les informations obligatoires;
+  note right
+    **Champs obligatoires :**
+    - Nom (2-50 caractères)
+    - Prénom (2-50 caractères)
+    - Genre (Masculin/Féminin)
+    - Date de naissance (DD/MM/YYYY)
+    - Email (format valide)
+    - Rôles dans l'équipe 1
+    
+    **Champs optionnels :**
+    - Numéro de téléphone (format français)
+  end note
+}
+
+partition "Système" {
+  :Valider les données saisies;
+
+  if (Données valides ?) then (non)
+    :Afficher messages d'erreur;
+    partition "Utilisateur" {
+      :Corriger les données;
+    }
+  else (oui)
+  endif
+
+  :Vérifier l'absence de doublons;
+  note right
+    **Vérification par :**
+    - Numéro de téléphone (si renseigné)
+    - Combinaison nom/prénom/email (si pas de téléphone)
+  end note
+
+  if (Doublon détecté ?) then (oui)
+    :Afficher message d'erreur;
+    :Proposer de consulter le contact existant;
+    partition "Utilisateur" {
+      :Annuler la création;
+    }
+    stop
+  else (non)
+  endif
+
+  if (Numéro de téléphone valide ?) then (oui)
+    :Créer le contact avec statut "En attente";
+    :Enregistrer l'historique de création;
+    :Générer token de validation;
+    :Envoyer SMS d'invitation;
+    note right
+      **SMS contient :**
+      - Lien de validation personnalisé
+      - Lien de refus
+      - Validité : 30 jours
+    end note
+  else (non)
+    :Créer le contact avec statut "Non joignable";
+    :Enregistrer l'historique de création;
+    note right
+      **Validation manuelle requise**
+      par un administrateur
+    end note
+  endif
+
+  :Confirmer la création du contact;
+}
+
+partition "Utilisateur" {
+  :Recevoir confirmation de création;
+}
+
+stop
+
+@enduml

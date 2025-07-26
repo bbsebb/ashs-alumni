@@ -1,0 +1,122 @@
+@startuml Fonctionnalité - Modification d'un contact
+
+title Fonctionnalité : Modification d'un contact
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #E8F5E8
+    BorderColor #2E7D32
+    FontColor #1B5E20
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+start
+
+partition "Utilisateur" {
+  :Accéder à la fiche du contact;
+  note right
+    **Pré-conditions :**
+    - Utilisateur authentifié
+    - Pour utilisateur standard : contact associé OU contact "En attente"
+    - Pour administrateur : aucune restriction
+  end note
+}
+
+partition "Système" {
+  :Vérifier les droits d'accès;
+
+  if (Droits suffisants ?) then (non)
+    :Afficher message d'erreur d'accès;
+    stop
+  else (oui)
+  endif
+
+  :Afficher le formulaire de modification;
+  note right
+    **Champs modifiables selon les droits :**
+    - Utilisateur standard : tous sauf statut
+    - Administrateur : tous les champs
+  end note
+}
+
+partition "Utilisateur" {
+  :Modifier les champs autorisés;
+}
+
+partition "Système" {
+  :Valider les modifications;
+
+  if (Données valides ?) then (non)
+    :Afficher messages d'erreur;
+    partition "Utilisateur" {
+      :Corriger les données;
+    }
+  else (oui)
+  endif
+
+  if (Email ou téléphone modifié ?) then (oui)
+    :Vérifier l'absence de doublons;
+    note right
+      **Nouvelle vérification de doublons**
+      si email ou téléphone changé
+    end note
+    
+    if (Doublon détecté ?) then (oui)
+      :Afficher message d'erreur;
+      :Proposer de consulter le contact existant;
+      partition "Utilisateur" {
+        :Annuler la modification;
+      }
+      stop
+    else (non)
+    endif
+  else (non)
+  endif
+
+  if (Statut modifié ?) then (oui)
+    note right
+      **Seuls les administrateurs**
+      peuvent modifier le statut
+    end note
+    
+    if (Utilisateur = Admin ?) then (non)
+      :Ignorer la modification de statut;
+    else (oui)
+      if (Transition autorisée ?) then (non)
+        :Afficher erreur de transition;
+        stop
+      else (oui)
+        :Déclencher actions liées au changement de statut;
+        note right
+          **Actions possibles :**
+          - Envoi SMS si passage à "En attente"
+          - Notification admin si passage à "Non sollicité"
+        end note
+      endif
+    endif
+  else (non)
+  endif
+
+  :Mettre à jour le contact;
+  :Enregistrer l'historique de modification;
+  note right
+    **Historique inclut :**
+    - Utilisateur déclencheur
+    - Horodatage
+    - Champs modifiés
+    - Valeurs avant/après
+  end note
+
+  :Confirmer la modification;
+}
+
+partition "Utilisateur" {
+  :Recevoir confirmation de modification;
+}
+
+stop
+
+@enduml

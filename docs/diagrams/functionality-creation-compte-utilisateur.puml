@@ -1,0 +1,139 @@
+@startuml Fonctionnalité - Création de compte utilisateur
+
+title Fonctionnalité : Création de compte utilisateur
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #FFF8E1
+    BorderColor #FF8F00
+    FontColor #E65100
+}
+skinparam activityDiamond {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+
+note top
+  **Description :** Permet la création d'un compte utilisateur via SMS ou par un administrateur
+  **Acteurs :** Visiteur avec contact en attente (via SMS), Administrateur
+end note
+
+start
+
+if (Méthode de création ?) then (Via SMS)
+  partition "Visiteur" {
+    :Cliquer sur lien de validation SMS;
+    note right
+      **Pré-conditions :**
+      - Contact avec statut "En attente"
+      - Token de validation valide
+    end note
+  }
+  
+  partition "Système" {
+    :Vérifier la validité du token;
+    
+    if (Token valide ?) then (non)
+      :Afficher erreur "Lien expiré ou invalide";
+      stop
+    else (oui)
+    endif
+    
+    :Afficher les informations du contact;
+  }
+  
+  partition "Visiteur" {
+    :Confirmer ou corriger les informations;
+    :Saisir informations de connexion;
+    note right
+      **Informations requises :**
+      - Mot de passe (8 caractères min, complexité)
+      - Confirmation du mot de passe
+    end note
+  }
+  
+  partition "Système" {
+    :Valider le mot de passe;
+    
+    if (Mot de passe valide ?) then (non)
+      :Afficher erreurs de validation;
+      partition "Visiteur" {
+        :Corriger le mot de passe;
+      }
+    else (oui)
+    endif
+  }
+  
+else (Via Admin)
+  partition "Administrateur" {
+    :Accéder à la fiche d'un contact validé;
+    note right
+      **Pré-conditions :**
+      - Contact avec statut "Validé"
+      - Aucun compte utilisateur associé
+    end note
+    
+    :Initier la création du compte utilisateur;
+  }
+  
+  partition "Système" {
+    :Générer identifiants temporaires;
+    :Envoyer lien d'activation;
+  }
+  
+  partition "Contact externe" {
+    :Recevoir et cliquer sur lien d'activation;
+    :Définir son mot de passe;
+  }
+endif
+
+partition "Système" {
+  :Créer le compte utilisateur;
+  note right
+    **Compte utilisateur inclut :**
+    - Email (identifiant)
+    - Mot de passe hashé
+    - Rôle par défaut : USER
+    - Statut : ACTIF
+  end note
+
+  :Établir l'association contact-utilisateur;
+  note right
+    **Association 1:1 obligatoire**
+    Contact ↔ Utilisateur
+  end note
+
+  if (Contact déjà validé ?) then (non)
+    :Passer le contact au statut "Validé";
+  else (oui)
+  endif
+
+  :Enregistrer l'historique;
+  note right
+    **Historique inclut :**
+    - Création du compte utilisateur
+    - Association contact-utilisateur
+    - Changement de statut si applicable
+  end note
+
+  if (Création via SMS ?) then (oui)
+    :Connecter automatiquement l'utilisateur;
+    :Créer session utilisateur;
+    
+    partition "Visiteur devenu Utilisateur" {
+      :Accéder au tableau de bord;
+    }
+  else (non)
+    :Notifier l'administrateur du succès;
+    
+    partition "Administrateur" {
+      :Recevoir confirmation de création;
+    }
+  endif
+
+  :Confirmer la création du compte;
+}
+
+stop
+
+@enduml

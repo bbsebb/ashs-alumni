@@ -1,0 +1,172 @@
+@startuml Fonctionnalité - Création d'événement
+
+title Fonctionnalité : Création d'événement
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+note top
+  **Description :** Permet aux administrateurs de créer des soirées retrouvailles
+  **Acteurs :** Administrateur uniquement
+  **Objectif :** Organiser des événements pour les membres validés de la communauté
+end note
+
+start
+
+partition "Administrateur" {
+  :Accéder à l'interface de création d'événement;
+  note right
+    **Pré-conditions :**
+    - Utilisateur authentifié
+    - Rôle administrateur requis
+    - Accès aux fonctions d'administration
+  end note
+
+  :Saisir les informations de l'événement;
+  note right
+    **Informations obligatoires :**
+    - Titre (100 caractères max)
+    - Date et heure de l'événement
+    - Lieu (255 caractères max)
+    
+    **Informations optionnelles :**
+    - Description détaillée
+    - Nombre de places maximum
+    - Date limite d'inscription
+    - Instructions spéciales
+  end note
+}
+
+partition "Système" {
+  :Valider les données saisies;
+
+  if (Données valides ?) then (non)
+    :Afficher messages d'erreur détaillés;
+    note right
+      **Validations :**
+      - Titre non vide et longueur correcte
+      - Date future (pas dans le passé)
+      - Lieu non vide
+      - Places max > 0 si défini
+      - Date limite < date événement
+    end note
+    partition "Administrateur" {
+      :Corriger les données;
+    }
+  else (oui)
+  endif
+
+  :Vérifier les conflits de dates;
+  note right
+    **Vérification des conflits :**
+    - Pas d'autre événement le même jour
+    - Alerte si événements proches (< 7 jours)
+    - Suggestion de modification si conflit
+  end note
+
+  if (Conflit détecté ?) then (oui)
+    :Afficher avertissement de conflit;
+    partition "Administrateur" {
+      if (Confirmer malgré le conflit ?) then (non)
+        :Modifier la date;
+      else (oui)
+      endif
+    }
+  else (non)
+  endif
+
+  :Définir le statut initial de l'événement;
+  note right
+    **Statuts possibles :**
+    - BROUILLON : Événement en préparation
+    - OUVERT : Inscriptions ouvertes
+    - FERME : Inscriptions fermées
+    - ANNULE : Événement annulé
+  end note
+}
+
+partition "Administrateur" {
+  :Choisir le statut initial;
+}
+
+partition "Système" {
+  if (Statut = OUVERT ?) then (oui)
+    :Vérifier que toutes les informations sont complètes;
+    
+    if (Informations complètes ?) then (non)
+      :Forcer le statut à BROUILLON;
+      :Afficher message d'information;
+    else (oui)
+    endif
+  else (non)
+  endif
+
+  :Créer l'événement dans la base de données;
+  note right
+    **Données enregistrées :**
+    - Toutes les informations saisies
+    - Créateur (ID administrateur)
+    - Date de création
+    - Statut défini
+    - UUID unique généré
+  end note
+
+  :Enregistrer l'historique de création;
+  note right
+    **Historique inclut :**
+    - Action : Création événement
+    - Administrateur créateur
+    - Horodatage
+    - Informations de l'événement
+  end note
+
+  if (Statut = OUVERT ?) then (oui)
+    :Déclencher les notifications;
+    note right
+      **Notifications possibles :**
+      - Email aux utilisateurs validés
+      - Notification sur tableau de bord
+      - Mise à jour de la page publique
+    end note
+  else (non)
+  endif
+
+  :Générer l'ID public de l'événement;
+  note right
+    **ID public :**
+    - Identifiant court et lisible
+    - Utilisé dans les URLs publiques
+    - Format : ASHS-YYYY-MM-XXX
+  end note
+
+  :Confirmer la création de l'événement;
+}
+
+partition "Administrateur" {
+  :Recevoir confirmation avec détails;
+  note right
+    **Confirmation inclut :**
+    - ID de l'événement
+    - Statut actuel
+    - Lien d'administration
+    - Actions possibles suivantes
+  end note
+
+  if (Créer un autre événement ?) then (oui)
+    :Retourner au formulaire de création;
+  else (non)
+    :Accéder à la gestion des événements;
+  endif
+}
+
+stop
+
+@enduml

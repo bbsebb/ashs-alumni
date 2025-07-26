@@ -1,0 +1,63 @@
+@startuml contact-status-states
+!theme plain
+title Diagramme d'états - Statuts des contacts
+
+[*] --> EN_ATTENTE : Création d'un contact\navec numéro valide
+
+[*] --> NON_JOIGNABLE : Création d'un contact\nsans numéro valide
+
+state EN_ATTENTE {
+  EN_ATTENTE : Contact créé mais non validé
+  EN_ATTENTE : - Peut recevoir des SMS
+  EN_ATTENTE : - Modifiable par tous les utilisateurs
+  EN_ATTENTE : - En attente de validation
+}
+
+state VALIDE {
+  VALIDE : Contact confirmé
+  VALIDE : - Peut créer un compte utilisateur
+  VALIDE : - Peut s'inscrire aux événements
+  VALIDE : - Modifiable uniquement par son utilisateur associé ou admin
+}
+
+state NON_SOLLICITE {
+  NON_SOLLICITE : Contact qui refuse d'être contacté
+  NON_SOLLICITE : - Invisible pour les utilisateurs standards
+  NON_SOLLICITE : - Aucune communication automatique
+  NON_SOLLICITE : - Géré uniquement par les administrateurs
+}
+
+state NON_JOIGNABLE {
+  NON_JOIGNABLE : Contact sans numéro de téléphone valide
+  NON_JOIGNABLE : - Ne peut pas recevoir de SMS
+  NON_JOIGNABLE : - Validation manuelle requise
+  NON_JOIGNABLE : - Modifiable par tous les utilisateurs
+}
+
+EN_ATTENTE --> VALIDE : Validation via SMS\nou par administrateur
+EN_ATTENTE --> NON_SOLLICITE : Refus via lien SMS\nou action administrateur
+EN_ATTENTE --> NON_JOIGNABLE : Détection automatique\nnuméro invalide
+
+NON_JOIGNABLE --> VALIDE : Validation manuelle\npar administrateur
+NON_JOIGNABLE --> NON_SOLLICITE : Action administrateur
+
+VALIDE --> NON_SOLLICITE : Action administrateur\nuniquement
+
+NON_SOLLICITE --> VALIDE : Réactivation par\nadministrateur uniquement
+
+note right of EN_ATTENTE : Statut initial pour\nles contacts joignables
+note right of NON_JOIGNABLE : Statut initial pour\nles contacts sans téléphone
+note right of VALIDE : Seul statut permettant\nla création d'un compte
+note right of NON_SOLLICITE : Statut terminal\n(sauf intervention admin)
+
+note as N1
+  <b>Règles de transition :</b>
+  • Seuls les administrateurs peuvent modifier
+    le statut d'un contact validé
+  • La transition vers NON_SOLLICITE peut être
+    automatique (refus SMS) ou manuelle (admin)
+  • La validation peut être automatique (SMS)
+    ou manuelle (admin)
+end note
+
+@enduml

@@ -1,0 +1,125 @@
+@startuml Fonctionnalité - Authentification
+
+title Fonctionnalité : Authentification
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #E8EAF6
+    BorderColor #3F51B5
+    FontColor #1A237E
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+note top
+  **Description :** Processus de connexion des utilisateurs à l'application
+  **Acteurs :** Visiteur, Utilisateur
+  **Méthodes :** Email + mot de passe, Lien de connexion temporaire (optionnel)
+end note
+
+start
+
+partition "Visiteur" {
+  :Accéder à la page de connexion;
+  :Saisir email et mot de passe;
+}
+
+partition "Système" {
+  :Valider le format de l'email;
+
+  if (Email valide ?) then (non)
+    :Afficher erreur de format;
+    partition "Visiteur" {
+      :Corriger l'email;
+    }
+  else (oui)
+  endif
+
+  :Rechercher l'utilisateur par email;
+
+  if (Utilisateur trouvé ?) then (non)
+    :Incrémenter compteur tentatives IP;
+    :Afficher erreur générique;
+    note right
+      **Sécurité :** Message générique
+      pour éviter l'énumération d'emails
+    end note
+    stop
+  else (oui)
+  endif
+
+  :Vérifier le statut du compte;
+
+  if (Compte actif ?) then (non)
+    :Afficher erreur "Compte suspendu";
+    stop
+  else (oui)
+  endif
+
+  :Vérifier les tentatives de connexion;
+
+  if (Compte bloqué ?) then (oui)
+    :Afficher erreur "Compte temporairement bloqué";
+    note right
+      **Règle :** Blocage après 5 échecs
+      pendant 15 minutes
+    end note
+    stop
+  else (non)
+  endif
+
+  :Vérifier le mot de passe;
+
+  if (Mot de passe correct ?) then (non)
+    :Incrémenter compteur échecs utilisateur;
+    :Enregistrer tentative échouée;
+    
+    if (5 échecs atteints ?) then (oui)
+      :Bloquer le compte temporairement;
+      :Envoyer notification sécurité (optionnel);
+    else (non)
+    endif
+    
+    :Afficher erreur générique;
+    stop
+  else (oui)
+  endif
+
+  :Réinitialiser compteur échecs;
+  :Créer session utilisateur;
+  note right
+    **Session inclut :**
+    - Token JWT (15 minutes)
+    - Refresh token (24 heures)
+    - Rôles utilisateur
+    - ID contact associé
+  end note
+
+  :Enregistrer dernière connexion;
+  :Enregistrer log de connexion;
+
+  if (Utilisateur = Admin ?) then (oui)
+    :Charger permissions administrateur;
+  else (non)
+    :Charger permissions utilisateur standard;
+  endif
+
+  :Rediriger vers tableau de bord;
+}
+
+partition "Utilisateur connecté" {
+  :Accéder aux fonctionnalités autorisées;
+}
+
+note bottom
+  **Gestion des sessions :**
+  - Durée : 24 heures avec renouvellement automatique
+  - Déconnexion automatique après inactivité
+  - Token stocké en HttpOnly cookies (sécurité)
+end note
+
+stop
+
+@enduml

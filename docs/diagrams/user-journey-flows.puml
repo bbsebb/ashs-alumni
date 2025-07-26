@@ -1,0 +1,202 @@
+@startuml user-journey-flows
+!theme plain
+title Parcours utilisateur - ASHS Alumni
+
+' Définition des couleurs pour les différents types d'éléments
+skinparam activity {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+  FontColor #0D47A1
+}
+
+skinparam activityDiamond {
+  BackgroundColor #FFF3E0
+  BorderColor #F57C00
+  FontColor #E65100
+}
+
+' Parcours principal avec swimlanes pour séparer les acteurs
+|Utilisateur|
+start
+:Choix du parcours;
+
+if (Type d'action ?) then (Invitation contact)
+  |Utilisateur authentifié|
+  :Ajoute un nouveau contact;
+  note right: Via formulaire de création
+  
+  |Système|
+  :Vérifie les doublons;
+  
+  if (Doublon détecté ?) then (oui)
+    :Affiche erreur\n"Contact existant";
+    |Utilisateur authentifié|
+    stop
+  else (non)
+    :Crée contact avec\nstatut "En attente";
+  endif
+  
+  if (Numéro de téléphone\nvalide ?) then (oui)
+    |Service SMS|
+    :Envoie SMS d'invitation\navec lien personnalisé;
+    note right: Token unique 30 jours
+    
+    |Contact invité|
+    :Reçoit SMS avec\nlien de validation;
+    
+    if (Action du contact ?) then (Validation)
+      :Clique sur lien\nde validation;
+      |Système|
+      :Affiche formulaire\nde confirmation;
+      |Contact invité|
+      :Confirme/corrige\nses informations;
+      |Système|
+      :Statut passe à "Validé";
+      :Propose création\ncompte utilisateur;
+      stop
+    elseif (Refus) then
+      :Clique sur lien\nde refus;
+      |Système|
+      :Statut passe à\n"Non sollicité";
+      stop
+    else (Pas de réponse)
+      |Système|
+      :Contact reste en\nstatut "En attente";
+      note right: Relance possible par admin
+      stop
+    endif
+  else (non)
+    :Statut passe à\n"Non joignable";
+    :Validation manuelle\nrequise par admin;
+    stop
+  endif
+
+elseif (Inscription spontanée) then
+  |Visiteur|
+  :Accède à la page\nd'inscription;
+  :Saisit informations\npersonnelles;
+  
+  |Système|
+  :Vérifie les doublons;
+  
+  if (Doublon détecté ?) then (oui)
+    :Affiche erreur\n"Contact existant";
+    |Visiteur|
+    stop
+  else (non)
+    :Crée le contact;
+  endif
+  
+  if (Numéro de téléphone\nvalide ?) then (oui)
+    |Service SMS|
+    :Envoie SMS de validation;
+    |Visiteur|
+    :Valide via SMS;
+    |Système|
+    :Statut "Validé";
+  else (non)
+    :Statut "Non joignable";
+    :Validation admin requise;
+  endif
+  
+  :Crée compte utilisateur;
+  :Connexion automatique;
+  stop
+
+elseif (Inscription événement) then
+  |Utilisateur|
+  :Consulte les événements\ndisponibles;
+  
+  if (Utilisateur connecté ?) then (non)
+    :Redirection vers\npage de connexion;
+    :Authentification;
+  else (oui)
+  endif
+  
+  |Système|
+  if (Contact validé ?) then (non)
+    :Message d'erreur\n"Contact non validé";
+    |Utilisateur|
+    stop
+  else (oui)
+  endif
+  
+  |Utilisateur|
+  :Sélectionne un événement;
+  
+  |Système|
+  if (Événement ouvert ?) then (non)
+    :Message "Inscriptions\nfermées";
+    |Utilisateur|
+    stop
+  else (oui)
+  endif
+  
+  if (Places disponibles ?) then (non)
+    :Message "Événement\ncomplet";
+    |Utilisateur|
+    stop
+  else (oui)
+  endif
+  
+  :Affiche formulaire\nd'inscription;
+  |Utilisateur|
+  :Saisit commentaire\n(optionnel);
+  :Confirme inscription;
+  |Système|
+  :Enregistre inscription;
+  :Envoie notification\nde confirmation;
+  stop
+
+else (Gestion administrative)
+  |Administrateur|
+  :Se connecte;
+  :Accède tableau de bord\nadministrateur;
+  
+  fork
+    :Gestion des contacts;
+    :Validation manuelle des\ncontacts "Non joignables";
+    :Modification des statuts;
+    :Consultation historiques;
+  fork again
+    :Gestion des événements;
+    :Création nouvel événement;
+    :Définition dates et lieux;
+    :Gestion des inscriptions;
+  fork again
+    :Gestion des listes;
+    :Import liste "à ne pas contacter";
+    :Import anciens participants;
+    :Export données CSV;
+  end fork
+  
+  :Actions administratives\neffectuées;
+  stop
+endif
+
+note as N1
+  <b>Règles SMS :</b>
+  • 1 SMS maximum par numéro de téléphone par période de 24h
+  • Format français uniquement (mobile et fixe)
+  • Token unique avec validité de 30 jours
+  • Lien de validation + lien de refus inclus
+end note
+
+note as N2
+  <b>Vérification des doublons :</b>
+  • Priorité : vérification par numéro de téléphone
+  • Fallback : combinaison nom/prénom/email (si pas de téléphone)
+  • Vérification sur tous les statuts confondus
+  • Blocage automatique si doublon trouvé
+end note
+
+note as N3
+  <b>Règle fondamentale d'accès :</b>
+  Seuls les utilisateurs avec contact validé peuvent :
+  • S'inscrire aux événements
+  • Accéder aux fonctionnalités complètes
+  • Modifier les contacts en attente
+  • Créer de nouveaux contacts
+end note
+
+@enduml

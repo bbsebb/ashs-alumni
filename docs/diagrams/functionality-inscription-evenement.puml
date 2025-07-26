@@ -1,0 +1,205 @@
+@startuml Fonctionnalité - Inscription à un événement
+
+title Fonctionnalité : Inscription à un événement
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #E8F5E8
+    BorderColor #2E7D32
+    FontColor #1B5E20
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+note top
+  **Description :** Permet aux utilisateurs avec contact validé de s'inscrire à un événement
+  **Acteurs :** Utilisateur authentifié avec contact validé
+  **Contrainte :** Seuls les contacts validés peuvent s'inscrire
+end note
+
+start
+
+partition "Utilisateur" {
+  :Consulter la liste des événements;
+  note right
+    **Événements visibles :**
+    - Statut OUVERT uniquement
+    - Informations publiques affichées
+    - Places disponibles indiquées
+  end note
+
+  :Sélectionner un événement;
+}
+
+partition "Système" {
+  :Vérifier l'authentification;
+
+  if (Utilisateur connecté ?) then (non)
+    :Rediriger vers page de connexion;
+    partition "Utilisateur" {
+      :Se connecter;
+    }
+    :Retourner à l'événement sélectionné;
+  else (oui)
+  endif
+
+  :Vérifier le statut du contact associé;
+
+  if (Contact validé ?) then (non)
+    :Afficher message d'erreur;
+    note right
+      **Message :** "Votre contact doit être validé
+      pour vous inscrire aux événements.
+      Contactez un administrateur si nécessaire."
+    end note
+    stop
+  else (oui)
+  endif
+
+  :Vérifier le statut de l'événement;
+
+  if (Événement ouvert aux inscriptions ?) then (non)
+    :Afficher message selon le statut;
+    note right
+      **Messages possibles :**
+      - BROUILLON : "Événement en préparation"
+      - FERME : "Inscriptions fermées"
+      - ANNULE : "Événement annulé"
+    end note
+    stop
+  else (oui)
+  endif
+
+  :Vérifier la date limite d'inscription;
+
+  if (Date limite dépassée ?) then (oui)
+    :Afficher message "Inscriptions fermées";
+    stop
+  else (non)
+  endif
+
+  :Vérifier si déjà inscrit;
+
+  if (Utilisateur déjà inscrit ?) then (oui)
+    :Afficher statut d'inscription actuel;
+    note right
+      **Actions possibles :**
+      - Voir les détails de l'inscription
+      - Annuler l'inscription (si autorisé)
+      - Modifier le commentaire
+    end note
+    stop
+  else (non)
+  endif
+
+  :Vérifier les places disponibles;
+
+  if (Places disponibles ?) then (non)
+    :Afficher message "Événement complet";
+    note right
+      **Options futures :**
+      - Liste d'attente (fonctionnalité future)
+      - Notification si désistement
+    end note
+    stop
+  else (oui)
+  endif
+
+  :Afficher le formulaire d'inscription;
+  note right
+    **Informations affichées :**
+    - Détails complets de l'événement
+    - Nombre de places restantes
+    - Date limite d'inscription
+    - Conditions particulières
+  end note
+}
+
+partition "Utilisateur" {
+  :Confirmer les informations personnelles;
+  :Saisir un commentaire (optionnel);
+  note right
+    **Commentaire :**
+    - 500 caractères maximum
+    - Informations complémentaires
+    - Besoins spéciaux, accompagnants, etc.
+  end note
+
+  :Confirmer l'inscription;
+}
+
+partition "Système" {
+  :Vérifier à nouveau les conditions;
+  note right
+    **Double vérification :**
+    - Places toujours disponibles
+    - Événement toujours ouvert
+    - Utilisateur toujours éligible
+  end note
+
+  if (Conditions toujours remplies ?) then (non)
+    :Afficher message d'erreur;
+    :Expliquer le changement de situation;
+    stop
+  else (oui)
+  endif
+
+  :Enregistrer l'inscription;
+  note right
+    **Données enregistrées :**
+    - ID événement et utilisateur
+    - Date d'inscription
+    - Statut : INSCRIT
+    - Commentaire (si fourni)
+    - Horodatage précis
+  end note
+
+  :Décrémenter le nombre de places disponibles;
+
+  :Enregistrer l'historique;
+  note right
+    **Historique inclut :**
+    - Action : Inscription événement
+    - Utilisateur inscrit
+    - Événement concerné
+    - Horodatage
+  end note
+
+  :Envoyer confirmation par email (optionnel);
+  note right
+    **Email de confirmation :**
+    - Détails de l'événement
+    - Informations pratiques
+    - Lien d'annulation
+    - Contact organisateur
+  end note
+
+  :Afficher confirmation d'inscription;
+}
+
+partition "Utilisateur" {
+  :Recevoir confirmation visuelle;
+  note right
+    **Confirmation inclut :**
+    - Numéro d'inscription
+    - Récapitulatif de l'événement
+    - Actions possibles (annulation, modification)
+    - Informations de contact
+  end note
+
+  :Accéder à "Mes inscriptions";
+}
+
+note bottom
+  **Post-conditions :**
+  - Inscription enregistrée avec statut INSCRIT
+  - Places disponibles mises à jour
+  - Utilisateur peut gérer son inscription
+  - Historique complet conservé
+end note
+
+stop
+
+@enduml

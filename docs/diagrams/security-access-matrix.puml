@@ -1,0 +1,117 @@
+@startuml security-access-matrix
+!theme plain
+title Matrice des droits d'accès - ASHS Alumni
+
+!define ALLOWED <color:green><b>✓</b></color>
+!define DENIED <color:red><b>✗</b></color>
+!define PARTIAL <color:orange><b>◐</b></color>
+
+package "Acteurs" {
+  actor "Visiteur" as visiteur
+  actor "Utilisateur\nAuthentifié" as user
+  actor "Administrateur" as admin
+}
+
+package "Fonctionnalités" {
+  usecase "Consulter événements publics" as UC1
+  usecase "S'inscrire spontanément" as UC2
+  usecase "Se connecter" as UC3
+  usecase "Consulter son profil" as UC4
+  usecase "Modifier son contact" as UC5
+  usecase "Créer un contact" as UC6
+  usecase "Modifier contact en attente" as UC7
+  usecase "Modifier tout contact" as UC8
+  usecase "Gérer les statuts" as UC9
+  usecase "Créer des événements" as UC10
+  usecase "Gérer les inscriptions" as UC11
+  usecase "Accéder aux historiques" as UC12
+  usecase "Gérer les utilisateurs" as UC13
+  usecase "S'inscrire aux événements" as UC14
+  usecase "Consulter contacts validés" as UC15
+}
+
+' Relations Visiteur
+visiteur --> UC1 : ALLOWED
+visiteur --> UC2 : ALLOWED
+visiteur --> UC3 : DENIED
+visiteur --> UC4 : DENIED
+visiteur --> UC5 : DENIED
+visiteur --> UC6 : DENIED
+visiteur --> UC7 : DENIED
+visiteur --> UC8 : DENIED
+visiteur --> UC9 : DENIED
+visiteur --> UC10 : DENIED
+visiteur --> UC11 : DENIED
+visiteur --> UC12 : DENIED
+visiteur --> UC13 : DENIED
+visiteur --> UC14 : DENIED
+visiteur --> UC15 : DENIED
+
+' Relations Utilisateur
+user --> UC1 : ALLOWED
+user --> UC2 : DENIED
+user --> UC3 : ALLOWED
+user --> UC4 : ALLOWED
+user --> UC5 : ALLOWED
+user --> UC6 : ALLOWED
+user --> UC7 : ALLOWED
+user --> UC8 : DENIED
+user --> UC9 : DENIED
+user --> UC10 : DENIED
+user --> UC11 : DENIED
+user --> UC12 : DENIED
+user --> UC13 : DENIED
+user --> UC14 : ALLOWED
+user --> UC15 : ALLOWED
+
+' Relations Administrateur
+admin --> UC1 : ALLOWED
+admin --> UC2 : DENIED
+admin --> UC3 : ALLOWED
+admin --> UC4 : ALLOWED
+admin --> UC5 : ALLOWED
+admin --> UC6 : ALLOWED
+admin --> UC7 : ALLOWED
+admin --> UC8 : ALLOWED
+admin --> UC9 : ALLOWED
+admin --> UC10 : ALLOWED
+admin --> UC11 : ALLOWED
+admin --> UC12 : ALLOWED
+admin --> UC13 : ALLOWED
+admin --> UC14 : ALLOWED
+admin --> UC15 : ALLOWED
+
+note right of visiteur
+  <b>Visiteur non authentifié :</b>
+  • Accès limité aux informations publiques
+  • Peut s'inscrire spontanément
+  • Doit se connecter pour les autres actions
+end note
+
+note right of user
+  <b>Utilisateur authentifié :</b>
+  • Doit avoir un contact validé associé
+  • Peut modifier son propre contact
+  • Peut modifier les contacts "en attente"
+  • Accès aux fonctionnalités principales
+end note
+
+note right of admin
+  <b>Administrateur :</b>
+  • Tous les droits sur le système
+  • Peut modifier tous les contacts
+  • Gère les événements et utilisateurs
+  • Accès aux historiques et audits
+end note
+
+note as N1
+  <b>Règles spéciales :</b>
+  • Un utilisateur ne peut s'inscrire aux événements
+    que si son contact est validé
+  • Les numéros de téléphone sont partiellement
+    masqués pour tous (sauf admin)
+  • L'historique des modifications est tracé
+    pour toutes les actions
+end note
+
+@enduml

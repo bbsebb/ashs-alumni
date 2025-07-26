@@ -1,0 +1,183 @@
+@startuml Fonctionnalité - Validation de contact et inscription utilisateur
+
+title Fonctionnalité : Validation de contact et inscription utilisateur
+skinparam backgroundColor #FAFAFA
+skinparam activity {
+    BackgroundColor #FCE4EC
+    BorderColor #C2185B
+    FontColor #880E4F
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+note top
+  **Description :** Processus intégré de validation d'un contact via SMS incluant l'inscription utilisateur
+  **Acteurs :** Contact externe, Système, Administrateur (validation alternative)
+  **Important :** Contact devient "Validé" UNIQUEMENT après création et liaison du compte utilisateur
+end note
+
+start
+
+if (Méthode de validation ?) then (Via SMS)
+  partition "Contact externe" {
+    :Cliquer sur le lien de validation SMS;
+    note right
+      **Pré-conditions :**
+      - Contact avec statut "En attente"
+      - Token de validation valide (30 jours)
+      - Lien reçu par SMS
+    end note
+  }
+  
+  partition "Système" {
+    :Vérifier la validité du token;
+    
+    if (Token valide et non expiré ?) then (non)
+      :Afficher erreur "Lien expiré ou invalide";
+      :Proposer de demander un nouveau lien;
+      stop
+    else (oui)
+    endif
+    
+    :Afficher les informations du contact;
+    note right
+      **Informations pré-remplies :**
+      - Nom, prénom, email
+      - Date de naissance
+      - Rôles dans l'équipe
+    end note
+  }
+  
+  partition "Contact externe" {
+    :Vérifier et corriger les informations si nécessaire;
+    :Saisir les informations de connexion;
+    note right
+      **Informations de connexion :**
+      - Mot de passe (8 caractères min, complexité)
+      - Confirmation du mot de passe
+      - Acceptation des conditions d'utilisation
+    end note
+  }
+  
+  partition "Système" {
+    :Valider les données saisies;
+    
+    if (Données valides ?) then (non)
+      :Afficher messages d'erreur détaillés;
+      partition "Contact externe" {
+        :Corriger les données;
+      }
+    else (oui)
+    endif
+    
+    if (Informations contact modifiées ?) then (oui)
+      :Vérifier l'absence de nouveaux doublons;
+      
+      if (Doublon détecté ?) then (oui)
+        :Afficher erreur de doublon;
+        :Proposer de contacter l'administrateur;
+        stop
+      else (non)
+      endif
+    else (non)
+    endif
+  }
+
+else (Via Admin)
+  partition "Administrateur" {
+    :Accéder à la fiche d'un contact "En attente";
+    :Valider manuellement le contact;
+    note right
+      **Validation administrative :**
+      - Contact passe directement à "Validé"
+      - Pas de création de compte automatique
+      - Processus séparé pour création compte
+    end note
+  }
+  
+  partition "Système" {
+    :Passer le contact au statut "Validé";
+    :Enregistrer l'historique de validation admin;
+  }
+  stop
+endif
+
+partition "Système" {
+  :Créer le compte utilisateur;
+  note right
+    **Création du compte :**
+    - Email comme identifiant unique
+    - Mot de passe hashé (bcrypt/argon2)
+    - Rôle par défaut : USER
+    - Statut : ACTIF
+  end note
+
+  if (Création compte réussie ?) then (non)
+    :Afficher erreur technique;
+    :Enregistrer l'erreur dans les logs;
+    stop
+  else (oui)
+  endif
+
+  :Établir l'association contact-utilisateur;
+  note right
+    **Association 1:1 obligatoire :**
+    - Contact.id ↔ Utilisateur.contact_id
+    - Relation unique et permanente
+    - Vérification de l'intégrité
+  end note
+
+  if (Association réussie ?) then (non)
+    :Supprimer le compte utilisateur créé;
+    :Afficher erreur technique;
+    stop
+  else (oui)
+  endif
+
+  :Marquer le token comme utilisé;
+  :Passer le contact au statut "Validé";
+  note right
+    **IMPORTANT :** Le contact devient "Validé"
+    UNIQUEMENT après la création et liaison
+    réussie du compte utilisateur
+  end note
+
+  :Enregistrer l'historique complet;
+  note right
+    **Historique inclut :**
+    - Validation du contact
+    - Création du compte utilisateur
+    - Association contact-utilisateur
+    - Changement de statut vers "Validé"
+  end note
+
+  :Créer session utilisateur automatiquement;
+  note right
+    **Session automatique :**
+    - Token JWT généré
+    - Utilisateur connecté immédiatement
+    - Redirection vers tableau de bord
+  end note
+
+  :Envoyer email de confirmation (optionnel);
+}
+
+partition "Contact externe devenu Utilisateur" {
+  :Accéder au tableau de bord utilisateur;
+  :Découvrir les fonctionnalités disponibles;
+}
+
+note bottom
+  **Post-conditions :**
+  - Contact avec statut "Validé"
+  - Compte utilisateur actif et associé
+  - Session utilisateur créée
+  - Possibilité de s'inscrire aux événements
+end note
+
+stop
+
+@enduml
