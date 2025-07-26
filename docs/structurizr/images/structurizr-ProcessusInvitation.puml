@@ -1,0 +1,80 @@
+@startuml
+set separator none
+title Processus d'invitation et validation
+
+top to bottom direction
+skinparam ranksep 60
+skinparam nodesep 30
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+}
+
+hide stereotype
+
+skinparam person<<AncienActuelJoueur>> {
+  BackgroundColor #08427b
+  FontColor #ffffff
+  BorderColor #052e56
+  shadowing false
+}
+skinparam rectangle<<ASHSAlumni.GestiondesContacts>> {
+  BackgroundColor #438dd5
+  FontColor #ffffff
+  BorderColor #2e6295
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<ASHSAlumni.GestiondesUtilisateurs>> {
+  BackgroundColor #438dd5
+  FontColor #ffffff
+  BorderColor #2e6295
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<ASHSAlumni.Historisation>> {
+  BackgroundColor #438dd5
+  FontColor #ffffff
+  BorderColor #2e6295
+  roundCorner 20
+  shadowing false
+}
+skinparam person<<InvitéInscritSpontané>> {
+  BackgroundColor #08427b
+  FontColor #ffffff
+  BorderColor #052e56
+  shadowing false
+}
+skinparam rectangle<<ServiceSMS>> {
+  BackgroundColor #999999
+  FontColor #ffffff
+  BorderColor #6b6b6b
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<ASHSAlumni>> {
+  BorderColor #0b4884
+  FontColor #0b4884
+  shadowing false
+}
+
+rectangle "ASHS Alumni\n<size:10>[Software System]</size>" <<ASHSAlumni>> {
+  rectangle "==Gestion des Utilisateurs\n<size:10>[Container: Fonctionnel]</size>\n\nEspace de gestion des comptes d'accès et authentification" <<ASHSAlumni.GestiondesUtilisateurs>> as ASHSAlumni.GestiondesUtilisateurs
+  rectangle "==Historisation\n<size:10>[Container: Fonctionnel]</size>\n\nEspace de traçabilité et conservation des historiques" <<ASHSAlumni.Historisation>> as ASHSAlumni.Historisation
+  rectangle "==Gestion des Contacts\n<size:10>[Container: Fonctionnel]</size>\n\nEspace de gestion des informations personnelles et statuts des contacts" <<ASHSAlumni.GestiondesContacts>> as ASHSAlumni.GestiondesContacts
+}
+
+person "==Ancien/Actuel Joueur\n<size:10>[Person]</size>\n\nMembre des équipes 1 de l'ASHS souhaitant participer aux retrouvailles" <<AncienActuelJoueur>> as AncienActuelJoueur
+person "==Invité/Inscrit Spontané\n<size:10>[Person]</size>\n\nPersonne invitée ou s'inscrivant spontanément" <<InvitéInscritSpontané>> as InvitéInscritSpontané
+rectangle "==Service SMS\n<size:10>[Software System]</size>\n\nService externe d'envoi de SMS pour les invitations" <<ServiceSMS>> as ServiceSMS
+
+AncienActuelJoueur -[#707070,thickness=2]-> ASHSAlumni.GestiondesContacts : "<color:#707070>1. 1. Ajoute un nouveau contact"
+ASHSAlumni.GestiondesContacts -[#707070,thickness=2]-> ASHSAlumni.GestiondesContacts : "<color:#707070>2. 2. Vérifie les doublons"
+ASHSAlumni.GestiondesContacts -[#707070,thickness=2]-> ServiceSMS : "<color:#707070>3. 3. Envoie SMS d'invitation (si téléphone valide)"
+InvitéInscritSpontané -[#707070,thickness=2]-> ASHSAlumni.GestiondesContacts : "<color:#707070>4. 4. Valide son contact via lien SMS"
+ASHSAlumni.GestiondesUtilisateurs <-[#707070,thickness=2]- ASHSAlumni.GestiondesContacts : "<color:#707070>5. 5. Création du compte utilisateur"
+ASHSAlumni.Historisation -[#707070,thickness=2]-> ASHSAlumni.GestiondesContacts : "<color:#707070>6. 6. Enregistre l'historique"
+@enduml

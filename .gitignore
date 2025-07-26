@@ -185,3 +185,4 @@ coverage/
 # Documentation build
 docs/_build/
 site/
+/docs/structurizr/dsl/.structurizr/
