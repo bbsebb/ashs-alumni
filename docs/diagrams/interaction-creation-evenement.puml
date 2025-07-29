@@ -1,0 +1,253 @@
+@startuml Diagramme d'interaction - Création d'événement
+
+title Diagramme d'interaction : Création d'événement
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Administrateur" as Admin
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nÉvénement" as EventController
+participant "Service\nAutorisation" as AuthService
+participant "Service\nValidation" as Validator
+participant "Service\nÉvénement" as EventService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Accès à la création d'événement ==
+
+Admin -> UI : Accéder à la gestion des événements
+activate UI
+UI -> EventController : Demander page création événement
+activate EventController
+
+EventController -> AuthService : Vérifier droits administrateur
+activate AuthService
+AuthService -> DB : Vérifier profil utilisateur
+activate DB
+DB -> AuthService : Profil utilisateur
+deactivate DB
+
+alt Utilisateur non administrateur
+    AuthService -> EventController : Accès refusé
+    EventController -> UI : Erreur d'autorisation
+    UI -> Admin : Message d'accès refusé
+    deactivate EventController
+    deactivate UI
+    deactivate AuthService
+end
+
+AuthService -> EventController : Accès autorisé
+deactivate AuthService
+
+EventController -> UI : Formulaire de création événement
+UI -> Admin : Afficher formulaire vide
+deactivate EventController
+
+== Saisie des informations de l'événement ==
+
+Admin -> UI : Saisir informations événement
+note right of Admin
+    **Informations saisies :**
+    - Titre (obligatoire)
+    - Description
+    - Date et heure (obligatoire)
+    - Lieu (obligatoire)
+    - Nombre de places max (optionnel)
+    - Date limite d'inscription
+    - Statut initial (Brouillon/Ouvert)
+end note
+
+UI -> EventController : Soumettre données événement
+activate EventController
+
+== Validation des données ==
+
+EventController -> Validator : Valider données événement
+activate Validator
+Validator -> Validator : Vérifier titre (obligatoire, 1-100 car.)
+Validator -> Validator : Vérifier date événement (future)
+Validator -> Validator : Vérifier lieu (obligatoire, 1-255 car.)
+Validator -> Validator : Vérifier places max (si renseigné, > 0)
+Validator -> Validator : Vérifier date limite inscription (avant date événement)
+
+alt Données invalides
+    Validator -> EventController : Erreurs de validation
+    EventController -> UI : Messages d'erreur
+    UI -> Admin : Afficher erreurs
+    Admin -> UI : Corriger données
+    UI -> EventController : Soumettre corrections
+    EventController -> Validator : Revalider
+end
+
+Validator -> EventController : Données valides
+deactivate Validator
+
+== Vérification des conflits ==
+
+EventController -> EventService : Vérifier conflits potentiels
+activate EventService
+EventService -> DB : Rechercher événements à la même date/lieu
+activate DB
+DB -> EventService : Événements existants
+deactivate DB
+
+alt Conflit détecté
+    EventService -> EventController : Conflit trouvé
+    EventController -> UI : Avertissement conflit
+    UI -> Admin : Afficher avertissement + options
+    Admin -> UI : Confirmer ou modifier
+    
+    alt Admin annule
+        UI -> EventController : Annulation création
+        EventController -> UI : Création annulée
+        UI -> Admin : Retour au formulaire
+        deactivate EventController
+        deactivate UI
+        deactivate EventService
+    else Admin confirme
+        UI -> EventController : Confirmation malgré conflit
+    end
+end
+
+EventService -> EventController : Aucun conflit ou confirmé
+deactivate EventService
+
+== Création de l'événement ==
+
+EventController -> EventService : Créer nouvel événement
+activate EventService
+EventService -> DB : Insérer événement
+activate DB
+DB -> EventService : Événement créé avec ID
+deactivate DB
+
+EventService -> History : Enregistrer création événement
+activate History
+History -> DB : Insérer historique création
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+EventService -> EventController : Événement créé avec succès
+deactivate EventService
+
+== Gestion du statut initial ==
+
+alt Statut = "Ouvert"
+    EventController -> EventService : Publier événement
+    activate EventService
+    EventService -> DB : Mettre à jour statut à OUVERT
+    activate DB
+    DB -> EventService : Statut mis à jour
+    deactivate DB
+    
+    EventService -> History : Enregistrer publication
+    activate History
+    History -> DB : Insérer historique publication
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    
+    EventService -> EventController : Événement publié
+    deactivate EventService
+    
+else Statut = "Brouillon"
+    EventController -> EventController : Événement reste en brouillon
+    note right
+        **Brouillon :**
+        - Visible uniquement par les admins
+        - Peut être modifié librement
+        - Doit être publié pour ouvrir inscriptions
+    end note
+end
+
+== Confirmation et actions post-création ==
+
+EventController -> UI : Confirmation création + détails événement
+deactivate EventController
+UI -> Admin : Afficher confirmation avec options
+note right of UI
+    **Options disponibles :**
+    - Modifier l'événement
+    - Publier (si brouillon)
+    - Créer un autre événement
+    - Voir liste des événements
+end note
+
+== Actions optionnelles post-création ==
+
+alt Admin choisit de modifier
+    Admin -> UI : Demander modification
+    UI -> EventController : Rediriger vers modification
+    activate EventController
+    EventController -> UI : Formulaire modification pré-rempli
+    UI -> Admin : Afficher formulaire modifiable
+    deactivate EventController
+    
+else Admin choisit de publier (si brouillon)
+    Admin -> UI : Demander publication
+    UI -> EventController : Publier événement
+    activate EventController
+    
+    EventController -> EventService : Changer statut à OUVERT
+    activate EventService
+    EventService -> DB : Mettre à jour statut
+    activate DB
+    DB -> EventService : Statut mis à jour
+    deactivate DB
+    
+    EventService -> History : Enregistrer publication
+    activate History
+    History -> DB : Insérer historique
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    
+    EventService -> EventController : Événement publié
+    deactivate EventService
+    
+    EventController -> UI : Confirmation publication
+    deactivate EventController
+    UI -> Admin : Événement maintenant ouvert aux inscriptions
+    
+else Admin termine
+    Admin -> UI : Retour à la liste des événements
+    UI -> EventController : Afficher liste événements
+    activate EventController
+    EventController -> EventService : Récupérer tous les événements
+    activate EventService
+    EventService -> DB : Sélectionner événements
+    activate DB
+    DB -> EventService : Liste événements
+    deactivate DB
+    EventService -> EventController : Événements récupérés
+    deactivate EventService
+    EventController -> UI : Liste complète
+    deactivate EventController
+    UI -> Admin : Afficher tableau de bord événements
+end
+
+deactivate UI
+
+note over Admin, History
+    **Post-conditions :**
+    - Événement créé avec statut approprié
+    - Historique de création enregistré
+    - Événement visible selon son statut
+    - Options de gestion disponibles
+    - Possibilité de publication immédiate ou différée
+end note
+
+@enduml

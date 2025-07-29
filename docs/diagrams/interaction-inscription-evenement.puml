@@ -1,0 +1,301 @@
+@startuml Diagramme d'interaction - Inscription à un événement
+
+title Diagramme d'interaction : Inscription à un événement
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Utilisateur\nAuthentifié" as User
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nÉvénement" as EventController
+participant "Service\nAutorisation" as AuthService
+participant "Service\nÉvénement" as EventService
+participant "Service\nInscription" as RegistrationService
+participant "Service\nUtilisateur" as UserService
+participant "Service\nContact" as ContactService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Consultation des événements ==
+
+User -> UI : Accéder à la liste des événements
+activate UI
+UI -> EventController : Demander événements disponibles
+activate EventController
+
+EventController -> EventService : Récupérer événements ouverts
+activate EventService
+EventService -> DB : Sélectionner événements avec statut OUVERT
+activate DB
+DB -> EventService : Liste événements ouverts
+deactivate DB
+EventService -> EventController : Événements disponibles
+deactivate EventService
+
+EventController -> UI : Liste événements avec détails
+UI -> User : Afficher événements disponibles
+deactivate EventController
+
+== Sélection et consultation d'un événement ==
+
+User -> UI : Sélectionner un événement
+UI -> EventController : Demander détails événement
+activate EventController
+
+EventController -> EventService : Récupérer détails complets
+activate EventService
+EventService -> DB : Sélectionner événement par ID
+activate DB
+DB -> EventService : Détails événement
+deactivate DB
+
+EventService -> RegistrationService : Compter inscriptions actuelles
+activate RegistrationService
+RegistrationService -> DB : Compter inscriptions pour cet événement
+activate DB
+DB -> RegistrationService : Nombre d'inscriptions
+deactivate DB
+RegistrationService -> EventService : Places occupées
+deactivate RegistrationService
+
+EventService -> EventController : Événement + disponibilité
+deactivate EventService
+
+EventController -> UI : Détails événement + statut places
+UI -> User : Afficher détails avec bouton inscription
+deactivate EventController
+
+== Vérifications préalables à l'inscription ==
+
+User -> UI : Cliquer "S'inscrire"
+UI -> EventController : Demander inscription
+activate EventController
+
+EventController -> AuthService : Vérifier authentification
+activate AuthService
+AuthService -> AuthService : Vérifier session utilisateur
+
+alt Utilisateur non connecté
+    AuthService -> EventController : Non authentifié
+    EventController -> UI : Redirection connexion
+    UI -> User : Rediriger vers page de connexion
+    deactivate EventController
+    deactivate UI
+    deactivate AuthService
+end
+
+AuthService -> EventController : Utilisateur authentifié
+deactivate AuthService
+
+EventController -> UserService : Récupérer profil utilisateur
+activate UserService
+UserService -> DB : Sélectionner utilisateur et contact associé
+activate DB
+DB -> UserService : Données utilisateur + contact
+deactivate DB
+UserService -> EventController : Profil complet
+deactivate UserService
+
+EventController -> ContactService : Vérifier statut contact
+activate ContactService
+ContactService -> ContactService : Vérifier statut VALIDE
+
+alt Contact non validé
+    ContactService -> EventController : Contact non validé
+    EventController -> UI : Erreur statut contact
+    UI -> User : Message "Contact doit être validé"
+    deactivate EventController
+    deactivate UI
+    deactivate ContactService
+end
+
+ContactService -> EventController : Contact validé
+deactivate ContactService
+
+== Vérification de l'événement et des places ==
+
+EventController -> EventService : Vérifier disponibilité événement
+activate EventService
+EventService -> DB : Récupérer événement actuel
+activate DB
+DB -> EventService : Données événement
+deactivate DB
+
+alt Événement fermé ou annulé
+    EventService -> EventController : Événement non disponible
+    EventController -> UI : Erreur disponibilité
+    UI -> User : Message "Inscriptions fermées"
+    deactivate EventController
+    deactivate UI
+    deactivate EventService
+end
+
+alt Date limite dépassée
+    EventService -> EventService : Vérifier date limite inscription
+    EventService -> EventController : Date limite dépassée
+    EventController -> UI : Erreur date limite
+    UI -> User : Message "Date limite dépassée"
+    deactivate EventController
+    deactivate UI
+    deactivate EventService
+end
+
+EventService -> RegistrationService : Vérifier places disponibles
+activate RegistrationService
+RegistrationService -> DB : Compter inscriptions actuelles
+activate DB
+DB -> RegistrationService : Nombre inscriptions
+deactivate DB
+
+alt Places épuisées
+    RegistrationService -> EventService : Aucune place disponible
+    EventService -> EventController : Événement complet
+    EventController -> UI : Erreur places
+    UI -> User : Message "Événement complet"
+    deactivate RegistrationService
+    deactivate EventService
+    deactivate EventController
+    deactivate UI
+end
+
+RegistrationService -> EventService : Places disponibles
+deactivate RegistrationService
+EventService -> EventController : Inscription possible
+deactivate EventService
+
+== Vérification inscription existante ==
+
+EventController -> RegistrationService : Vérifier inscription existante
+activate RegistrationService
+RegistrationService -> DB : Rechercher inscription utilisateur/événement
+activate DB
+DB -> RegistrationService : Résultat recherche
+deactivate DB
+
+alt Déjà inscrit
+    RegistrationService -> EventController : Inscription existante
+    EventController -> UI : Information déjà inscrit
+    UI -> User : Message "Déjà inscrit" + détails
+    deactivate RegistrationService
+    deactivate EventController
+    deactivate UI
+end
+
+RegistrationService -> EventController : Pas d'inscription existante
+deactivate RegistrationService
+
+== Formulaire d'inscription ==
+
+EventController -> UI : Afficher formulaire inscription
+UI -> User : Formulaire avec commentaire optionnel
+deactivate EventController
+
+User -> UI : Saisir commentaire (optionnel) + confirmer
+UI -> EventController : Soumettre inscription
+activate EventController
+
+== Enregistrement de l'inscription ==
+
+EventController -> RegistrationService : Créer inscription
+activate RegistrationService
+RegistrationService -> DB : Insérer nouvelle inscription
+activate DB
+DB -> RegistrationService : Inscription créée avec ID
+deactivate DB
+
+RegistrationService -> History : Enregistrer inscription
+activate History
+History -> DB : Insérer historique inscription
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+RegistrationService -> EventController : Inscription réussie
+deactivate RegistrationService
+
+== Confirmation et notification ==
+
+EventController -> UI : Confirmation inscription
+deactivate EventController
+UI -> User : Message de confirmation + détails
+note right of UI
+    **Confirmation contient :**
+    - Nom de l'événement
+    - Date et lieu
+    - Numéro d'inscription
+    - Instructions éventuelles
+    - Lien pour annuler inscription
+end note
+
+== Gestion de l'annulation d'inscription ==
+
+alt Utilisateur souhaite annuler
+    User -> UI : Cliquer "Annuler inscription"
+    UI -> EventController : Demander annulation
+    activate EventController
+    
+    EventController -> RegistrationService : Annuler inscription
+    activate RegistrationService
+    RegistrationService -> DB : Mettre à jour statut à ANNULE
+    activate DB
+    DB -> RegistrationService : Inscription annulée
+    deactivate DB
+    
+    RegistrationService -> History : Enregistrer annulation
+    activate History
+    History -> DB : Insérer historique annulation
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    
+    RegistrationService -> EventController : Annulation confirmée
+    deactivate RegistrationService
+    
+    EventController -> UI : Confirmation annulation
+    deactivate EventController
+    UI -> User : Message "Inscription annulée"
+end
+
+== Consultation des inscriptions utilisateur ==
+
+alt Utilisateur consulte ses inscriptions
+    User -> UI : Accéder "Mes inscriptions"
+    UI -> EventController : Demander inscriptions utilisateur
+    activate EventController
+    
+    EventController -> RegistrationService : Récupérer inscriptions utilisateur
+    activate RegistrationService
+    RegistrationService -> DB : Sélectionner inscriptions par utilisateur
+    activate DB
+    DB -> RegistrationService : Liste inscriptions
+    deactivate DB
+    RegistrationService -> EventController : Inscriptions récupérées
+    deactivate RegistrationService
+    
+    EventController -> UI : Liste inscriptions avec détails
+    deactivate EventController
+    UI -> User : Afficher tableau inscriptions
+end
+
+deactivate UI
+
+note over User, History
+    **Post-conditions :**
+    - Inscription enregistrée si toutes conditions remplies
+    - Historique complet de l'inscription
+    - Confirmation envoyée à l'utilisateur
+    - Place réservée dans l'événement
+    - Possibilité d'annulation ultérieure
+end note
+
+@enduml

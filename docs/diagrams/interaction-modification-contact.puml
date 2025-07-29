@@ -1,0 +1,183 @@
+@startuml Diagramme d'interaction - Modification d'un contact
+
+title Diagramme d'interaction : Modification d'un contact
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Utilisateur\nAuthentifié" as User
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nContact" as Controller
+participant "Service\nAutorisation" as AuthService
+participant "Service\nValidation" as Validator
+participant "Service\nContact" as ContactService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Accès à la modification ==
+
+User -> UI : Accéder à la fiche contact
+activate UI
+UI -> Controller : Demander fiche contact (ID)
+activate Controller
+
+Controller -> AuthService : Vérifier droits modification
+activate AuthService
+AuthService -> DB : Récupérer profil utilisateur
+activate DB
+DB -> AuthService : Profil utilisateur
+deactivate DB
+
+alt Utilisateur standard
+    AuthService -> DB : Vérifier si contact associé ou en attente
+    activate DB
+    DB -> AuthService : Statut autorisation
+    deactivate DB
+else Administrateur
+    AuthService -> AuthService : Autorisation complète
+end
+
+alt Accès refusé
+    AuthService -> Controller : Accès non autorisé
+    Controller -> UI : Erreur d'autorisation
+    UI -> User : Message d'accès refusé
+    deactivate Controller
+    deactivate UI
+    deactivate AuthService
+end
+
+AuthService -> Controller : Accès autorisé
+deactivate AuthService
+
+Controller -> ContactService : Récupérer données contact
+activate ContactService
+ContactService -> DB : Sélectionner contact par ID
+activate DB
+DB -> ContactService : Données contact
+deactivate DB
+ContactService -> Controller : Contact trouvé
+deactivate ContactService
+
+Controller -> UI : Données contact + droits modification
+UI -> User : Afficher formulaire pré-rempli
+deactivate Controller
+
+== Modification des données ==
+
+User -> UI : Modifier champs autorisés
+UI -> Controller : Soumettre modifications
+activate Controller
+
+Controller -> Validator : Valider nouvelles données
+activate Validator
+Validator -> Validator : Vérifier formats (nom, prénom, email, etc.)
+Validator -> Validator : Vérifier contraintes métier
+
+alt Données invalides
+    Validator -> Controller : Erreurs de validation
+    Controller -> UI : Messages d'erreur
+    UI -> User : Afficher erreurs
+    User -> UI : Corriger données
+    UI -> Controller : Soumettre corrections
+    Controller -> Validator : Revalider
+end
+
+Validator -> Controller : Données valides
+deactivate Validator
+
+== Vérification des doublons (si email/téléphone modifié) ==
+
+alt Email ou téléphone modifié
+    Controller -> ContactService : Vérifier nouveaux doublons
+    activate ContactService
+    ContactService -> DB : Rechercher doublons
+    activate DB
+    DB -> ContactService : Résultat recherche
+    deactivate DB
+    
+    alt Doublon détecté
+        ContactService -> Controller : Doublon trouvé
+        Controller -> UI : Erreur doublon
+        UI -> User : Message d'erreur
+        User -> UI : Annuler ou corriger
+        UI -> Controller : Action utilisateur
+        deactivate ContactService
+        deactivate Controller
+    end
+    
+    ContactService -> Controller : Aucun doublon
+    deactivate ContactService
+end
+
+== Sauvegarde des modifications ==
+
+Controller -> ContactService : Mettre à jour contact
+activate ContactService
+
+ContactService -> DB : Récupérer valeurs actuelles
+activate DB
+DB -> ContactService : Valeurs avant modification
+deactivate DB
+
+ContactService -> DB : Mettre à jour contact
+activate DB
+DB -> ContactService : Confirmation mise à jour
+deactivate DB
+
+ContactService -> History : Enregistrer historique modification
+activate History
+History -> DB : Insérer historique\n(valeurs avant/après, champs modifiés)
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+== Gestion des changements de statut (Admin uniquement) ==
+
+alt Administrateur ET changement de statut
+    ContactService -> ContactService : Traiter changement statut
+    
+    alt Passage à "Validé"
+        ContactService -> ContactService : Vérifier conditions validation
+    else Passage à "Non sollicité"
+        ContactService -> ContactService : Marquer comme non sollicité
+    else Passage à "Non joignable"
+        ContactService -> ContactService : Marquer comme non joignable
+    end
+    
+    ContactService -> History : Enregistrer changement statut
+    activate History
+    History -> DB : Insérer historique statut
+    activate DB
+    DB -> History : Historique statut enregistré
+    deactivate DB
+    deactivate History
+end
+
+ContactService -> Controller : Modification réussie
+deactivate ContactService
+
+== Confirmation ==
+
+Controller -> UI : Confirmation modification
+deactivate Controller
+UI -> User : Afficher confirmation + nouvelles données
+deactivate UI
+
+note over User, History
+    **Post-conditions :**
+    - Contact mis à jour selon droits
+    - Historique complet enregistré
+    - Changements de statut traités
+    - Vérifications de doublons effectuées
+end note
+
+@enduml

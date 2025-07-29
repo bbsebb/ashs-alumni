@@ -1,0 +1,149 @@
+@startuml Diagramme d'interaction - Création d'un contact
+
+title Diagramme d'interaction : Création d'un contact
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Utilisateur\nAuthentifié" as User
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nContact" as Controller
+participant "Service\nValidation" as Validator
+participant "Service\nContact" as ContactService
+participant "Base de\nDonnées" as DB
+participant "Service\nSMS" as SMS
+participant "Service\nHistorique" as History
+
+== Saisie des informations ==
+
+User -> UI : Accéder au formulaire de création
+activate UI
+UI -> User : Afficher formulaire vide
+User -> UI : Saisir informations contact\n(nom, prénom, genre, date naissance,\nemail, téléphone, rôles)
+UI -> Controller : Soumettre données contact
+activate Controller
+
+== Validation des données ==
+
+Controller -> Validator : Valider format des données
+activate Validator
+Validator -> Validator : Vérifier nom/prénom (2-50 car.)
+Validator -> Validator : Vérifier format email
+Validator -> Validator : Vérifier format téléphone
+Validator -> Validator : Vérifier date naissance (16-100 ans)
+Validator -> Validator : Vérifier rôles sélectionnés
+
+alt Données invalides
+    Validator -> Controller : Retourner erreurs validation
+    Controller -> UI : Erreurs de validation
+    UI -> User : Afficher messages d'erreur
+    User -> UI : Corriger les données
+    UI -> Controller : Soumettre données corrigées
+    Controller -> Validator : Revalider données
+end
+
+Validator -> Controller : Données valides
+deactivate Validator
+
+== Vérification des doublons ==
+
+Controller -> ContactService : Vérifier doublons
+activate ContactService
+
+alt Téléphone renseigné
+    ContactService -> DB : Rechercher par téléphone
+    activate DB
+    DB -> ContactService : Résultat recherche
+    deactivate DB
+else Pas de téléphone
+    ContactService -> DB : Rechercher par nom/prénom/email
+    activate DB
+    DB -> ContactService : Résultat recherche
+    deactivate DB
+end
+
+alt Doublon détecté
+    ContactService -> Controller : Contact existant trouvé
+    Controller -> UI : Erreur doublon + lien consultation
+    UI -> User : Afficher erreur et proposer consultation
+    User -> UI : Annuler création
+    UI -> Controller : Annulation
+    Controller -> UI : Confirmation annulation
+    UI -> User : Création annulée
+    deactivate Controller
+    deactivate UI
+    deactivate ContactService
+end
+
+ContactService -> Controller : Aucun doublon
+deactivate ContactService
+
+== Création du contact ==
+
+Controller -> ContactService : Créer nouveau contact
+activate ContactService
+
+alt Numéro téléphone valide
+    ContactService -> DB : Insérer contact (statut: EN_ATTENTE)
+    activate DB
+    DB -> ContactService : Contact créé avec ID
+    deactivate DB
+    
+    ContactService -> History : Enregistrer historique création
+    activate History
+    History -> DB : Insérer historique
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    
+    ContactService -> ContactService : Générer token validation
+    ContactService -> SMS : Envoyer invitation SMS
+    activate SMS
+    SMS -> SMS : Composer message avec liens
+    SMS -> SMS : Envoyer SMS au numéro
+    SMS -> ContactService : Confirmation envoi
+    deactivate SMS
+    
+else Numéro invalide ou absent
+    ContactService -> DB : Insérer contact (statut: NON_JOIGNABLE)
+    activate DB
+    DB -> ContactService : Contact créé avec ID
+    deactivate DB
+    
+    ContactService -> History : Enregistrer historique création
+    activate History
+    History -> DB : Insérer historique
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+end
+
+ContactService -> Controller : Contact créé avec succès
+deactivate ContactService
+
+== Confirmation ==
+
+Controller -> UI : Confirmation création
+deactivate Controller
+UI -> User : Afficher confirmation avec détails
+deactivate UI
+
+note over User, SMS
+    **Post-conditions :**
+    - Contact créé avec statut approprié
+    - Historique enregistré
+    - SMS envoyé si téléphone valide
+    - Token généré pour validation
+end note
+
+@enduml

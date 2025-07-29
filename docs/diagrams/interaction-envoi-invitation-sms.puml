@@ -1,0 +1,228 @@
+@startuml Diagramme d'interaction - Envoi d'invitation SMS
+
+title Diagramme d'interaction : Envoi d'invitation SMS
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+participant "Service\nContact" as ContactService
+participant "Service\nValidation" as Validator
+participant "Service\nToken" as TokenService
+participant "Service\nSMS" as SMSService
+participant "Service\nTemplate" as TemplateService
+participant "Base de\nDonnées" as DB
+participant "API SMS\nExterne" as SMSAPI
+participant "Service\nHistorique" as History
+
+== Déclenchement automatique (après création contact) ==
+
+ContactService -> ContactService : Contact créé avec téléphone
+activate ContactService
+
+ContactService -> Validator : Vérifier numéro de téléphone
+activate Validator
+Validator -> Validator : Valider format français\n(0X XX XX XX XX ou +33 X XX XX XX XX)
+
+alt Numéro invalide
+    Validator -> ContactService : Numéro invalide
+    ContactService -> DB : Mettre à jour statut à NON_JOIGNABLE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    ContactService -> History : Enregistrer changement statut
+    activate History
+    History -> DB : Insérer historique
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    deactivate ContactService
+    deactivate Validator
+end
+
+Validator -> ContactService : Numéro valide
+deactivate Validator
+
+== Vérification des limitations ==
+
+ContactService -> SMSService : Vérifier limitations d'envoi
+activate SMSService
+SMSService -> DB : Compter SMS envoyés à ce numéro (24h)
+activate DB
+DB -> SMSService : Nombre de SMS récents
+deactivate DB
+
+alt Limite atteinte (≥1 SMS en 24h)
+    SMSService -> ContactService : Limite d'envoi atteinte
+    ContactService -> History : Enregistrer tentative bloquée
+    activate History
+    History -> DB : Insérer log limitation
+    activate DB
+    DB -> History : Log enregistré
+    deactivate DB
+    deactivate History
+    deactivate SMSService
+    deactivate ContactService
+end
+
+SMSService -> ContactService : Envoi autorisé
+deactivate SMSService
+
+== Génération des tokens ==
+
+ContactService -> TokenService : Générer tokens validation/refus
+activate TokenService
+TokenService -> TokenService : Générer token validation unique
+TokenService -> TokenService : Générer token refus unique
+TokenService -> TokenService : Définir expiration (30 jours)
+
+TokenService -> DB : Enregistrer tokens
+activate DB
+DB -> TokenService : Tokens enregistrés
+deactivate DB
+
+TokenService -> ContactService : Tokens générés
+deactivate TokenService
+
+== Préparation du message SMS ==
+
+ContactService -> TemplateService : Préparer contenu SMS
+activate TemplateService
+TemplateService -> DB : Récupérer données contact (prénom)
+activate DB
+DB -> TemplateService : Données contact
+deactivate DB
+
+TemplateService -> TemplateService : Composer message personnalisé
+note right
+    **Contenu SMS :**
+    Bonjour [Prénom],
+    Vous êtes invité(e) à rejoindre 
+    la communauté ASHS Alumni.
+    Validez : [lien_validation]
+    Refuser : [lien_refus]
+end note
+
+TemplateService -> TemplateService : Générer liens raccourcis sécurisés
+TemplateService -> ContactService : Message SMS prêt
+deactivate TemplateService
+
+== Envoi du SMS ==
+
+ContactService -> SMSService : Envoyer SMS d'invitation
+activate SMSService
+SMSService -> SMSService : Normaliser numéro de téléphone
+SMSService -> SMSService : Valider longueur message (<160 car.)
+
+SMSService -> SMSAPI : Envoyer SMS via API externe
+activate SMSAPI
+SMSAPI -> SMSAPI : Traiter demande d'envoi
+SMSAPI -> SMSAPI : Envoyer SMS au destinataire
+
+alt Erreur d'envoi
+    SMSAPI -> SMSService : Erreur envoi (réseau, numéro invalide, etc.)
+    SMSService -> ContactService : Échec envoi SMS
+    ContactService -> DB : Mettre à jour statut à NON_JOIGNABLE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    ContactService -> History : Enregistrer échec envoi
+    activate History
+    History -> DB : Insérer log échec
+    activate DB
+    DB -> History : Log enregistré
+    deactivate DB
+    deactivate History
+    deactivate SMSAPI
+    deactivate SMSService
+    deactivate ContactService
+end
+
+SMSAPI -> SMSService : SMS envoyé avec succès
+deactivate SMSAPI
+
+SMSService -> ContactService : Confirmation envoi
+deactivate SMSService
+
+== Enregistrement et finalisation ==
+
+ContactService -> DB : Enregistrer envoi SMS
+activate DB
+DB -> ContactService : Envoi enregistré
+deactivate DB
+
+ContactService -> History : Enregistrer envoi d'invitation
+activate History
+History -> DB : Insérer historique envoi
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+ContactService -> DB : Confirmer statut EN_ATTENTE
+activate DB
+DB -> ContactService : Statut confirmé
+deactivate DB
+
+== Envoi manuel par Administrateur ==
+
+participant "Administrateur" as Admin
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nContact" as Controller
+
+Admin -> UI : Sélectionner contact + demander renvoi SMS
+activate UI
+UI -> Controller : Demander renvoi invitation
+activate Controller
+
+Controller -> ContactService : Initier renvoi SMS
+ContactService -> SMSService : Vérifier limitations (même processus)
+activate SMSService
+
+alt Limite atteinte
+    SMSService -> ContactService : Renvoi bloqué
+    ContactService -> Controller : Erreur limitation
+    Controller -> UI : Message d'erreur
+    UI -> Admin : Afficher limitation (24h)
+    deactivate Controller
+    deactivate UI
+    deactivate SMSService
+end
+
+SMSService -> ContactService : Renvoi autorisé
+deactivate SMSService
+
+note over ContactService
+    **Même processus que l'envoi automatique :**
+    - Génération nouveaux tokens
+    - Préparation message
+    - Envoi SMS
+    - Enregistrement historique
+end note
+
+ContactService -> Controller : SMS renvoyé
+Controller -> UI : Confirmation renvoi
+deactivate Controller
+UI -> Admin : Afficher confirmation
+deactivate UI
+
+deactivate ContactService
+
+note over ContactService, History
+    **Post-conditions :**
+    - SMS envoyé si numéro valide et limites respectées
+    - Tokens de validation/refus générés (30 jours)
+    - Contact reste en statut EN_ATTENTE
+    - Historique complet de l'envoi
+    - Limitation : 1 SMS par numéro par 24h
+end note
+
+@enduml

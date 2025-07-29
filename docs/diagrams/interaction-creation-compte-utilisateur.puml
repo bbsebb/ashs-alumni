@@ -1,0 +1,218 @@
+@startuml Diagramme d'interaction - Création de compte utilisateur
+
+title Diagramme d'interaction : Création de compte utilisateur
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Visiteur\n(via SMS)" as Visitor
+actor "Administrateur" as Admin
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nUtilisateur" as UserController
+participant "Contrôleur\nContact" as ContactController
+participant "Service\nValidation" as Validator
+participant "Service\nUtilisateur" as UserService
+participant "Service\nContact" as ContactService
+participant "Service\nSécurité" as SecurityService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Création de compte via SMS (Processus intégré) ==
+
+Visitor -> UI : Cliquer lien validation SMS
+activate UI
+UI -> ContactController : Valider token SMS
+activate ContactController
+
+ContactController -> ContactService : Vérifier token validation
+activate ContactService
+ContactService -> DB : Rechercher token valide
+activate DB
+DB -> ContactService : Token et contact associé
+deactivate DB
+
+alt Token invalide ou expiré
+    ContactService -> ContactController : Token invalide
+    ContactController -> UI : Erreur token
+    UI -> Visitor : Message d'erreur + lien contact
+    deactivate ContactController
+    deactivate UI
+    deactivate ContactService
+end
+
+ContactService -> ContactController : Token valide + données contact
+deactivate ContactService
+ContactController -> UI : Afficher formulaire validation
+UI -> Visitor : Formulaire avec données pré-remplies
+deactivate ContactController
+
+== Validation et correction des informations ==
+
+Visitor -> UI : Confirmer/corriger informations contact
+UI -> ContactController : Soumettre données contact
+activate ContactController
+
+ContactController -> Validator : Valider données contact
+activate Validator
+Validator -> Validator : Vérifier formats et contraintes
+Validator -> ContactController : Données contact validées
+deactivate Validator
+
+ContactController -> ContactService : Mettre à jour contact si modifié
+activate ContactService
+ContactService -> DB : Mettre à jour contact
+activate DB
+DB -> ContactService : Contact mis à jour
+deactivate DB
+ContactService -> ContactController : Contact actualisé
+deactivate ContactService
+
+ContactController -> UI : Demander informations compte utilisateur
+UI -> Visitor : Afficher formulaire création compte
+deactivate ContactController
+
+== Création du compte utilisateur ==
+
+Visitor -> UI : Saisir mot de passe et confirmation
+UI -> UserController : Soumettre données compte
+activate UserController
+
+UserController -> Validator : Valider mot de passe
+activate Validator
+Validator -> Validator : Vérifier complexité mot de passe\n(8 car. min, maj, min, chiffre)
+Validator -> Validator : Vérifier correspondance confirmation
+
+alt Mot de passe invalide
+    Validator -> UserController : Erreurs validation
+    UserController -> UI : Messages d'erreur
+    UI -> Visitor : Afficher erreurs
+    Visitor -> UI : Corriger mot de passe
+    UI -> UserController : Soumettre correction
+    UserController -> Validator : Revalider
+end
+
+Validator -> UserController : Mot de passe valide
+deactivate Validator
+
+UserController -> SecurityService : Hasher mot de passe
+activate SecurityService
+SecurityService -> SecurityService : Générer hash bcrypt (coût 12)
+SecurityService -> UserController : Hash mot de passe
+deactivate SecurityService
+
+UserController -> UserService : Créer compte utilisateur
+activate UserService
+UserService -> DB : Insérer nouvel utilisateur
+activate DB
+DB -> UserService : Utilisateur créé avec ID
+deactivate DB
+
+UserService -> DB : Associer contact-utilisateur (1:1)
+activate DB
+DB -> UserService : Association créée
+deactivate DB
+
+UserService -> ContactService : Mettre à jour statut contact à VALIDE
+activate ContactService
+ContactService -> DB : Mettre à jour statut contact
+activate DB
+DB -> ContactService : Statut mis à jour
+deactivate DB
+ContactService -> UserService : Contact validé
+deactivate ContactService
+
+UserService -> History : Enregistrer création compte
+activate History
+History -> DB : Insérer historique création
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+UserService -> UserController : Compte créé avec succès
+deactivate UserService
+
+== Connexion automatique ==
+
+UserController -> SecurityService : Créer session utilisateur
+activate SecurityService
+SecurityService -> SecurityService : Générer token session
+SecurityService -> DB : Enregistrer session
+activate DB
+DB -> SecurityService : Session enregistrée
+deactivate DB
+SecurityService -> UserController : Session créée
+deactivate SecurityService
+
+UserController -> UI : Connexion réussie + redirection
+deactivate UserController
+UI -> Visitor : Rediriger vers tableau de bord
+deactivate UI
+
+== Création manuelle par Administrateur ==
+
+Admin -> UI : Accéder gestion contacts validés
+activate UI
+UI -> ContactController : Lister contacts validés sans compte
+activate ContactController
+
+ContactController -> ContactService : Récupérer contacts sans utilisateur
+activate ContactService
+ContactService -> DB : Sélectionner contacts VALIDE sans utilisateur
+activate DB
+DB -> ContactService : Liste contacts éligibles
+deactivate DB
+ContactService -> ContactController : Contacts récupérés
+deactivate ContactService
+
+ContactController -> UI : Liste contacts éligibles
+UI -> Admin : Afficher contacts + action création compte
+deactivate ContactController
+
+Admin -> UI : Sélectionner contact + initier création
+UI -> UserController : Demander création compte manuel
+activate UserController
+
+UserController -> UserService : Créer compte avec identifiants temporaires
+activate UserService
+UserService -> SecurityService : Générer mot de passe temporaire
+activate SecurityService
+SecurityService -> SecurityService : Générer mot de passe aléatoire sécurisé
+SecurityService -> UserService : Mot de passe temporaire
+deactivate SecurityService
+
+UserService -> DB : Insérer utilisateur avec mot de passe temporaire
+activate DB
+DB -> UserService : Utilisateur créé
+deactivate DB
+
+UserService -> DB : Associer contact-utilisateur
+activate DB
+DB -> UserService : Association créée
+deactivate DB
+
+UserService -> UserController : Compte créé + identifiants temporaires
+deactivate UserService
+
+UserController -> UI : Confirmation création + identifiants
+deactivate UserController
+UI -> Admin : Afficher identifiants à transmettre
+deactivate UI
+
+note over Visitor, History
+    **Post-conditions :**
+    - Compte utilisateur créé et associé au contact
+    - Contact passe au statut "Validé"
+    - Session créée (via SMS) ou identifiants générés (admin)
+    - Historique complet enregistré
+end note
+
+@enduml

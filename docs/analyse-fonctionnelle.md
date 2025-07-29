@@ -40,11 +40,11 @@ L'application couvre les domaines fonctionnels suivants :
 
 ### 2.1 Vue d'ensemble architecturale
 
-Le diagramme suivant présente l'architecture fonctionnelle globale du système avec les interactions entre modules :
+Le diagramme suivant présente l'architecture fonctionnelle globale du système sous forme de composants et leurs dépendances :
 
 ```plantuml
 @startuml
-!include ../diagrams/module-interactions.puml
+!include ../diagrams/module-components.puml
 @enduml
 ```
 
@@ -107,9 +107,17 @@ MAD → * : Supervision et administration de tous les modules
 
 **Description** : Permet à un utilisateur authentifié de créer un nouveau contact dans le système.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-creation-contact.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-creation-contact.puml
 @enduml
 ```
 
@@ -160,9 +168,17 @@ MAD → * : Supervision et administration de tous les modules
 
 **Description** : Permet la modification des informations d'un contact selon les droits de l'utilisateur.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-modification-contact.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-modification-contact.puml
 @enduml
 ```
 
@@ -194,9 +210,17 @@ MAD → * : Supervision et administration de tous les modules
 
 **Description** : Gestion du cycle de vie des statuts des contacts.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-gestion-statuts.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-gestion-statuts.puml
 @enduml
 ```
 
@@ -220,9 +244,17 @@ MAD → * : Supervision et administration de tous les modules
 
 **Description** : Permet à une personne de créer un compte utilisateur. Ce processus est intégré dans la validation de contact via SMS (voir section 3.3.2) ou peut être effectué par un administrateur pour les contacts déjà validés.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-creation-compte-utilisateur.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-creation-compte-utilisateur.puml
 @enduml
 ```
 
@@ -257,9 +289,17 @@ MAD → * : Supervision et administration de tous les modules
 
 **Description** : Processus de connexion des utilisateurs à l'application.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-authentification.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-authentification.puml
 @enduml
 ```
 
@@ -278,9 +318,17 @@ MAD → * : Supervision et administration de tous les modules
 
 **Description** : Envoi automatique d'un SMS d'invitation lors de la création d'un contact avec numéro valide.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-envoi-invitation-sms.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-envoi-invitation-sms.puml
 @enduml
 ```
 
@@ -306,9 +354,17 @@ Pour refuser : [lien_refus]
 
 **Description** : Processus de validation d'un contact via SMS (incluant l'inscription utilisateur) ou action administrative.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-validation-contact-inscription-utilisateur.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-validation-contact-inscription-utilisateur.puml
 @enduml
 ```
 
@@ -335,9 +391,17 @@ Pour refuser : [lien_refus]
 
 **Description** : Permet aux administrateurs de créer des soirées retrouvailles.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-creation-evenement.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-creation-evenement.puml
 @enduml
 ```
 
@@ -356,9 +420,17 @@ Pour refuser : [lien_refus]
 
 **Description** : Permet aux utilisateurs avec contact validé de s'inscrire à un événement.
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-inscription-evenement.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-inscription-evenement.puml
 @enduml
 ```
 
@@ -383,9 +455,17 @@ Pour refuser : [lien_refus]
 
 **Description** : Permet aux administrateurs de gérer les listes "à ne pas contacter" et "anciens participants".
 
+**Diagramme d'activité** :
 ```plantuml
 @startuml
 !include ../diagrams/functionality-gestion-listes-reference.puml
+@enduml
+```
+
+**Diagramme d'interaction** :
+```plantuml
+@startuml
+!include ../diagrams/interaction-gestion-listes-reference.puml
 @enduml
 ```
 

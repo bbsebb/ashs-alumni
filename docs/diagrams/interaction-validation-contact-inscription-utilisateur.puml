@@ -1,0 +1,285 @@
+@startuml Diagramme d'interaction - Validation de contact et inscription utilisateur
+
+title Diagramme d'interaction : Validation de contact et inscription utilisateur
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Contact\n(via SMS)" as Contact
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nValidation" as ValidationController
+participant "Contrôleur\nUtilisateur" as UserController
+participant "Service\nToken" as TokenService
+participant "Service\nValidation" as Validator
+participant "Service\nContact" as ContactService
+participant "Service\nUtilisateur" as UserService
+participant "Service\nSécurité" as SecurityService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Accès via lien SMS ==
+
+Contact -> UI : Cliquer lien validation dans SMS
+activate UI
+UI -> ValidationController : Traiter lien avec token
+activate ValidationController
+
+ValidationController -> TokenService : Vérifier validité du token
+activate TokenService
+TokenService -> DB : Rechercher token de validation
+activate DB
+DB -> TokenService : Token et contact associé
+deactivate DB
+
+alt Token invalide, expiré ou déjà utilisé
+    TokenService -> ValidationController : Token invalide
+    ValidationController -> UI : Erreur token
+    UI -> Contact : Message d'erreur + lien contact support
+    deactivate ValidationController
+    deactivate UI
+    stop
+end
+
+TokenService -> ValidationController : Token valide + données contact
+deactivate TokenService
+
+ValidationController -> ContactService : Récupérer informations contact
+activate ContactService
+ContactService -> DB : Sélectionner contact par ID
+activate DB
+DB -> ContactService : Données complètes du contact
+deactivate DB
+ContactService -> ValidationController : Contact récupéré
+deactivate ContactService
+
+ValidationController -> UI : Afficher formulaire validation
+UI -> Contact : Formulaire avec données pré-remplies
+deactivate ValidationController
+
+== Validation et correction des informations ==
+
+Contact -> UI : Vérifier/corriger informations contact
+UI -> ValidationController : Soumettre données contact
+activate ValidationController
+
+ValidationController -> Validator : Valider données modifiées
+activate Validator
+Validator -> Validator : Vérifier formats (nom, prénom, email, etc.)
+Validator -> Validator : Vérifier contraintes métier
+
+alt Données invalides
+    Validator -> ValidationController : Erreurs de validation
+    ValidationController -> UI : Messages d'erreur
+    UI -> Contact : Afficher erreurs
+    Contact -> UI : Corriger données
+    UI -> ValidationController : Soumettre corrections
+    ValidationController -> Validator : Revalider
+end
+
+Validator -> ValidationController : Données contact validées
+deactivate Validator
+
+== Vérification des doublons (si modifications) ==
+
+alt Informations modifiées (email ou téléphone)
+    ValidationController -> ContactService : Vérifier nouveaux doublons
+    activate ContactService
+    ContactService -> DB : Rechercher doublons potentiels
+    activate DB
+    DB -> ContactService : Résultat recherche
+    deactivate DB
+    
+    alt Doublon détecté
+        ContactService -> ValidationController : Doublon trouvé
+        ValidationController -> UI : Erreur doublon
+        UI -> Contact : Message d'erreur + options
+        Contact -> UI : Annuler ou corriger
+        UI -> ValidationController : Action contact
+        deactivate ContactService
+        deactivate ValidationController
+        stop
+    end
+    
+    ContactService -> ValidationController : Aucun doublon
+    deactivate ContactService
+end
+
+== Mise à jour du contact ==
+
+ValidationController -> ContactService : Mettre à jour contact
+activate ContactService
+ContactService -> DB : Mettre à jour informations contact
+activate DB
+DB -> ContactService : Contact mis à jour
+deactivate DB
+
+ContactService -> History : Enregistrer modifications
+activate History
+History -> DB : Insérer historique validation
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+ContactService -> ValidationController : Contact actualisé
+deactivate ContactService
+
+ValidationController -> UI : Demander création compte utilisateur
+UI -> Contact : Formulaire création compte
+deactivate ValidationController
+
+== Création du compte utilisateur ==
+
+Contact -> UI : Saisir mot de passe et confirmation
+UI -> UserController : Soumettre données compte
+activate UserController
+
+UserController -> Validator : Valider mot de passe
+activate Validator
+Validator -> Validator : Vérifier complexité\n(8 car. min, maj, min, chiffre)
+Validator -> Validator : Vérifier correspondance confirmation
+
+alt Mot de passe invalide
+    Validator -> UserController : Erreurs validation
+    UserController -> UI : Messages d'erreur
+    UI -> Contact : Afficher erreurs
+    Contact -> UI : Corriger mot de passe
+    UI -> UserController : Soumettre correction
+    UserController -> Validator : Revalider
+end
+
+Validator -> UserController : Mot de passe valide
+deactivate Validator
+
+UserController -> SecurityService : Hasher mot de passe
+activate SecurityService
+SecurityService -> SecurityService : Générer hash bcrypt (coût 12)
+SecurityService -> UserController : Hash généré
+deactivate SecurityService
+
+== Création compte et association ==
+
+UserController -> UserService : Créer compte utilisateur
+activate UserService
+UserService -> DB : Insérer nouvel utilisateur
+activate DB
+DB -> UserService : Utilisateur créé avec ID
+deactivate DB
+
+UserService -> DB : Associer contact-utilisateur (1:1)
+activate DB
+DB -> UserService : Association créée
+deactivate DB
+
+UserService -> ContactService : Mettre à jour statut contact à VALIDE
+activate ContactService
+ContactService -> DB : Mettre à jour statut
+activate DB
+DB -> ContactService : Statut mis à jour
+deactivate DB
+ContactService -> UserService : Contact validé
+deactivate ContactService
+
+UserService -> History : Enregistrer création compte
+activate History
+History -> DB : Insérer historique création utilisateur
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+UserService -> UserController : Compte créé avec succès
+deactivate UserService
+
+== Invalidation du token et connexion automatique ==
+
+UserController -> TokenService : Marquer token comme utilisé
+activate TokenService
+TokenService -> DB : Mettre à jour token (utilisé = true)
+activate DB
+DB -> TokenService : Token invalidé
+deactivate DB
+deactivate TokenService
+
+UserController -> SecurityService : Créer session utilisateur
+activate SecurityService
+SecurityService -> SecurityService : Générer token session
+SecurityService -> DB : Enregistrer session
+activate DB
+DB -> SecurityService : Session créée
+deactivate DB
+SecurityService -> UserController : Session établie
+deactivate SecurityService
+
+UserController -> UI : Connexion réussie + redirection
+deactivate UserController
+UI -> Contact : Rediriger vers tableau de bord
+deactivate UI
+
+== Validation administrative (alternative) ==
+
+participant "Administrateur" as Admin
+
+Admin -> UI : Accéder gestion contacts en attente
+activate UI
+UI -> ValidationController : Lister contacts à valider
+activate ValidationController
+
+ValidationController -> ContactService : Récupérer contacts EN_ATTENTE
+activate ContactService
+ContactService -> DB : Sélectionner contacts en attente
+activate DB
+DB -> ContactService : Liste contacts
+deactivate DB
+ContactService -> ValidationController : Contacts récupérés
+deactivate ContactService
+
+ValidationController -> UI : Liste contacts avec actions
+UI -> Admin : Afficher contacts + boutons validation
+deactivate ValidationController
+
+Admin -> UI : Sélectionner contact + valider
+UI -> ValidationController : Demander validation administrative
+activate ValidationController
+
+ValidationController -> ContactService : Valider contact administrativement
+activate ContactService
+ContactService -> DB : Mettre à jour statut à VALIDE
+activate DB
+DB -> ContactService : Statut mis à jour
+deactivate DB
+
+ContactService -> History : Enregistrer validation admin
+activate History
+History -> DB : Insérer historique validation
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+ContactService -> ValidationController : Contact validé
+deactivate ContactService
+
+ValidationController -> UI : Confirmation validation
+deactivate ValidationController
+UI -> Admin : Afficher confirmation
+deactivate UI
+
+note over Contact, History
+    **Post-conditions :**
+    - Contact validé et statut mis à jour
+    - Compte utilisateur créé et associé (via SMS)
+    - Session automatique créée (via SMS)
+    - Token invalidé après utilisation
+    - Historique complet enregistré
+end note
+
+@enduml

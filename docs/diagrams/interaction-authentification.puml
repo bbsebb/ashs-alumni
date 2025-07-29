@@ -1,0 +1,221 @@
+@startuml Diagramme d'interaction - Authentification
+
+title Diagramme d'interaction : Authentification
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Utilisateur" as User
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nAuthentification" as AuthController
+participant "Service\nValidation" as Validator
+participant "Service\nUtilisateur" as UserService
+participant "Service\nSécurité" as SecurityService
+participant "Service\nSession" as SessionService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Connexion par Email/Mot de passe ==
+
+User -> UI : Accéder à la page de connexion
+activate UI
+UI -> User : Afficher formulaire de connexion
+User -> UI : Saisir email et mot de passe
+UI -> AuthController : Soumettre identifiants
+activate AuthController
+
+== Validation des données ==
+
+AuthController -> Validator : Valider format email
+activate Validator
+Validator -> Validator : Vérifier format RFC 5322
+Validator -> Validator : Vérifier présence mot de passe
+
+alt Format invalide
+    Validator -> AuthController : Erreurs de format
+    AuthController -> UI : Messages d'erreur
+    UI -> User : Afficher erreurs de saisie
+    User -> UI : Corriger identifiants
+    UI -> AuthController : Soumettre correction
+    AuthController -> Validator : Revalider
+end
+
+Validator -> AuthController : Format valide
+deactivate Validator
+
+== Vérification des tentatives de connexion ==
+
+AuthController -> SecurityService : Vérifier tentatives échouées
+activate SecurityService
+SecurityService -> DB : Compter tentatives récentes pour cet email
+activate DB
+DB -> SecurityService : Nombre de tentatives
+deactivate DB
+
+alt Trop de tentatives (≥5 en 15 min)
+    SecurityService -> AuthController : Compte temporairement bloqué
+    AuthController -> UI : Message de blocage temporaire
+    UI -> User : Afficher message de blocage (15 min)
+    deactivate AuthController
+    deactivate UI
+    deactivate SecurityService
+end
+
+SecurityService -> AuthController : Tentatives dans la limite
+deactivate SecurityService
+
+== Authentification ==
+
+AuthController -> UserService : Rechercher utilisateur par email
+activate UserService
+UserService -> DB : Sélectionner utilisateur par email
+activate DB
+DB -> UserService : Données utilisateur (si trouvé)
+deactivate DB
+
+alt Utilisateur non trouvé
+    UserService -> AuthController : Utilisateur inexistant
+    AuthController -> SecurityService : Enregistrer tentative échouée
+    activate SecurityService
+    SecurityService -> DB : Insérer tentative échouée
+    activate DB
+    DB -> SecurityService : Tentative enregistrée
+    deactivate DB
+    deactivate SecurityService
+    AuthController -> UI : Erreur identifiants invalides
+    UI -> User : Message d'erreur générique
+    deactivate AuthController
+    deactivate UI
+    deactivate UserService
+end
+
+UserService -> AuthController : Utilisateur trouvé
+deactivate UserService
+
+AuthController -> SecurityService : Vérifier mot de passe
+activate SecurityService
+SecurityService -> SecurityService : Comparer hash bcrypt
+SecurityService -> SecurityService : Vérifier statut utilisateur (ACTIF)
+
+alt Mot de passe incorrect ou utilisateur suspendu
+    SecurityService -> AuthController : Authentification échouée
+    SecurityService -> DB : Enregistrer tentative échouée
+    activate DB
+    DB -> SecurityService : Tentative enregistrée
+    deactivate DB
+    deactivate SecurityService
+    AuthController -> UI : Erreur identifiants invalides
+    UI -> User : Message d'erreur générique
+    deactivate AuthController
+    deactivate UI
+end
+
+SecurityService -> AuthController : Authentification réussie
+deactivate SecurityService
+
+== Création de session ==
+
+AuthController -> SessionService : Créer nouvelle session
+activate SessionService
+SessionService -> SessionService : Générer token session unique
+SessionService -> SessionService : Définir expiration (24h)
+SessionService -> DB : Enregistrer session utilisateur
+activate DB
+DB -> SessionService : Session créée
+deactivate DB
+
+SessionService -> AuthController : Session établie
+deactivate SessionService
+
+== Mise à jour des informations utilisateur ==
+
+AuthController -> UserService : Mettre à jour dernière connexion
+activate UserService
+UserService -> DB : Mettre à jour timestamp dernière_connexion
+activate DB
+DB -> UserService : Timestamp mis à jour
+deactivate DB
+UserService -> AuthController : Informations mises à jour
+deactivate UserService
+
+AuthController -> History : Enregistrer connexion réussie
+activate History
+History -> DB : Insérer log de connexion
+activate DB
+DB -> History : Log enregistré
+deactivate DB
+deactivate History
+
+== Réponse de connexion ==
+
+AuthController -> UI : Connexion réussie + token session
+deactivate AuthController
+UI -> UI : Stocker token session (cookie sécurisé)
+UI -> User : Rediriger vers tableau de bord
+deactivate UI
+
+== Connexion par lien temporaire (optionnel) ==
+
+User -> UI : Cliquer lien de connexion temporaire
+activate UI
+UI -> AuthController : Valider token temporaire
+activate AuthController
+
+AuthController -> SecurityService : Vérifier token temporaire
+activate SecurityService
+SecurityService -> DB : Rechercher token valide et non expiré
+activate DB
+DB -> SecurityService : Token et utilisateur associé
+deactivate DB
+
+alt Token invalide ou expiré
+    SecurityService -> AuthController : Token invalide
+    AuthController -> UI : Erreur token
+    UI -> User : Message d'erreur + lien connexion normale
+    deactivate AuthController
+    deactivate UI
+    deactivate SecurityService
+end
+
+SecurityService -> AuthController : Token valide
+deactivate SecurityService
+
+AuthController -> SessionService : Créer session directement
+activate SessionService
+SessionService -> DB : Créer session utilisateur
+activate DB
+DB -> SessionService : Session créée
+deactivate DB
+SessionService -> AuthController : Session établie
+deactivate SessionService
+
+AuthController -> SecurityService : Invalider token temporaire
+activate SecurityService
+SecurityService -> DB : Marquer token comme utilisé
+activate DB
+DB -> SecurityService : Token invalidé
+deactivate DB
+deactivate SecurityService
+
+AuthController -> UI : Connexion réussie
+deactivate AuthController
+UI -> User : Rediriger vers tableau de bord
+deactivate UI
+
+note over User, History
+    **Sécurité :**
+    - Blocage après 5 tentatives échouées (15 min)
+    - Sessions expirées après 24h d'inactivité
+    - Mots de passe hashés avec bcrypt (coût 12)
+    - Logs complets des tentatives de connexion
+end note
+
+@enduml

@@ -1,0 +1,204 @@
+@startuml Diagramme d'interaction - Gestion des statuts
+
+title Diagramme d'interaction : Gestion des statuts
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Administrateur" as Admin
+actor "Contact\n(via SMS)" as Contact
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nContact" as Controller
+participant "Service\nAutorisation" as AuthService
+participant "Service\nContact" as ContactService
+participant "Service\nUtilisateur" as UserService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Changement de statut par Administrateur ==
+
+Admin -> UI : Accéder à la gestion des contacts
+activate UI
+UI -> Controller : Demander liste contacts avec filtres
+activate Controller
+
+Controller -> AuthService : Vérifier droits administrateur
+activate AuthService
+AuthService -> DB : Vérifier profil utilisateur
+activate DB
+DB -> AuthService : Profil administrateur confirmé
+deactivate DB
+AuthService -> Controller : Accès autorisé
+deactivate AuthService
+
+Controller -> ContactService : Récupérer liste contacts
+activate ContactService
+ContactService -> DB : Sélectionner contacts selon filtres
+activate DB
+DB -> ContactService : Liste des contacts
+deactivate DB
+ContactService -> Controller : Contacts récupérés
+deactivate ContactService
+
+Controller -> UI : Liste contacts avec statuts actuels
+UI -> Admin : Afficher liste avec actions possibles
+deactivate Controller
+
+Admin -> UI : Sélectionner contact et nouveau statut
+UI -> Controller : Demander changement statut
+activate Controller
+
+Controller -> ContactService : Valider transition statut
+activate ContactService
+
+alt Transition non autorisée
+    ContactService -> Controller : Erreur transition invalide
+    Controller -> UI : Message d'erreur
+    UI -> Admin : Afficher erreur de transition
+    deactivate Controller
+    deactivate UI
+    deactivate ContactService
+end
+
+ContactService -> DB : Récupérer statut actuel
+activate DB
+DB -> ContactService : Statut actuel du contact
+deactivate DB
+
+== Traitement selon le nouveau statut ==
+
+alt Passage à "Validé"
+    ContactService -> ContactService : Vérifier conditions validation
+    ContactService -> DB : Mettre à jour statut à VALIDE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    
+    alt Contact sans compte utilisateur
+        ContactService -> UserService : Créer compte utilisateur
+        activate UserService
+        UserService -> DB : Insérer nouvel utilisateur
+        activate DB
+        DB -> UserService : Utilisateur créé
+        deactivate DB
+        UserService -> DB : Associer contact-utilisateur
+        activate DB
+        DB -> UserService : Association créée
+        deactivate DB
+        UserService -> ContactService : Compte utilisateur créé
+        deactivate UserService
+    end
+
+else Passage à "Non sollicité"
+    ContactService -> DB : Mettre à jour statut à NON_SOLLICITE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    
+    alt Contact avec compte utilisateur
+        ContactService -> UserService : Suspendre compte utilisateur
+        activate UserService
+        UserService -> DB : Mettre à jour statut utilisateur
+        activate DB
+        DB -> UserService : Utilisateur suspendu
+        deactivate DB
+        UserService -> ContactService : Compte suspendu
+        deactivate UserService
+    end
+
+else Passage à "Non joignable"
+    ContactService -> DB : Mettre à jour statut à NON_JOIGNABLE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+
+else Passage à "En attente"
+    ContactService -> DB : Mettre à jour statut à EN_ATTENTE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+end
+
+ContactService -> History : Enregistrer changement statut
+activate History
+History -> DB : Insérer historique changement
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+ContactService -> Controller : Changement effectué
+deactivate ContactService
+
+Controller -> UI : Confirmation changement
+deactivate Controller
+UI -> Admin : Afficher confirmation
+deactivate UI
+
+== Changement de statut automatique (via SMS) ==
+
+Contact -> UI : Cliquer lien validation/refus SMS
+activate UI
+UI -> Controller : Traiter action SMS (token)
+activate Controller
+
+Controller -> ContactService : Valider token et action
+activate ContactService
+ContactService -> DB : Vérifier validité token
+activate DB
+DB -> ContactService : Token valide
+deactivate DB
+
+alt Action = Validation
+    ContactService -> DB : Mettre à jour statut à VALIDE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    
+    ContactService -> UserService : Initier création compte
+    activate UserService
+    UserService -> UI : Rediriger vers formulaire inscription
+    UI -> Contact : Afficher formulaire création compte
+    deactivate UserService
+
+else Action = Refus
+    ContactService -> DB : Mettre à jour statut à NON_SOLLICITE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    
+    ContactService -> UI : Afficher confirmation refus
+    UI -> Contact : Message de confirmation refus
+end
+
+ContactService -> History : Enregistrer action automatique
+activate History
+History -> DB : Insérer historique action
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+ContactService -> Controller : Action traitée
+deactivate ContactService
+Controller -> UI : Résultat action
+deactivate Controller
+deactivate UI
+
+note over Admin, History
+    **Transitions autorisées :**
+    - En attente → Validé/Non sollicité/Non joignable
+    - Validé → Non sollicité (admin uniquement)
+    - Non joignable → Validé (admin uniquement)
+    - Non sollicité → Validé (admin uniquement)
+end note
+
+@enduml

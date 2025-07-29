@@ -1,0 +1,356 @@
+@startuml Diagramme d'interaction - Gestion des listes de référence
+
+title Diagramme d'interaction : Gestion des listes de référence
+skinparam backgroundColor #FAFAFA
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #0277BD
+}
+
+actor "Administrateur" as Admin
+participant "Interface\nUtilisateur" as UI
+participant "Contrôleur\nListes" as ListController
+participant "Service\nAutorisation" as AuthService
+participant "Service\nValidation" as Validator
+participant "Service\nListes" as ListService
+participant "Service\nImportExport" as ImportExportService
+participant "Service\nContact" as ContactService
+participant "Base de\nDonnées" as DB
+participant "Service\nHistorique" as History
+
+== Accès à la gestion des listes ==
+
+Admin -> UI : Accéder gestion listes de référence
+activate UI
+UI -> ListController : Demander page gestion listes
+activate ListController
+
+ListController -> AuthService : Vérifier droits administrateur
+activate AuthService
+AuthService -> DB : Vérifier profil utilisateur
+activate DB
+DB -> AuthService : Profil administrateur confirmé
+deactivate DB
+
+alt Utilisateur non administrateur
+    AuthService -> ListController : Accès refusé
+    ListController -> UI : Erreur d'autorisation
+    UI -> Admin : Message d'accès refusé
+    deactivate ListController
+    deactivate UI
+    deactivate AuthService
+end
+
+AuthService -> ListController : Accès autorisé
+deactivate AuthService
+
+ListController -> ListService : Récupérer statistiques listes
+activate ListService
+ListService -> DB : Compter éléments par type de liste
+activate DB
+DB -> ListService : Statistiques
+deactivate DB
+ListService -> ListController : Données statistiques
+deactivate ListService
+
+ListController -> UI : Page gestion avec statistiques
+UI -> Admin : Afficher tableau de bord listes
+note right of UI
+    **Types de listes :**
+    - Liste "à ne pas contacter"
+    - Liste "anciens participants"
+    - Statistiques par liste
+    - Actions disponibles
+end note
+deactivate ListController
+
+== Gestion de la liste "à ne pas contacter" ==
+
+Admin -> UI : Sélectionner "Liste à ne pas contacter"
+UI -> ListController : Demander liste non sollicités
+activate ListController
+
+ListController -> ListService : Récupérer liste non sollicités
+activate ListService
+ListService -> DB : Sélectionner contacts NON_SOLLICITE
+activate DB
+DB -> ListService : Liste contacts non sollicités
+deactivate DB
+ListService -> ListController : Contacts récupérés
+deactivate ListService
+
+ListController -> UI : Liste avec actions (ajouter, supprimer, exporter)
+UI -> Admin : Afficher liste avec filtres et recherche
+deactivate ListController
+
+=== Ajout manuel à la liste ===
+
+alt Admin ajoute manuellement
+    Admin -> UI : Cliquer "Ajouter contact"
+    UI -> ListController : Formulaire ajout contact
+    activate ListController
+    ListController -> UI : Formulaire de saisie
+    UI -> Admin : Afficher formulaire
+    deactivate ListController
+    
+    Admin -> UI : Saisir informations contact
+    UI -> ListController : Soumettre nouveau contact
+    activate ListController
+    
+    ListController -> Validator : Valider données contact
+    activate Validator
+    Validator -> Validator : Vérifier formats obligatoires
+    
+    alt Données invalides
+        Validator -> ListController : Erreurs validation
+        ListController -> UI : Messages d'erreur
+        UI -> Admin : Afficher erreurs
+        Admin -> UI : Corriger données
+        UI -> ListController : Soumettre corrections
+        ListController -> Validator : Revalider
+    end
+    
+    Validator -> ListController : Données valides
+    deactivate Validator
+    
+    ListController -> ContactService : Vérifier doublon
+    activate ContactService
+    ContactService -> DB : Rechercher contact existant
+    activate DB
+    DB -> ContactService : Résultat recherche
+    deactivate DB
+    
+    alt Contact existant
+        ContactService -> ListController : Contact trouvé
+        ListController -> ContactService : Mettre à jour statut à NON_SOLLICITE
+        ContactService -> DB : Mettre à jour statut
+        activate DB
+        DB -> ContactService : Statut mis à jour
+        deactivate DB
+    else Nouveau contact
+        ContactService -> DB : Créer contact avec statut NON_SOLLICITE
+        activate DB
+        DB -> ContactService : Contact créé
+        deactivate DB
+    end
+    
+    ContactService -> History : Enregistrer ajout à liste
+    activate History
+    History -> DB : Insérer historique
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    
+    ContactService -> ListController : Contact ajouté à la liste
+    deactivate ContactService
+    
+    ListController -> UI : Confirmation ajout
+    deactivate ListController
+    UI -> Admin : Message de confirmation
+end
+
+=== Suppression de la liste ===
+
+alt Admin supprime un contact
+    Admin -> UI : Sélectionner contact + "Supprimer"
+    UI -> ListController : Demander suppression
+    activate ListController
+    
+    ListController -> UI : Demander confirmation
+    UI -> Admin : Dialogue de confirmation
+    Admin -> UI : Confirmer suppression
+    UI -> ListController : Confirmation reçue
+    
+    ListController -> ContactService : Retirer de la liste
+    activate ContactService
+    ContactService -> DB : Mettre à jour statut (ex: EN_ATTENTE)
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    
+    ContactService -> History : Enregistrer suppression
+    activate History
+    History -> DB : Insérer historique suppression
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    
+    ContactService -> ListController : Contact retiré
+    deactivate ContactService
+    
+    ListController -> UI : Confirmation suppression
+    deactivate ListController
+    UI -> Admin : Liste mise à jour
+end
+
+== Gestion de la liste "anciens participants" ==
+
+Admin -> UI : Sélectionner "Anciens participants"
+UI -> ListController : Demander liste anciens participants
+activate ListController
+
+ListController -> ListService : Récupérer anciens participants
+activate ListService
+ListService -> DB : Sélectionner participants événements passés
+activate DB
+DB -> ListService : Liste anciens participants
+deactivate DB
+ListService -> ListController : Participants récupérés
+deactivate ListService
+
+ListController -> UI : Liste avec historique participations
+UI -> Admin : Afficher liste avec détails événements
+deactivate ListController
+
+== Import/Export des listes ==
+
+=== Import CSV ===
+
+alt Admin importe un fichier CSV
+    Admin -> UI : Cliquer "Importer CSV"
+    UI -> ListController : Demander import
+    activate ListController
+    ListController -> UI : Formulaire upload fichier
+    UI -> Admin : Interface de sélection fichier
+    deactivate ListController
+    
+    Admin -> UI : Sélectionner fichier CSV + type de liste
+    UI -> ListController : Soumettre fichier
+    activate ListController
+    
+    ListController -> ImportExportService : Traiter fichier CSV
+    activate ImportExportService
+    ImportExportService -> ImportExportService : Valider format CSV
+    ImportExportService -> ImportExportService : Parser contenu
+    
+    alt Format CSV invalide
+        ImportExportService -> ListController : Erreur format
+        ListController -> UI : Message d'erreur format
+        UI -> Admin : Afficher erreur + exemple format
+        deactivate ImportExportService
+        deactivate ListController
+    end
+    
+    ImportExportService -> Validator : Valider chaque ligne
+    activate Validator
+    Validator -> Validator : Vérifier formats données
+    Validator -> ImportExportService : Résultats validation
+    deactivate Validator
+    
+    ImportExportService -> ListController : Rapport pré-import
+    ListController -> UI : Afficher aperçu + erreurs
+    UI -> Admin : Rapport avec actions possibles
+    deactivate ListController
+    
+    Admin -> UI : Confirmer import
+    UI -> ListController : Procéder à l'import
+    activate ListController
+    
+    ListController -> ImportExportService : Exécuter import
+    ImportExportService -> ContactService : Traiter chaque contact
+    activate ContactService
+    
+    loop Pour chaque ligne valide
+        ContactService -> DB : Créer/mettre à jour contact
+        activate DB
+        DB -> ContactService : Contact traité
+        deactivate DB
+        
+        ContactService -> History : Enregistrer import
+        activate History
+        History -> DB : Insérer historique import
+        activate DB
+        DB -> History : Historique enregistré
+        deactivate DB
+        deactivate History
+    end
+    
+    ContactService -> ImportExportService : Import terminé
+    deactivate ContactService
+    ImportExportService -> ListController : Rapport final
+    deactivate ImportExportService
+    
+    ListController -> UI : Résultats import
+    deactivate ListController
+    UI -> Admin : Afficher rapport final (succès/erreurs)
+end
+
+=== Export CSV ===
+
+alt Admin exporte une liste
+    Admin -> UI : Sélectionner liste + "Exporter CSV"
+    UI -> ListController : Demander export
+    activate ListController
+    
+    ListController -> ImportExportService : Générer export CSV
+    activate ImportExportService
+    ImportExportService -> ListService : Récupérer données liste
+    activate ListService
+    ListService -> DB : Sélectionner contacts selon type
+    activate DB
+    DB -> ListService : Données contacts
+    deactivate DB
+    ListService -> ImportExportService : Contacts pour export
+    deactivate ListService
+    
+    ImportExportService -> ImportExportService : Formater en CSV
+    ImportExportService -> ImportExportService : Masquer données sensibles
+    ImportExportService -> ListController : Fichier CSV généré
+    deactivate ImportExportService
+    
+    ListController -> UI : Proposer téléchargement
+    deactivate ListController
+    UI -> Admin : Télécharger fichier CSV
+    
+    ListController -> History : Enregistrer export
+    activate ListController
+    activate History
+    History -> DB : Insérer historique export
+    activate DB
+    DB -> History : Historique enregistré
+    deactivate DB
+    deactivate History
+    deactivate ListController
+end
+
+== Recherche et filtrage ==
+
+alt Admin utilise la recherche
+    Admin -> UI : Saisir critères de recherche
+    UI -> ListController : Appliquer filtres
+    activate ListController
+    
+    ListController -> ListService : Rechercher avec critères
+    activate ListService
+    ListService -> DB : Requête avec filtres
+    activate DB
+    DB -> ListService : Résultats filtrés
+    deactivate DB
+    ListService -> ListController : Contacts correspondants
+    deactivate ListService
+    
+    ListController -> UI : Résultats de recherche
+    deactivate ListController
+    UI -> Admin : Afficher résultats avec pagination
+end
+
+deactivate UI
+
+note over Admin, History
+    **Post-conditions :**
+    - Listes mises à jour selon actions
+    - Historique complet des modifications
+    - Import/Export avec validation
+    - Recherche et filtrage fonctionnels
+    - Conformité RGPD respectée
+end note
+
+@enduml
