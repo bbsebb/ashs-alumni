@@ -2,14 +2,23 @@
 !theme plain
 title Diagramme d'états - Statuts des contacts
 
-[*] --> EN_ATTENTE : Création d'un contact\navec numéro valide
+[*] --> SOUMIS : Création d'un contact\npar utilisateur anonyme
 
-[*] --> NON_JOIGNABLE : Création d'un contact\nsans numéro valide
+[*] --> EN_ATTENTE : Création d'un contact\npar utilisateur inscrit\navec numéro valide
+
+[*] --> NON_JOIGNABLE : Création d'un contact\npar utilisateur inscrit\nsans numéro valide
+
+state SOUMIS {
+  SOUMIS : Contact soumis par utilisateur anonyme
+  SOUMIS : - En attente d'approbation admin
+  SOUMIS : - Non modifiable
+  SOUMIS : - Aucune communication automatique
+}
 
 state EN_ATTENTE {
-  EN_ATTENTE : Contact créé mais non validé
+  EN_ATTENTE : Contact approuvé et en attente de validation
   EN_ATTENTE : - Peut recevoir des SMS
-  EN_ATTENTE : - Modifiable par tous les utilisateurs
+  EN_ATTENTE : - Modifiable par les utilisateurs inscrits
   EN_ATTENTE : - En attente de validation
 }
 
@@ -31,8 +40,12 @@ state NON_JOIGNABLE {
   NON_JOIGNABLE : Contact sans numéro de téléphone valide
   NON_JOIGNABLE : - Ne peut pas recevoir de SMS
   NON_JOIGNABLE : - Validation manuelle requise
-  NON_JOIGNABLE : - Modifiable par tous les utilisateurs
+  NON_JOIGNABLE : - Modifiable par les utilisateurs inscrits
 }
+
+SOUMIS --> EN_ATTENTE : Approbation admin\navec numéro valide\n+ envoi SMS
+SOUMIS --> NON_JOIGNABLE : Approbation admin\nsans numéro valide
+SOUMIS --> NON_SOLLICITE : Rejet admin
 
 EN_ATTENTE --> VALIDE : Validation via SMS\nou par administrateur
 EN_ATTENTE --> NON_SOLLICITE : Refus via lien SMS\nou action administrateur
@@ -45,19 +58,19 @@ VALIDE --> NON_SOLLICITE : Action administrateur\nuniquement
 
 NON_SOLLICITE --> VALIDE : Réactivation par\nadministrateur uniquement
 
-note right of EN_ATTENTE : Statut initial pour\nles contacts joignables
-note right of NON_JOIGNABLE : Statut initial pour\nles contacts sans téléphone
+note right of SOUMIS : Statut initial pour\nles contacts anonymes
+note right of EN_ATTENTE : Statut pour contacts\napprouvés joignables
+note right of NON_JOIGNABLE : Statut pour contacts\nsans téléphone
 note right of VALIDE : Seul statut permettant\nla création d'un compte
 note right of NON_SOLLICITE : Statut terminal\n(sauf intervention admin)
 
 note as N1
   <b>Règles de transition :</b>
-  • Seuls les administrateurs peuvent modifier
-    le statut d'un contact validé
-  • La transition vers NON_SOLLICITE peut être
-    automatique (refus SMS) ou manuelle (admin)
-  • La validation peut être automatique (SMS)
-    ou manuelle (admin)
+  • Utilisateurs anonymes : création avec statut SOUMIS
+  • Utilisateurs inscrits : création directe EN_ATTENTE/NON_JOIGNABLE
+  • Seuls les administrateurs peuvent approuver les contacts SOUMIS
+  • Seuls les administrateurs peuvent modifier le statut d'un contact validé
+  • La modification des contacts nécessite d'être utilisateur inscrit
 end note
 
 @enduml

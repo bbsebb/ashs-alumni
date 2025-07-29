@@ -14,12 +14,19 @@ skinparam arrow {
 
 note top
   **Description :** Gestion du cycle de vie des statuts des contacts
-  **Acteurs :** Système, Utilisateur, Administrateur, Contact externe
+  **Acteurs :** Système, Utilisateur anonyme, Utilisateur inscrit, Administrateur, Contact externe
 end note
 
+state "Soumis" as SOUMIS {
+  SOUMIS : Contact créé par utilisateur anonyme
+  SOUMIS : - En attente d'approbation admin
+  SOUMIS : - Non modifiable par utilisateurs standards
+  SOUMIS : - Aucune communication automatique
+}
+
 state "En attente" as EN_ATTENTE {
-  EN_ATTENTE : Contact créé mais non validé
-  EN_ATTENTE : - Peut être modifié par tout utilisateur
+  EN_ATTENTE : Contact approuvé et en attente de validation
+  EN_ATTENTE : - Peut être modifié par utilisateurs inscrits
   EN_ATTENTE : - En attente de validation
 }
 
@@ -41,8 +48,13 @@ state "Non joignable" as NON_JOIGNABLE {
   NON_JOIGNABLE : - Pas de SMS possible
 }
 
-[*] --> EN_ATTENTE : Création contact\navec téléphone valide
-[*] --> NON_JOIGNABLE : Création contact\nsans téléphone valide
+[*] --> SOUMIS : Création contact\npar utilisateur anonyme
+[*] --> EN_ATTENTE : Création contact par utilisateur inscrit\navec téléphone valide
+[*] --> NON_JOIGNABLE : Création contact par utilisateur inscrit\nsans téléphone valide
+
+SOUMIS --> EN_ATTENTE : Approbation admin\navec téléphone valide + envoi SMS
+SOUMIS --> NON_JOIGNABLE : Approbation admin\nsans téléphone valide
+SOUMIS --> NON_SOLLICITE : Rejet admin
 
 EN_ATTENTE --> VALIDE : Processus complet d'inscription SMS\n(validation + création compte utilisateur)\n**OU** Validation admin
 EN_ATTENTE --> NON_SOLLICITE : Clic lien refus SMS\n**OU** Action admin
@@ -51,6 +63,14 @@ EN_ATTENTE --> NON_JOIGNABLE : Détection téléphone invalide\n(automatique)
 VALIDE --> NON_SOLLICITE : Action admin uniquement
 NON_JOIGNABLE --> VALIDE : Validation admin uniquement\n(après ajout téléphone valide)
 NON_SOLLICITE --> VALIDE : Action admin uniquement\n(réhabilitation)
+
+note right of SOUMIS
+  **État "Soumis" :**
+  - Statut initial pour contacts créés par utilisateurs anonymes
+  - Nécessite approbation admin pour progression
+  - Aucune communication automatique
+  - Non modifiable par utilisateurs standards
+end note
 
 note right of EN_ATTENTE
   **Transitions depuis "En attente" :**

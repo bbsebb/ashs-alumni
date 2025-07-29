@@ -23,6 +23,79 @@ participant "Service\nUtilisateur" as UserService
 participant "Base de\nDonnées" as DB
 participant "Service\nHistorique" as History
 
+== Approbation de contacts SOUMIS par Administrateur ==
+
+Admin -> UI : Accéder à la gestion des contacts soumis
+activate UI
+UI -> Controller : Demander liste contacts SOUMIS
+activate Controller
+
+Controller -> AuthService : Vérifier droits administrateur
+activate AuthService
+AuthService -> DB : Vérifier profil utilisateur
+activate DB
+DB -> AuthService : Profil administrateur confirmé
+deactivate DB
+AuthService -> Controller : Accès autorisé
+deactivate AuthService
+
+Controller -> ContactService : Récupérer contacts SOUMIS
+activate ContactService
+ContactService -> DB : Sélectionner contacts avec statut SOUMIS
+activate DB
+DB -> ContactService : Liste des contacts soumis
+deactivate DB
+ContactService -> Controller : Contacts soumis récupérés
+deactivate ContactService
+
+Controller -> UI : Liste contacts soumis
+UI -> Admin : Afficher contacts en attente d'approbation
+deactivate Controller
+
+Admin -> UI : Approuver/Rejeter contact
+UI -> Controller : Traiter décision admin
+activate Controller
+
+Controller -> ContactService : Traiter approbation/rejet
+activate ContactService
+
+alt Approbation avec téléphone valide
+    ContactService -> DB : Mettre à jour statut à EN_ATTENTE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+    
+    ContactService -> ContactService : Déclencher envoi SMS
+    note right : SMS d'invitation envoyé automatiquement
+
+else Approbation sans téléphone valide
+    ContactService -> DB : Mettre à jour statut à NON_JOIGNABLE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+
+else Rejet
+    ContactService -> DB : Mettre à jour statut à NON_SOLLICITE
+    activate DB
+    DB -> ContactService : Statut mis à jour
+    deactivate DB
+end
+
+ContactService -> History : Enregistrer décision admin
+activate History
+History -> DB : Insérer historique approbation
+activate DB
+DB -> History : Historique enregistré
+deactivate DB
+deactivate History
+
+ContactService -> Controller : Décision traitée
+deactivate ContactService
+Controller -> UI : Confirmation traitement
+deactivate Controller
+UI -> Admin : Afficher confirmation
+deactivate UI
+
 == Changement de statut par Administrateur ==
 
 Admin -> UI : Accéder à la gestion des contacts
@@ -195,6 +268,7 @@ deactivate UI
 
 note over Admin, History
     **Transitions autorisées :**
+    - Soumis → En attente/Non joignable/Non sollicité (admin uniquement)
     - En attente → Validé/Non sollicité/Non joignable
     - Validé → Non sollicité (admin uniquement)
     - Non joignable → Validé (admin uniquement)

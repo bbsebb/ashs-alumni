@@ -105,7 +105,7 @@ MAD → * : Supervision et administration de tous les modules
 
 #### 3.1.1 Fonctionnalité : Création d'un contact
 
-**Description** : Permet à un utilisateur authentifié de créer un nouveau contact dans le système.
+**Description** : Permet à toute personne (authentifiée ou anonyme) de créer un nouveau contact dans le système. Le statut initial dépend du type d'utilisateur.
 
 **Diagramme d'activité** :
 ```plantuml
@@ -121,20 +121,20 @@ MAD → * : Supervision et administration de tous les modules
 @enduml
 ```
 
-**Acteurs** : Utilisateur authentifié, Administrateur
+**Acteurs** : Utilisateur anonyme, Utilisateur authentifié, Administrateur
 
 **Pré-conditions** :
-- L'utilisateur doit être authentifié
-- L'utilisateur doit avoir un contact validé associé
+- Aucune pré-condition pour les utilisateurs anonymes
+- Pour les utilisateurs authentifiés : avoir un contact validé associé
 
 **Post-conditions** :
-- Un nouveau contact est créé avec le statut "En attente"
+- **Utilisateur anonyme** : Contact créé avec le statut "Soumis", en attente d'approbation admin
+- **Utilisateur authentifié** : Contact créé avec le statut "En attente" (si numéro valide) ou "Non joignable" (si pas de numéro valide)
 - Un historique de création est enregistré
-- Si le contact a un numéro de téléphone valide, un SMS d'invitation est envoyé
-- Si le contact n'a pas de numéro valide, le statut passe à "Non joignable"
+- Pour les utilisateurs authentifiés : Si le contact a un numéro de téléphone valide, un SMS d'invitation est envoyé automatiquement
 
 **Scénario principal** :
-1. L'utilisateur accède au formulaire de création de contact
+1. L'utilisateur (anonyme ou authentifié) accède au formulaire de création de contact
 2. L'utilisateur saisit les informations obligatoires :
    - Nom (obligatoire, 2-50 caractères)
    - Prénom (obligatoire, 2-50 caractères)
@@ -144,9 +144,10 @@ MAD → * : Supervision et administration de tous les modules
    - Numéro de téléphone (optionnel, format français)
    - Rôles dans l'équipe 1 (au moins un rôle obligatoire)
 3. Le système vérifie l'absence de doublons
-4. Le système crée le contact avec le statut approprié
+4. Le système crée le contact avec le statut approprié selon le type d'utilisateur
 5. Le système enregistre l'historique de création
-6. Le système envoie une invitation si applicable
+6. **Si utilisateur authentifié** : Le système envoie une invitation SMS si numéro valide
+7. **Si utilisateur anonyme** : Le contact reste en attente d'approbation admin
 
 **Scénarios alternatifs** :
 - **3a. Doublon détecté** :
@@ -166,7 +167,7 @@ MAD → * : Supervision et administration de tous les modules
 
 #### 3.1.2 Fonctionnalité : Modification d'un contact
 
-**Description** : Permet la modification des informations d'un contact selon les droits de l'utilisateur.
+**Description** : Permet la modification des informations d'un contact selon les droits de l'utilisateur. Seuls les utilisateurs inscrits peuvent modifier les contacts.
 
 **Diagramme d'activité** :
 ```plantuml
@@ -185,9 +186,9 @@ MAD → * : Supervision et administration de tous les modules
 **Acteurs** : Utilisateur authentifié, Administrateur
 
 **Pré-conditions** :
-- L'utilisateur doit être authentifié
-- Pour un utilisateur standard : le contact doit être son contact associé OU être en statut "En attente"
-- Pour un administrateur : aucune restriction
+- L'utilisateur doit être authentifié et inscrit (avoir un contact validé associé)
+- Pour un utilisateur standard : le contact doit être son contact associé OU être en statut "En attente" ou "Soumis"
+- Pour un administrateur : aucune restriction sur tous les contacts
 
 **Post-conditions** :
 - Les informations du contact sont mises à jour
@@ -225,12 +226,16 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Statuts possibles** :
-1. **En attente** : Contact créé mais non validé
-2. **Validé** : Contact confirmé avec compte utilisateur associé
-3. **Non sollicité/Refusé** : Contact qui ne souhaite pas être contacté
-4. **Non joignable** : Contact sans numéro de téléphone valide
+1. **Soumis** : Contact créé par un utilisateur anonyme, en attente d'approbation admin
+2. **En attente** : Contact approuvé et en attente de validation
+3. **Validé** : Contact confirmé avec compte utilisateur associé
+4. **Non sollicité/Refusé** : Contact qui ne souhaite pas être contacté
+5. **Non joignable** : Contact sans numéro de téléphone valide
 
 **Transitions autorisées** :
+- Soumis → En attente (approbation admin avec numéro valide + envoi SMS)
+- Soumis → Non joignable (approbation admin sans numéro valide)
+- Soumis → Non sollicité (rejet admin)
 - En attente → Validé (via processus complet d'inscription SMS incluant création compte utilisateur, ou validation admin)
 - En attente → Non sollicité (via lien de refus ou admin)
 - En attente → Non joignable (automatique si pas de téléphone)
@@ -512,11 +517,11 @@ Contact {
   date_naissance: Date NOT NULL
   telephone: String(15) NULLABLE
   email: String(255) NOT NULL
-  statut: Enum(EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE) NOT NULL
+  statut: Enum(SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE) NOT NULL
   date_creation: DateTime NOT NULL
   date_modification: DateTime NOT NULL
-  cree_par: UUID (FK -> Utilisateur) NOT NULL
-  modifie_par: UUID (FK -> Utilisateur) NOT NULL
+  cree_par: UUID (FK -> Utilisateur) NULLABLE
+  modifie_par: UUID (FK -> Utilisateur) NULLABLE
 }
 ```
 
@@ -806,16 +811,18 @@ Le diagramme suivant visualise la matrice des droits d'accès pour chaque type d
 
 #### Tableau détaillé des permissions
 
-| Fonctionnalité | Visiteur | Utilisateur | Admin |
-|----------------|----------|-------------|-------|
+| Fonctionnalité | Visiteur/Anonyme | Utilisateur | Admin |
+|----------------|------------------|-------------|-------|
 | Consulter événements publics | ✓ | ✓ | ✓ |
+| Créer un contact (statut SOUMIS) | ✓ | - | - |
 | S'inscrire spontanément | ✓ | - | - |
 | Se connecter | - | ✓ | ✓ |
 | Consulter son profil | - | ✓ | ✓ |
 | Modifier son contact | - | ✓ | ✓ |
-| Créer un contact | - | ✓ | ✓ |
-| Modifier contact en attente | - | ✓ | ✓ |
+| Créer un contact (statut EN_ATTENTE/NON_JOIGNABLE) | - | ✓ | ✓ |
+| Modifier contact en attente/soumis | - | ✓ | ✓ |
 | Modifier tout contact | - | - | ✓ |
+| Approuver contacts soumis | - | - | ✓ |
 | Gérer les statuts | - | - | ✓ |
 | Créer des événements | - | - | ✓ |
 | Gérer les inscriptions | - | - | ✓ |

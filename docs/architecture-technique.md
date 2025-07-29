@@ -110,10 +110,12 @@ module-contact/
 ### Module Contact
 - **Responsabilités** : Gestion des contacts, validation, historique
 - **Entités principales** : Contact, ContactHistory
-- **Statuts** : EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE
+- **Statuts** : SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE
 - **Règles métier** : 
+  - Création par utilisateurs anonymes (statut SOUMIS) ou inscrits (statut EN_ATTENTE/NON_JOIGNABLE)
   - Prévention des doublons (téléphone ou nom/prénom/email)
   - Historisation obligatoire de toute modification
+  - Modification réservée aux utilisateurs inscrits
 
 ### Module Event
 - **Responsabilités** : Gestion des événements et inscriptions
@@ -181,11 +183,11 @@ CREATE TABLE contact (
     telephone VARCHAR(15), -- France uniquement
     email VARCHAR(255),
     roles TEXT[], -- Rôles cumulables dans l'équipe
-    statut VARCHAR(20) NOT NULL, -- EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE
+    statut VARCHAR(20) NOT NULL, -- SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    created_by UUID,
-    updated_by UUID
+    created_by UUID, -- Nullable pour les créations anonymes
+    updated_by UUID -- Nullable pour les créations anonymes
 );
 ```
 
@@ -294,10 +296,12 @@ CREATE TABLE sms_message (
 
 ### Processus d'invitation
 1. **Création contact** → Vérification doublon
-2. **Si téléphone valide** → Génération lien personnalisé + envoi SMS
-3. **Si pas de téléphone** → Statut "NON_JOIGNABLE" + validation manuelle admin
-4. **Validation via SMS** → Processus complet d'inscription utilisateur (confirmation infos + création compte + association contact-utilisateur)
-5. **Finalisation** → Changement statut vers "VALIDE" uniquement après création et liaison du compte utilisateur
+2. **Si utilisateur anonyme** → Statut "SOUMIS" + attente approbation admin
+3. **Si utilisateur inscrit avec téléphone valide** → Statut "EN_ATTENTE" + génération lien personnalisé + envoi SMS
+4. **Si utilisateur inscrit sans téléphone** → Statut "NON_JOIGNABLE" + validation manuelle admin
+5. **Approbation admin (contacts SOUMIS)** → Passage vers "EN_ATTENTE" (si téléphone valide) ou "NON_JOIGNABLE" + envoi SMS si applicable
+6. **Validation via SMS** → Processus complet d'inscription utilisateur (confirmation infos + création compte + association contact-utilisateur)
+7. **Finalisation** → Changement statut vers "VALIDE" uniquement après création et liaison du compte utilisateur
 
 ## 🚀 **Déploiement et CI/CD**
 

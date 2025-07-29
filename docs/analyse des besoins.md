@@ -50,8 +50,9 @@ Le diagramme suivant illustre l'architecture fonctionnelle du système et les in
     - Email
     - Rôles occupés dans l'équipe 1 (liste de rôles possibles, cumulables)
 
-- Un utilisateur inscrit ne peut modifier que les données de son contact associé, mais peut également modifier les contacts en attente (non validés).
-- **Historique intégré** : chaque ajout ou modification de contact doit enregistrer l'identité de la personne ayant procédé à l'action, horodatée.
+- Seuls les utilisateurs inscrits peuvent modifier les contacts (pas les utilisateurs anonymes).
+- Un utilisateur inscrit ne peut modifier que les données de son contact associé, mais peut également modifier les contacts en attente ou soumis (non validés).
+- **Historique intégré** : chaque ajout ou modification de contact doit enregistrer l'identité de la personne ayant procédé à l'action, horodatée (nullable pour les créations anonymes).
 
 #### 2. Ajout, invitation et validation des contacts
 
@@ -63,17 +64,20 @@ Le diagramme suivant illustre le processus d'invitation et de validation des con
 @enduml
 ```
 
-- Tout utilisateur inscrit peut ajouter de nouveaux contacts qui seront "en attente".
+- **N'importe qui peut ajouter un contact** :
+  - **Utilisateurs anonymes** : Les contacts sont créés avec le statut "SOUMIS" et nécessitent une approbation admin
+  - **Utilisateurs inscrits** : Les contacts sont créés directement avec le statut "EN_ATTENTE" (si numéro valide) ou "NON_JOIGNABLE" (si pas de numéro valide)
 - **Prévention des doublons :**
     - Avant l'ajout d'un nouveau contact, le système doit vérifier l'existence d'un contact avec le même numéro de téléphone (si disponible).
-    - Si un contact existe déjà (quel que soit son statut : en attente, validé, non sollicité, ou non joignable), l'ajout est bloqué et l'utilisateur en est informé.
+    - Si un contact existe déjà (quel que soit son statut : soumis, en attente, validé, non sollicité, ou non joignable), l'ajout est bloqué et l'utilisateur en est informé.
     - Cette vérification évite l'envoi de SMS multiples à la même personne.
     - **Cas particulier :** Pour les contacts sans numéro de téléphone valide, la vérification de doublon se base sur la combinaison nom/prénom/email.
 
-- **Invitation par SMS (pour les contacts joignables) :**
+- **Invitation par SMS (pour les contacts joignables créés par des utilisateurs inscrits) :**
     - Envoi automatique d'un SMS avec un lien personnalisé, menant directement au processus d'inscription.
     - **Important :** Le processus via SMS inclut la validation du contact ET la création du compte utilisateur. Le contact ne devient "validé" qu'après la création réussie du compte utilisateur et son association au contact. L'inscription à la soirée est une étape séparée qui ne peut être effectuée qu'après ce processus complet.
-    - L'envoi de SMS n'a lieu que si aucun doublon n'est détecté lors de la création du contact et si le contact possède un numéro de téléphone valide.
+    - L'envoi de SMS n'a lieu que pour les contacts créés par des utilisateurs inscrits, si aucun doublon n'est détecté et si le contact possède un numéro de téléphone valide.
+    - **Contacts SOUMIS :** Les contacts créés par des utilisateurs anonymes ne reçoivent pas de SMS automatique. L'envoi de SMS se fait uniquement après approbation admin et passage au statut "EN_ATTENTE".
     - **Contacts non joignables :** Les contacts sans numéro de téléphone valide reçoivent automatiquement le statut "non joignable" et nécessitent une validation manuelle par un administrateur.
 
 - Toute personne peut également s'inscrire spontanément (sans parrainage).
@@ -82,7 +86,8 @@ Le diagramme suivant illustre le processus d'invitation et de validation des con
 
 #### 3. Statut des contacts
 - Statuts possibles pour chaque contact :
-    - **En attente** (ajouté mais pas encore validé)
+    - **Soumis** (ajouté par un utilisateur anonyme, en attente d'approbation admin)
+    - **En attente** (approuvé et en attente de validation)
     - **Validé** (contact confirmé avec compte utilisateur associé)
     - **Non sollicité/refusé** : liste administrateur, non contactés, invisibles pour les autres.
     - **Non joignable** : contact qui n'a pas de numéro de téléphone ou pas de numéro de téléphone valide, ne peut pas recevoir de SMS de validation.
