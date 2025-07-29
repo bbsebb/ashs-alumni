@@ -1,0 +1,127 @@
+@startuml module-components
+!theme plain
+title Architecture en Composants - ASHS Alumni
+
+package "Interface Utilisateur" {
+  [Interface Web] as ui
+}
+
+package "Couche Métier" {
+  [MGU - Gestion Utilisateurs] as mgu
+  [MGC - Gestion Contacts] as mgc
+  [MIV - Invitation/Validation] as miv
+  [MGE - Gestion Événements] as mge
+  [MAD - Administration] as mad
+}
+
+package "Services Transversaux" {
+  [Historisation] as hist
+  [Authentification] as auth
+}
+
+package "Services Externes" {
+  [Service SMS] as sms
+  [Service Email] as email
+}
+
+package "Couche Données" {
+  database "Base de Données" as db
+}
+
+' Relations Interface -> Métier
+ui --> mgu : Authentification\nGestion profils
+ui --> mgc : CRUD Contacts
+ui --> miv : Validation contacts
+ui --> mge : Gestion événements
+ui --> mad : Administration
+
+' Relations entre modules métier
+mgu --> mgc : Association 1:1\nUtilisateur-Contact
+mgc --> miv : Déclenchement\ninvitations
+miv --> mgc : Validation\ncontacts
+mge --> mgu : Vérification\ndroits inscription
+mad --> mgc : Supervision\ncontacts
+mad --> mgu : Gestion\nutilisateurs
+mad --> mge : Gestion\névénements
+mad --> miv : Supervision\ninvitations
+
+' Relations vers services transversaux
+mgc --> hist : Traçabilité\nmodifications
+mgu --> hist : Traçabilité\nactions utilisateur
+mge --> hist : Traçabilité\ninscriptions
+mad --> hist : Traçabilité\nactions admin
+miv --> hist : Traçabilité\nvalidations
+
+mgu --> auth : Vérification\nsessions
+mad --> auth : Contrôle\ndroits admin
+
+' Relations vers services externes
+miv --> sms : Envoi SMS\nd'invitation
+mad --> email : Notifications\nadministratives
+
+' Relations vers données
+mgu --> db : Données\nutilisateurs
+mgc --> db : Données\ncontacts
+miv --> db : Tokens\nvalidation
+mge --> db : Données\névénements
+mad --> db : Configuration\nsystème
+hist --> db : Historiques\naudit
+auth --> db : Sessions\nutilisateurs
+
+note top of mgu
+  <b>MGU - Module Gestion Utilisateurs</b>
+  • Authentification
+  • Gestion des profils
+  • Association contact-utilisateur
+  • Contrôle des droits d'accès
+end note
+
+note top of mgc
+  <b>MGC - Module Gestion Contacts</b>
+  • CRUD contacts
+  • Validation des données
+  • Détection des doublons
+  • Gestion des statuts
+end note
+
+note top of miv
+  <b>MIV - Module Invitation/Validation</b>
+  • Génération des invitations
+  • Envoi de SMS
+  • Validation des contacts
+  • Inscription spontanée
+end note
+
+note top of mge
+  <b>MGE - Module Gestion Événements</b>
+  • Création d'événements
+  • Inscriptions aux événements
+  • Gestion des participants
+  • Contrôle des places
+end note
+
+note top of mad
+  <b>MAD - Module Administration</b>
+  • Supervision générale
+  • Gestion des listes de référence
+  • Outils d'administration
+  • Consultation des historiques
+end note
+
+note right of hist
+  <b>Service Historisation</b>
+  • Traçabilité complète
+  • Audit des actions
+  • Conservation permanente
+  • Conformité RGPD
+end note
+
+note right of auth
+  <b>Service Authentification</b>
+  • Gestion des sessions
+  • Contrôle des droits
+  • Sécurité des accès
+  • Limitation des tentatives
+end note
+
+@enduml
