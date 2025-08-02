@@ -2,24 +2,24 @@
 !theme plain
 title Diagramme d'états - Statuts des contacts
 
-[*] --> SOUMIS : Création d'un contact\npar utilisateur anonyme
+[*] --> SUBMITTED : Création d'un contact\npar utilisateur anonyme
 
-[*] --> EN_ATTENTE : Création d'un contact\npar utilisateur inscrit\navec numéro valide
+[*] --> PENDING : Création d'un contact\npar utilisateur inscrit\navec numéro valide
 
-[*] --> NON_JOIGNABLE : Création d'un contact\npar utilisateur inscrit\nsans numéro valide
+[*] --> UNREACHABLE : Création d'un contact\npar utilisateur inscrit\nsans numéro valide
 
-state SOUMIS {
-  SOUMIS : Contact soumis par utilisateur anonyme
-  SOUMIS : - En attente d'approbation admin
-  SOUMIS : - Non modifiable
-  SOUMIS : - Aucune communication automatique
+state SUBMITTED {
+  SUBMITTED : Contact soumis par utilisateur anonyme
+  SUBMITTED : - En attente d'approbation admin
+  SUBMITTED : - Non modifiable
+  SUBMITTED : - Aucune communication automatique
 }
 
-state EN_ATTENTE {
-  EN_ATTENTE : Contact approuvé et en attente de validation
-  EN_ATTENTE : - Peut recevoir des SMS
-  EN_ATTENTE : - Modifiable par les utilisateurs inscrits
-  EN_ATTENTE : - En attente de validation
+state PENDING {
+  PENDING : Contact approuvé et en attente de validation
+  PENDING : - Peut recevoir des SMS
+  PENDING : - Modifiable par les utilisateurs inscrits
+  PENDING : - En attente de validation
 }
 
 state VALIDE {
@@ -45,7 +45,7 @@ state NON_JOIGNABLE {
 
 SOUMIS --> EN_ATTENTE : Approbation admin\navec numéro valide\n+ envoi SMS
 SOUMIS --> NON_JOIGNABLE : Approbation admin\nsans numéro valide
-SOUMIS --> NON_SOLLICITE : Rejet admin
+SOUMIS --> [*] : Suppression admin
 
 EN_ATTENTE --> VALIDE : Validation via SMS\nou par administrateur
 EN_ATTENTE --> NON_SOLLICITE : Refus via lien SMS\nou action administrateur

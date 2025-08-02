@@ -23,13 +23,13 @@ Le diagramme suivant présente une vue d'ensemble des acteurs du système et de 
 - **Administrateurs** (plusieurs possibles)
 
 ### Distinction entre utilisateurs et contacts
-**Important :** Les utilisateurs et les contacts sont deux entités distinctes mais peuvent être liées par une relation 1-1 :
+**Important :** Les utilisateurs et les contacts sont deux entités complètement indépendantes :
 
-- **Contact** : Représente une personne physique avec ses informations personnelles (nom, prénom, téléphone, email, etc.). Un contact peut avoir différents statuts (en attente, validé, non sollicité/refusé, non joignable).
+- **Contact** : Représente une personne physique avec ses informations personnelles (nom, prénom, téléphone, email, etc.). Un contact peut avoir différents statuts (submitted, pending, validated, not requested/refused, unreachable).
 
-- **Utilisateur** : Représente un compte d'accès à l'application permettant de se connecter et d'utiliser les fonctionnalités. Un utilisateur inscrit doit obligatoirement être associé à un contact validé.
+- **Utilisateur** : Représente un compte d'accès à l'application permettant de se connecter et d'utiliser les fonctionnalités. L'authentification est gérée entièrement par Keycloak.
 
-**Règle fondamentale :** Tout utilisateur inscrit sur la plateforme doit avoir un contact validé associé. Cette association est obligatoire et permet de garantir que chaque utilisateur correspond à une personne réelle identifiée dans la base de contacts.
+**Règle fondamentale :** Les utilisateurs et contacts sont des entités indépendantes. Un utilisateur peut exister sans contact associé et vice versa. L'authentification se fait exclusivement via Keycloak.
 
 ## 1.3 Cas d'utilisation (fonctionnalités)
 
@@ -51,7 +51,7 @@ Le diagramme suivant illustre l'architecture fonctionnelle du système et les in
     - Rôles occupés dans l'équipe 1 (liste de rôles possibles, cumulables)
 
 - Seuls les utilisateurs inscrits peuvent modifier les contacts (pas les utilisateurs anonymes).
-- Un utilisateur inscrit ne peut modifier que les données de son contact associé, mais peut également modifier les contacts en attente ou soumis (non validés).
+- Un utilisateur inscrit peut modifier les contacts en attente ou submitted (non validés).
 - **Historique intégré** : chaque ajout ou modification de contact doit enregistrer l'identité de la personne ayant procédé à l'action, horodatée (nullable pour les créations anonymes).
 
 #### 2. Ajout, invitation et validation des contacts
@@ -65,19 +65,19 @@ Le diagramme suivant illustre le processus d'invitation et de validation des con
 ```
 
 - **N'importe qui peut ajouter un contact** :
-  - **Utilisateurs anonymes** : Les contacts sont créés avec le statut "SOUMIS" et nécessitent une approbation admin
-  - **Utilisateurs inscrits** : Les contacts sont créés directement avec le statut "EN_ATTENTE" (si numéro valide) ou "NON_JOIGNABLE" (si pas de numéro valide)
+  - **Utilisateurs anonymes** : Les contacts sont créés avec le statut "SUBMITTED" et nécessitent une approbation admin
+  - **Utilisateurs inscrits** : Les contacts sont créés directement avec le statut "PENDING" (si numéro valide) ou "UNREACHABLE" (si pas de numéro valide)
 - **Prévention des doublons :**
     - Avant l'ajout d'un nouveau contact, le système doit vérifier l'existence d'un contact avec le même numéro de téléphone (si disponible).
-    - Si un contact existe déjà (quel que soit son statut : soumis, en attente, validé, non sollicité, ou non joignable), l'ajout est bloqué et l'utilisateur en est informé.
+    - Si un contact existe déjà (quel que soit son statut : submitted, pending, validated, not requested, ou unreachable), l'ajout est bloqué et l'utilisateur en est informé.
     - Cette vérification évite l'envoi de SMS multiples à la même personne.
     - **Cas particulier :** Pour les contacts sans numéro de téléphone valide, la vérification de doublon se base sur la combinaison nom/prénom/email.
 
 - **Invitation par SMS (pour les contacts joignables créés par des utilisateurs inscrits) :**
     - Envoi automatique d'un SMS avec un lien personnalisé, menant directement au processus d'inscription.
-    - **Important :** Le processus via SMS inclut la validation du contact ET la création du compte utilisateur. Le contact ne devient "validé" qu'après la création réussie du compte utilisateur et son association au contact. L'inscription à la soirée est une étape séparée qui ne peut être effectuée qu'après ce processus complet.
+    - **Important :** Le processus via SMS permet la validation du contact. La création de compte utilisateur est un processus indépendant géré par Keycloak. L'inscription à la soirée nécessite une authentification Keycloak.
     - L'envoi de SMS n'a lieu que pour les contacts créés par des utilisateurs inscrits, si aucun doublon n'est détecté et si le contact possède un numéro de téléphone valide.
-    - **Contacts SOUMIS :** Les contacts créés par des utilisateurs anonymes ne reçoivent pas de SMS automatique. L'envoi de SMS se fait uniquement après approbation admin et passage au statut "EN_ATTENTE".
+    - **Contacts SUBMITTED :** Les contacts créés par des utilisateurs anonymes ne reçoivent pas de SMS automatique. L'envoi de SMS se fait uniquement après approbation admin et passage au statut "PENDING".
     - **Contacts non joignables :** Les contacts sans numéro de téléphone valide reçoivent automatiquement le statut "non joignable" et nécessitent une validation manuelle par un administrateur.
 
 - Toute personne peut également s'inscrire spontanément (sans parrainage).
@@ -86,13 +86,13 @@ Le diagramme suivant illustre le processus d'invitation et de validation des con
 
 #### 3. Statut des contacts
 - Statuts possibles pour chaque contact :
-    - **Soumis** (ajouté par un utilisateur anonyme, en attente d'approbation admin)
-    - **En attente** (approuvé et en attente de validation)
-    - **Validé** (contact confirmé avec compte utilisateur associé)
-    - **Non sollicité/refusé** : liste administrateur, non contactés, invisibles pour les autres.
-    - **Non joignable** : contact qui n'a pas de numéro de téléphone ou pas de numéro de téléphone valide, ne peut pas recevoir de SMS de validation.
+    - **Submitted** (ajouté par un utilisateur anonyme, en attente d'approbation admin)
+    - **Pending** (approuvé et en attente de validation)
+    - **Validated** (contact confirmé et validé)
+    - **Not requested/refused** : liste administrateur, non contactés, invisibles pour les autres.
+    - **Unreachable** : contact qui n'a pas de numéro de téléphone ou pas de numéro de téléphone valide, ne peut pas recevoir de SMS de validation.
 
-- Seuls les utilisateurs associés à des contacts validés peuvent voir l'ensemble des fonctionnalités et s'inscrire à la soirée.
+- Seuls les utilisateurs authentifiés via Keycloak peuvent accéder à l'ensemble des fonctionnalités et s'inscrire à la soirée.
 
 #### 4. Inscription à la soirée retrouvaille
 
@@ -105,7 +105,7 @@ Le diagramme suivant illustre le processus d'inscription à un événement :
 ```
 
 - Dates fixées par un ou plusieurs administrateurs.
-- Les utilisateurs associés à des contacts validés peuvent s'inscrire à la soirée via la plateforme.
+- Les utilisateurs authentifiés via Keycloak peuvent s'inscrire à la soirée via la plateforme.
 - La liste des inscrits est ouverte à tous (même non connectés), mais les numéros de téléphone sont partiellement masqués pour éviter le scrapping.
 - Les administrateurs doivent pouvoir retirer ou supprimer tout inscrit.
 
@@ -128,21 +128,21 @@ Le diagramme suivant illustre le processus d'inscription à un événement :
 ### Contraintes de sécurité et confidentialité
 - **Protection des données personnelles** : Numéros de téléphone partiellement visibles côté frontend pour éviter le scrapping
 - **Traçabilité** : Historisation obligatoire de toute création et modification d'un contact (qui/quand)
-- **Contrôle d'accès** : Seuls les utilisateurs associés à des contacts validés peuvent accéder à l'ensemble des fonctionnalités
+- **Contrôle d'accès** : Authentification via Keycloak pour accéder aux fonctionnalités utilisateur
 
 ### Contraintes de gestion des droits
 - **Utilisateurs standards** :
-  - Ne peuvent modifier que les données de leur propre contact associé (une fois validé)
-  - Peuvent modifier tout contact en attente (non validé)
+  - Peuvent créer et modifier les contacts en attente ou submitted (non validés)
+  - Authentifiés via Keycloak avec gestion des rôles
 - **Administrateurs** : Droit global de modification et de suppression sur tous les contacts et inscrits
 
 ### Contraintes métier
-- **Règle fondamentale** : Tout utilisateur inscrit sur la plateforme doit avoir un contact validé associé
+- **Indépendance des entités** : Les utilisateurs et contacts sont des entités complètement indépendantes
 - **Prévention des doublons** : Vérification obligatoire avant ajout d'un nouveau contact (par téléphone ou combinaison nom/prénom/email)
 - **Validation des contacts** : 
-  - Contacts avec téléphone valide : processus complet d'inscription via SMS (validation + création compte utilisateur)
+  - Contacts avec téléphone valide : validation via SMS
   - Contacts sans téléphone valide : statut "non joignable" et validation manuelle par administrateur
-- **Séparation des processus** : La validation du contact et l'inscription à la soirée sont deux étapes distinctes
+- **Séparation des processus** : La validation du contact, la création de compte utilisateur et l'inscription aux événements sont des étapes distinctes
 
 ### Contraintes techniques
 - **Numéros de téléphone** : France uniquement

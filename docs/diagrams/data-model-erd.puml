@@ -11,23 +11,23 @@ entity "Contact" as contact {
   * date_naissance : Date
   telephone : String(15)
   * email : String(255)
-  * statut : Enum(EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE)
+  * statut : Enum(SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE)
   * date_creation : DateTime
   * date_modification : DateTime
-  * cree_par : UUID <<FK>>
-  * modifie_par : UUID <<FK>>
+  cree_par : UUID <<FK>>
+  modifie_par : UUID <<FK>>
 }
 
 entity "Utilisateur" as utilisateur {
   * id : UUID <<PK>>
   --
-  * contact_id : UUID <<FK>>
+  * keycloak_user_id : String(255)
+  * username : String(100)
   * email : String(255)
-  * mot_de_passe_hash : String(255)
-  est_administrateur : Boolean = FALSE
+  roles : String(50)[]
+  enabled : Boolean = TRUE
   * date_creation : DateTime
   derniere_connexion : DateTime
-  statut : Enum(ACTIF, SUSPENDU, SUPPRIME) = ACTIF
 }
 
 entity "Role" as role {
@@ -96,7 +96,6 @@ entity "TokenValidation" as token {
 }
 
 ' Relations
-utilisateur ||--|| contact : "associé à"
 contact ||--o{ contact_role : "a des rôles"
 role ||--o{ contact_role : "attribué à"
 contact ||--o{ historique : "historisé"
@@ -105,10 +104,9 @@ utilisateur ||--o{ evenement : "crée"
 utilisateur ||--o{ inscription : "s'inscrit"
 evenement ||--o{ inscription : "reçoit des inscriptions"
 utilisateur ||--o{ historique : "effectue des actions"
-utilisateur ||--o{ contact : "crée/modifie"
 
 note right of contact : "Entité centrale représentant\nune personne physique"
-note right of utilisateur : "Compte d'accès à l'application\nAssociation 1:1 avec Contact validé"
+note right of utilisateur : "Compte d'accès à l'application\nAuthentification via Keycloak\nIndépendant des contacts"
 note right of contact_role : "Table de liaison\nUn contact peut avoir\nplusieurs rôles"
 note right of token : "Tokens pour validation SMS\nDurée de vie : 30 jours"
 

@@ -52,11 +52,11 @@ Controller -> UI : Liste contacts soumis
 UI -> Admin : Afficher contacts en attente d'approbation
 deactivate Controller
 
-Admin -> UI : Approuver/Rejeter contact
+Admin -> UI : Approuver/Supprimer contact
 UI -> Controller : Traiter décision admin
 activate Controller
 
-Controller -> ContactService : Traiter approbation/rejet
+Controller -> ContactService : Traiter approbation/suppression
 activate ContactService
 
 alt Approbation avec téléphone valide
@@ -74,10 +74,10 @@ else Approbation sans téléphone valide
     DB -> ContactService : Statut mis à jour
     deactivate DB
 
-else Rejet
-    ContactService -> DB : Mettre à jour statut à NON_SOLLICITE
+else Suppression
+    ContactService -> DB : Supprimer le contact
     activate DB
-    DB -> ContactService : Statut mis à jour
+    DB -> ContactService : Contact supprimé
     deactivate DB
 end
 

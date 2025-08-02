@@ -54,7 +54,7 @@ state "Non joignable" as NON_JOIGNABLE {
 
 SOUMIS --> EN_ATTENTE : Approbation admin\navec téléphone valide + envoi SMS
 SOUMIS --> NON_JOIGNABLE : Approbation admin\nsans téléphone valide
-SOUMIS --> NON_SOLLICITE : Rejet admin
+SOUMIS --> [*] : Suppression admin
 
 EN_ATTENTE --> VALIDE : Processus complet d'inscription SMS\n(validation + création compte utilisateur)\n**OU** Validation admin
 EN_ATTENTE --> NON_SOLLICITE : Clic lien refus SMS\n**OU** Action admin

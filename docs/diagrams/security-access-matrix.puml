@@ -17,7 +17,6 @@ package "Fonctionnalités" {
   usecase "S'inscrire spontanément" as UC2
   usecase "Se connecter" as UC3
   usecase "Consulter son profil" as UC4
-  usecase "Modifier son contact" as UC5
   usecase "Créer contact (statut SOUMIS)" as UC6A
   usecase "Créer contact (statut EN_ATTENTE)" as UC6B
   usecase "Modifier contact en attente/soumis" as UC7
@@ -37,7 +36,6 @@ visiteur --> UC1 : ALLOWED
 visiteur --> UC2 : ALLOWED
 visiteur --> UC3 : DENIED
 visiteur --> UC4 : DENIED
-visiteur --> UC5 : DENIED
 visiteur --> UC6A : ALLOWED
 visiteur --> UC6B : DENIED
 visiteur --> UC7 : DENIED
@@ -56,7 +54,6 @@ user --> UC1 : ALLOWED
 user --> UC2 : DENIED
 user --> UC3 : ALLOWED
 user --> UC4 : ALLOWED
-user --> UC5 : ALLOWED
 user --> UC6A : DENIED
 user --> UC6B : ALLOWED
 user --> UC7 : ALLOWED
@@ -75,7 +72,6 @@ admin --> UC1 : ALLOWED
 admin --> UC2 : DENIED
 admin --> UC3 : ALLOWED
 admin --> UC4 : ALLOWED
-admin --> UC5 : ALLOWED
 admin --> UC6A : DENIED
 admin --> UC6B : ALLOWED
 admin --> UC7 : ALLOWED
@@ -99,11 +95,11 @@ end note
 
 note right of user
   <b>Utilisateur authentifié :</b>
-  • Doit avoir un contact validé associé
-  • Peut modifier son propre contact
+  • Authentifié via Keycloak
   • Peut créer des contacts (statut EN_ATTENTE/NON_JOIGNABLE)
   • Peut modifier les contacts "en attente" et "soumis"
   • Accès aux fonctionnalités principales
+  • Peut s'inscrire aux événements
 end note
 
 note right of admin
@@ -117,12 +113,12 @@ end note
 
 note as N1
   <b>Règles spéciales :</b>
-  • Un utilisateur ne peut s'inscrire aux événements
-    que si son contact est validé
+  • Authentification déléguée à Keycloak
   • Les numéros de téléphone sont partiellement
     masqués pour tous (sauf admin)
   • L'historique des modifications est tracé
     pour toutes les actions
+  • Contacts et utilisateurs sont indépendants
 end note
 
 @enduml

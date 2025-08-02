@@ -103,16 +103,16 @@ module-contact/
 ## 🔧 **Modules détaillés**
 
 ### Module User
-- **Responsabilités** : Gestion des comptes utilisateurs, authentification
+- **Responsabilités** : Gestion des comptes utilisateurs, intégration Keycloak
 - **Entités principales** : User, UserRole
-- **Règles métier** : Association obligatoire avec un contact validé
+- **Règles métier** : Authentification et autorisation via Keycloak, indépendant des contacts
 
 ### Module Contact
 - **Responsabilités** : Gestion des contacts, validation, historique
 - **Entités principales** : Contact, ContactHistory
-- **Statuts** : SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE
+- **Statuts** : SUBMITTED, PENDING, VALIDATED, NOT_REQUESTED, UNREACHABLE
 - **Règles métier** : 
-  - Création par utilisateurs anonymes (statut SOUMIS) ou inscrits (statut EN_ATTENTE/NON_JOIGNABLE)
+  - Création par utilisateurs anonymes (statut SUBMITTED) ou inscrits (statut PENDING/UNREACHABLE)
   - Prévention des doublons (téléphone ou nom/prénom/email)
   - Historisation obligatoire de toute modification
   - Modification réservée aux utilisateurs inscrits
@@ -120,7 +120,7 @@ module-contact/
 ### Module Event
 - **Responsabilités** : Gestion des événements et inscriptions
 - **Entités principales** : Event, EventRegistration
-- **Règles métier** : Seuls les utilisateurs avec contact validé peuvent s'inscrire
+- **Règles métier** : Seuls les utilisateurs authentifiés peuvent s'inscrire aux événements
 
 ### Module SMS
 - **Responsabilités** : Envoi de SMS via Twilio
@@ -145,23 +145,25 @@ module-contact/
 
 ## 🔐 **Sécurité & Authentification**
 
-### Stratégie JWT
-- **Durée des tokens** : 15 minutes + refresh token
+### Intégration Keycloak
+- **Authentification** : Déléguée entièrement à Keycloak
+- **Tokens** : JWT émis par Keycloak avec durée configurable
 - **Stockage** : HttpOnly cookies (best practices Angular)
-- **Claims** : Rôles utilisateur embarqués dans le JWT
-- **Algorithme** : RS256 ou HS256 selon les besoins
+- **Claims** : Rôles utilisateur embarqués dans le JWT Keycloak
+- **Algorithme** : RS256 (clés publiques Keycloak)
 
-### Gestion des mots de passe
-- **Hachage** : bcrypt ou argon2 via Spring Security
-- **Politique** : Complexité minimale définie
-- **Stockage** : Jamais en clair, toujours hashé avec salt
+### Gestion des utilisateurs
+- **Création** : Via interface Keycloak ou API Keycloak
+- **Mots de passe** : Gérés entièrement par Keycloak
+- **Politique** : Configurée dans Keycloak
+- **Réinitialisation** : Via workflows Keycloak
 
 ### Autorisation
-- **Mécanisme** : `@PreAuthorize` pour la gestion de droits (RBAC)
-- **Rôles** : USER, ADMIN
+- **Mécanisme** : `@PreAuthorize` avec validation des tokens Keycloak
+- **Rôles** : USER, ADMIN (définis dans Keycloak)
 - **Permissions granulaires** :
-  - Utilisateurs standards : modification de leur contact + contacts en attente
-  - Administrateurs : droits complets sur tous les contacts et inscrits
+  - Utilisateurs standards : création et modification des contacts
+  - Administrateurs : droits complets sur tous les contacts et événements
 
 ### Protection des données
 - **Numéros de téléphone** : Affichage partiel côté frontend (anti-scrapping)
@@ -183,7 +185,7 @@ CREATE TABLE contact (
     telephone VARCHAR(15), -- France uniquement
     email VARCHAR(255),
     roles TEXT[], -- Rôles cumulables dans l'équipe
-    statut VARCHAR(20) NOT NULL, -- SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE
+    statut VARCHAR(20) NOT NULL, -- SUBMITTED, PENDING, VALIDATED, NOT_REQUESTED, UNREACHABLE
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     created_by UUID, -- Nullable pour les créations anonymes
@@ -209,9 +211,9 @@ CREATE TABLE contact_history (
 ```sql
 CREATE TABLE user (
     id UUID PRIMARY KEY,
-    contact_id UUID NOT NULL UNIQUE, -- Association obligatoire
+    keycloak_user_id VARCHAR(255) UNIQUE NOT NULL, -- ID utilisateur Keycloak
     username VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     roles VARCHAR(50)[] NOT NULL,
     enabled BOOLEAN DEFAULT true,
     created_at TIMESTAMP NOT NULL,
@@ -296,12 +298,12 @@ CREATE TABLE sms_message (
 
 ### Processus d'invitation
 1. **Création contact** → Vérification doublon
-2. **Si utilisateur anonyme** → Statut "SOUMIS" + attente approbation admin
-3. **Si utilisateur inscrit avec téléphone valide** → Statut "EN_ATTENTE" + génération lien personnalisé + envoi SMS
-4. **Si utilisateur inscrit sans téléphone** → Statut "NON_JOIGNABLE" + validation manuelle admin
-5. **Approbation admin (contacts SOUMIS)** → Passage vers "EN_ATTENTE" (si téléphone valide) ou "NON_JOIGNABLE" + envoi SMS si applicable
-6. **Validation via SMS** → Processus complet d'inscription utilisateur (confirmation infos + création compte + association contact-utilisateur)
-7. **Finalisation** → Changement statut vers "VALIDE" uniquement après création et liaison du compte utilisateur
+2. **Si utilisateur anonyme** → Statut "SUBMITTED" + attente approbation admin
+3. **Si utilisateur authentifié avec téléphone valide** → Statut "PENDING" + génération lien personnalisé + envoi SMS
+4. **Si utilisateur authentifié sans téléphone** → Statut "UNREACHABLE" + validation manuelle admin
+5. **Approbation admin (contacts SUBMITTED)** → Passage vers "PENDING" (si téléphone valide) ou "UNREACHABLE" + envoi SMS si applicable
+6. **Validation via SMS** → Confirmation des informations du contact
+7. **Finalisation** → Changement statut vers "VALIDATED" après validation
 
 ## 🚀 **Déploiement et CI/CD**
 
@@ -392,9 +394,9 @@ jobs:
 ## 📋 **Contraintes et règles métier**
 
 ### Règles fondamentales
-1. **Association obligatoire** : Tout utilisateur ↔ contact validé
+1. **Indépendance des modules** : Contacts et utilisateurs sont complètement indépendants
 2. **Prévention doublons** : Vérification par téléphone ou nom/prénom/email
-3. **Séparation processus** : Validation contact ≠ inscription événement
+3. **Authentification Keycloak** : Gestion centralisée des utilisateurs via Keycloak
 4. **Traçabilité** : Historisation obligatoire de toute modification
 
 ### Contraintes techniques
@@ -404,7 +406,7 @@ jobs:
 - **Sécurité** : Chiffrement des données sensibles
 
 ### Contraintes fonctionnelles
-- **Droits utilisateurs** : Modification limitée à leur contact + contacts en attente
+- **Droits utilisateurs** : Création et modification des contacts selon les permissions Keycloak
 - **Droits administrateurs** : Accès complet à tous les contacts et fonctionnalités
 - **Affichage public** : Numéros de téléphone partiellement masqués
 

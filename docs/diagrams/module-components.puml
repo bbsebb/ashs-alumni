@@ -36,10 +36,9 @@ ui --> mge : Gestion événements
 ui --> mad : Administration
 
 ' Relations entre modules métier
-mgu --> mgc : Association 1:1\nUtilisateur-Contact
 mgc --> miv : Déclenchement\ninvitations
 miv --> mgc : Validation\ncontacts
-mge --> mgu : Vérification\ndroits inscription
+mge --> mgu : Vérification\nauthentification
 mad --> mgc : Supervision\ncontacts
 mad --> mgu : Gestion\nutilisateurs
 mad --> mge : Gestion\névénements
@@ -70,9 +69,9 @@ auth --> db : Sessions\nutilisateurs
 
 note top of mgu
   <b>MGU - Module Gestion Utilisateurs</b>
-  • Authentification
+  • Intégration Keycloak
   • Gestion des profils
-  • Association contact-utilisateur
+  • Authentification déléguée
   • Contrôle des droits d'accès
 end note
 
@@ -118,10 +117,10 @@ end note
 
 note right of auth
   <b>Service Authentification</b>
-  • Gestion des sessions
-  • Contrôle des droits
-  • Sécurité des accès
-  • Limitation des tentatives
+  • Intégration Keycloak
+  • Validation tokens JWT
+  • Contrôle des droits RBAC
+  • Sécurité déléguée
 end note
 
 @enduml

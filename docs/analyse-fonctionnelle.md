@@ -125,11 +125,11 @@ MAD → * : Supervision et administration de tous les modules
 
 **Pré-conditions** :
 - Aucune pré-condition pour les utilisateurs anonymes
-- Pour les utilisateurs authentifiés : avoir un contact validé associé
+- Pour les utilisateurs authentifiés : être authentifié via Keycloak
 
 **Post-conditions** :
-- **Utilisateur anonyme** : Contact créé avec le statut "Soumis", en attente d'approbation admin
-- **Utilisateur authentifié** : Contact créé avec le statut "En attente" (si numéro valide) ou "Non joignable" (si pas de numéro valide)
+- **Utilisateur anonyme** : Contact créé avec le statut "Submitted", en attente d'approbation admin
+- **Utilisateur authentifié** : Contact créé avec le statut "Pending" (si numéro valide) ou "Unreachable" (si pas de numéro valide)
 - Un historique de création est enregistré
 - Pour les utilisateurs authentifiés : Si le contact a un numéro de téléphone valide, un SMS d'invitation est envoyé automatiquement
 
@@ -186,8 +186,8 @@ MAD → * : Supervision et administration de tous les modules
 **Acteurs** : Utilisateur authentifié, Administrateur
 
 **Pré-conditions** :
-- L'utilisateur doit être authentifié et inscrit (avoir un contact validé associé)
-- Pour un utilisateur standard : le contact doit être son contact associé OU être en statut "En attente" ou "Soumis"
+- L'utilisateur doit être authentifié via Keycloak
+- Pour un utilisateur standard : le contact doit être en statut "Pending" ou "Submitted"
 - Pour un administrateur : aucune restriction sur tous les contacts
 
 **Post-conditions** :
@@ -226,28 +226,28 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Statuts possibles** :
-1. **Soumis** : Contact créé par un utilisateur anonyme, en attente d'approbation admin
-2. **En attente** : Contact approuvé et en attente de validation
-3. **Validé** : Contact confirmé avec compte utilisateur associé
-4. **Non sollicité/Refusé** : Contact qui ne souhaite pas être contacté
-5. **Non joignable** : Contact sans numéro de téléphone valide
+1. **Submitted** : Contact créé par un utilisateur anonyme, en attente d'approbation admin
+2. **Pending** : Contact approuvé et en attente de validation
+3. **Validated** : Contact confirmé et validé
+4. **Not requested** : Contact refusé ou non contacté
+5. **Unreachable** : Contact sans numéro de téléphone valide
 
 **Transitions autorisées** :
-- Soumis → En attente (approbation admin avec numéro valide + envoi SMS)
-- Soumis → Non joignable (approbation admin sans numéro valide)
-- Soumis → Non sollicité (rejet admin)
-- En attente → Validé (via processus complet d'inscription SMS incluant création compte utilisateur, ou validation admin)
-- En attente → Non sollicité (via lien de refus ou admin)
-- En attente → Non joignable (automatique si pas de téléphone)
-- Validé → Non sollicité (admin uniquement)
-- Non joignable → Validé (admin uniquement)
-- Non sollicité → Validé (admin uniquement)
+- Submitted → Pending (approbation admin avec numéro valide + envoi SMS)
+- Submitted → Unreachable (approbation admin sans numéro valide)
+- Submitted → Suppression (suppression admin)
+- Pending → Validated (via processus complet d'inscription SMS incluant création compte utilisateur, ou validation admin)
+- Pending → Not requested (via lien de refus ou admin)
+- Pending → Unreachable (automatique si pas de téléphone)
+- Validated → Not requested (admin uniquement)
+- Unreachable → Validated (admin uniquement)
+- Not requested → Validated (admin uniquement)
 
 ### 3.2 Module Gestion des Utilisateurs (MGU)
 
 #### 3.2.1 Fonctionnalité : Création de compte utilisateur
 
-**Description** : Permet à une personne de créer un compte utilisateur. Ce processus est intégré dans la validation de contact via SMS (voir section 3.3.2) ou peut être effectué par un administrateur pour les contacts déjà validés.
+**Description** : Permet à une personne de créer un compte utilisateur via Keycloak. La création de compte est indépendante de la gestion des contacts.
 
 **Diagramme d'activité** :
 ```plantuml
@@ -263,27 +263,28 @@ MAD → * : Supervision et administration de tous les modules
 @enduml
 ```
 
-**Acteurs** : Visiteur avec contact en attente (via SMS), Administrateur
+**Acteurs** : Visiteur, Administrateur
 
 **Pré-conditions** :
-- **Via SMS** : La personne doit avoir un contact avec le statut "En attente" et un token de validation valide
-- **Via admin** : La personne doit avoir un contact avec le statut "Validé" et aucun compte utilisateur associé
+- Aucune pré-condition spécifique
 
 **Post-conditions** :
-- Un compte utilisateur est créé
-- L'association contact-utilisateur est établie
-- Le contact passe au statut "Validé" (si ce n'était pas déjà le cas)
+- Un compte utilisateur est créé dans Keycloak
 - L'utilisateur peut se connecter à l'application
+- L'utilisateur a accès aux fonctionnalités selon ses rôles
 
-**Scénario principal (via SMS - processus intégré)** :
-1. Voir section 3.3.2 "Validation de contact et inscription utilisateur"
+**Scénario principal (création via Keycloak)** :
+1. L'utilisateur accède à l'interface de création de compte
+2. L'utilisateur est redirigé vers Keycloak
+3. L'utilisateur saisit ses informations (nom, email, mot de passe)
+4. Keycloak valide les informations et crée le compte
+5. L'utilisateur peut se connecter à l'application
 
-**Scénario alternatif (création manuelle par admin)** :
-1. L'administrateur accède à la fiche d'un contact validé sans compte utilisateur
-2. L'administrateur initie la création du compte utilisateur
-3. Le système génère des identifiants temporaires ou envoie un lien d'activation
-4. La personne définit son mot de passe
-5. Le système établit l'association contact-utilisateur
+**Scénario alternatif (création par admin)** :
+1. L'administrateur accède à l'interface d'administration Keycloak
+2. L'administrateur crée un nouveau compte utilisateur
+3. L'administrateur définit les rôles et permissions
+4. L'utilisateur reçoit ses identifiants de connexion
 
 **Règles de sécurité** :
 - Mot de passe : minimum 8 caractères, au moins une majuscule, une minuscule, un chiffre
@@ -355,40 +356,35 @@ Pour refuser : [lien_refus]
 - Lien de refus avec token unique
 - Limitation : 1 SMS par numéro par période de 24h
 
-#### 3.3.2 Fonctionnalité : Validation de contact et inscription utilisateur
+#### 3.3.2 Fonctionnalité : Validation de contact
 
-**Description** : Processus de validation d'un contact via SMS (incluant l'inscription utilisateur) ou action administrative.
+**Description** : Processus de validation d'un contact via SMS ou action administrative.
 
 **Diagramme d'activité** :
 ```plantuml
 @startuml
-!include ../diagrams/functionality-validation-contact-inscription-utilisateur.puml
+!include ../diagrams/functionality-validation-contact.puml
 @enduml
 ```
 
 **Diagramme d'interaction** :
 ```plantuml
 @startuml
-!include ../diagrams/interaction-validation-contact-inscription-utilisateur.puml
+!include ../diagrams/interaction-validation-contact.puml
 @enduml
 ```
 
 **Méthodes de validation** :
-1. **Via SMS** : Processus complet d'inscription via le lien dans le SMS
+1. **Via SMS** : Validation via le lien dans le SMS
 2. **Administrative** : Action d'un administrateur
 
-**Processus de validation et inscription via SMS** :
+**Processus de validation via SMS** :
 1. La personne clique sur le lien de validation
 2. Le système vérifie la validité du token
 3. Le système affiche les informations du contact
 4. La personne confirme ou corrige les informations
-5. La personne saisit ses informations de connexion :
-   - Mot de passe (8 caractères minimum, complexité requise)
-   - Confirmation du mot de passe
-6. Le système crée le compte utilisateur
-7. Le système établit l'association contact-utilisateur
-8. Le contact passe au statut "Validé"
-9. L'utilisateur est automatiquement connecté
+5. Le contact passe au statut "Validé"
+6. Un message de confirmation est affiché
 
 ### 3.4 Module Gestion des Événements (MGE)
 
@@ -439,11 +435,10 @@ Pour refuser : [lien_refus]
 @enduml
 ```
 
-**Acteurs** : Utilisateur authentifié avec contact validé
+**Acteurs** : Utilisateur authentifié
 
 **Pré-conditions** :
-- L'utilisateur doit être authentifié
-- Le contact associé doit être validé
+- L'utilisateur doit être authentifié via Keycloak
 - L'événement doit être ouvert aux inscriptions
 - Des places doivent être disponibles (si limitation)
 
@@ -517,7 +512,7 @@ Contact {
   date_naissance: Date NOT NULL
   telephone: String(15) NULLABLE
   email: String(255) NOT NULL
-  statut: Enum(SOUMIS, EN_ATTENTE, VALIDE, NON_SOLLICITE, NON_JOIGNABLE) NOT NULL
+  statut: Enum(SUBMITTED, PENDING, VALIDATED, NOT_REQUESTED, UNREACHABLE) NOT NULL
   date_creation: DateTime NOT NULL
   date_modification: DateTime NOT NULL
   cree_par: UUID (FK -> Utilisateur) NULLABLE
@@ -530,13 +525,13 @@ Contact {
 ```
 Utilisateur {
   id: UUID (PK)
-  contact_id: UUID (FK -> Contact) UNIQUE NOT NULL
+  keycloak_user_id: String(255) UNIQUE NOT NULL
+  username: String(100) UNIQUE NOT NULL
   email: String(255) UNIQUE NOT NULL
-  mot_de_passe_hash: String(255) NOT NULL
-  est_administrateur: Boolean DEFAULT FALSE
+  roles: String(50)[] NOT NULL
+  enabled: Boolean DEFAULT TRUE
   date_creation: DateTime NOT NULL
   derniere_connexion: DateTime NULLABLE
-  statut: Enum(ACTIF, SUSPENDU, SUPPRIME) DEFAULT ACTIF
 }
 ```
 
@@ -664,19 +659,19 @@ Le diagramme suivant illustre les différents statuts possibles d'un contact et 
 
 ### 5.2 Règles de gestion des utilisateurs
 
-#### RG-U001 : Association contact-utilisateur
-- Relation 1:1 obligatoire entre utilisateur et contact validé
-- Un contact validé ne peut être associé qu'à un seul utilisateur
-- Un utilisateur ne peut être associé qu'à un seul contact
+#### RG-U001 : Authentification Keycloak
+- Authentification déléguée entièrement à Keycloak
+- Gestion des mots de passe via Keycloak
+- Tokens JWT émis par Keycloak avec durée configurable
 
-#### RG-U002 : Authentification
-- Email unique dans le système
-- Mot de passe : minimum 8 caractères, complexité requise
-- Blocage temporaire après 5 tentatives échouées
-
-#### RG-U003 : Droits d'accès
-- Utilisateur standard : modification de son contact + contacts en attente
+#### RG-U002 : Droits d'accès
+- Utilisateur standard : création et modification des contacts
 - Administrateur : tous droits sur tous les contacts et utilisateurs
+
+#### RG-U003 : Indépendance des entités
+- Les utilisateurs et contacts sont des entités complètement indépendantes
+- Aucune association obligatoire entre utilisateur et contact
+- Un utilisateur peut exister sans contact associé
 
 ### 5.3 Règles de gestion des invitations
 
@@ -698,7 +693,7 @@ Le diagramme suivant illustre les différents statuts possibles d'un contact et 
 ### 5.4 Règles de gestion des événements
 
 #### RG-E001 : Inscription aux événements
-- Seuls les utilisateurs avec contact validé peuvent s'inscrire
+- Seuls les utilisateurs authentifiés via Keycloak peuvent s'inscrire
 - Respect du nombre de places maximum (si défini)
 - Respect de la date limite d'inscription
 
@@ -814,15 +809,15 @@ Le diagramme suivant visualise la matrice des droits d'accès pour chaque type d
 | Fonctionnalité | Visiteur/Anonyme | Utilisateur | Admin |
 |----------------|------------------|-------------|-------|
 | Consulter événements publics | ✓ | ✓ | ✓ |
-| Créer un contact (statut SOUMIS) | ✓ | - | - |
+| Créer un contact (statut SUBMITTED) | ✓ | - | - |
 | S'inscrire spontanément | ✓ | - | - |
 | Se connecter | - | ✓ | ✓ |
 | Consulter son profil | - | ✓ | ✓ |
 | Modifier son contact | - | ✓ | ✓ |
-| Créer un contact (statut EN_ATTENTE/NON_JOIGNABLE) | - | ✓ | ✓ |
-| Modifier contact en attente/soumis | - | ✓ | ✓ |
+| Créer un contact (statut PENDING/UNREACHABLE) | - | ✓ | ✓ |
+| Modifier contact en attente/submitted | - | ✓ | ✓ |
 | Modifier tout contact | - | - | ✓ |
-| Approuver contacts soumis | - | - | ✓ |
+| Approuver contacts submitted | - | - | ✓ |
 | Gérer les statuts | - | - | ✓ |
 | Créer des événements | - | - | ✓ |
 | Gérer les inscriptions | - | - | ✓ |
@@ -993,18 +988,18 @@ graph TD
 #### Processus d'invitation
 - ✅ Envoi automatique de SMS pour les contacts avec numéro valide
 - ✅ Génération de liens personnalisés sécurisés
-- ✅ Processus complet d'inscription via SMS (validation contact + création compte utilisateur)
+- ✅ Validation de contact via SMS indépendante de la création de compte
 - ✅ Gestion des refus et des non-réponses
 
 #### Gestion des utilisateurs
-- ✅ Création de compte intégrée dans le processus de validation des contacts
-- ✅ Association 1:1 contact-utilisateur respectée
-- ✅ Authentification sécurisée avec gestion des sessions
-- ✅ Gestion des droits selon le profil utilisateur
+- ✅ Création de compte via Keycloak indépendante des contacts
+- ✅ Authentification déléguée à Keycloak avec tokens JWT
+- ✅ Gestion des droits selon les rôles Keycloak
+- ✅ Utilisateurs et contacts comme entités indépendantes
 
 #### Gestion des événements
 - ✅ Création d'événements par les administrateurs
-- ✅ Inscription limitée aux utilisateurs avec contact validé
+- ✅ Inscription limitée aux utilisateurs authentifiés via Keycloak
 - ✅ Respect des limites de places et dates
 - ✅ Affichage public avec masquage des données sensibles
 
