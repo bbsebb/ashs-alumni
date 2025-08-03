@@ -1,0 +1,23 @@
+@use '@angular/material' as mat;
+
+// Use Material Angular's recommended override approach
+
+
+:host {
+  @include mat.button-toggle-overrides((
+    selected-state-background-color: var(--mat-sys-primary-container),
+    selected-state-text-color: var(--mat-sys-on-primary-container),
+  ));
+  display: block;
+  padding: var(--mat-sys-spacing-4, 16px);
+  margin-bottom: var(--mat-sys-spacing-4, 16px);
+}
+
+
+
+.filters {
+  display: flex;
+  flex-direction: column;
+
+}
+
