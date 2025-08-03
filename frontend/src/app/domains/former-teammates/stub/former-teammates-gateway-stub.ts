@@ -1,4 +1,4 @@
-import {Injectable, signal, Signal, WritableSignal} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FormerTeammatesGateway} from '../former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
 import {CreateFormerTeammate} from '../dto/payloads/createFormerTeammate';
@@ -17,6 +17,7 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
             id: '550e8400-e29b-41d4-a716-446655440001',
             firstName: 'Jean',
             lastName: 'Dupont',
+            gender: 'M',
             phone: '+33123456789',
             email: 'jean.dupont@email.com',
             birthDate: '1990-05-15',
@@ -27,6 +28,7 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
             id: '550e8400-e29b-41d4-a716-446655440002',
             firstName: 'Marie',
             lastName: 'Martin',
+          gender: 'M',
             phone: '+33987654321',
             email: 'marie.martin@email.com',
             birthDate: '1988-12-03',
@@ -37,6 +39,7 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
             id: '550e8400-e29b-41d4-a716-446655440003',
             firstName: 'Pierre',
             lastName: 'Durand',
+          gender: 'M',
             email: 'pierre.durand@email.com',
             birthDate: '1985-08-22',
             roles: ['PRESIDENT'],
@@ -46,6 +49,7 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
             id: '550e8400-e29b-41d4-a716-446655440004',
             firstName: 'Sophie',
             lastName: 'Leroy',
+          gender: 'F',
             phone: '+33555666777',
             roles: ['ASSISTANT'],
             status: 'NOT_REQUESTED'
@@ -70,7 +74,6 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
         throw new Error('Method not implemented.');
     }
     getFormerTeammates(): HttpResourceRef<FormerTeammate[] |  undefined> {
-      console.log('getFormerTeammates');
         return this.stubItemResourceRef ;
     }
 }

@@ -1,0 +1,22 @@
+
+<form [formGroup]="formFilter" class="filters" >
+  <!-- Filtre par genre -->
+  <mat-button-toggle-group name="gender" aria-label="Gender" [multiple]="true"  formControlName="gender">
+    <mat-button-toggle value="M">Masc.</mat-button-toggle>
+    <mat-button-toggle value="F">Fem.</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <!-- Filtre par statut de contact -->
+  <mat-button-toggle-group name="contactStatus" aria-label="Contact Status" [multiple]="true" formControlName="contactStatus">
+    <mat-button-toggle value="SUBMITTED">Soumis</mat-button-toggle>
+    <mat-button-toggle value="PENDING">En attente</mat-button-toggle>
+    <mat-button-toggle value="VALIDATED">Validé</mat-button-toggle>
+    <mat-button-toggle value="UNREACHABLE">Erroné ou absent</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <!-- Champ de recherche par nom -->
+  <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Rechercher par nom</mat-label>
+    <input matInput  type="text" placeholder="Rechercher par nom" formControlName="searchByName"/>
+  </mat-form-field>
+</form>

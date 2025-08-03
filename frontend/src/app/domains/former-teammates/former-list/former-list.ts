@@ -1,51 +1,111 @@
-import {Component, effect, inject, ResourceRef, signal, viewChild} from '@angular/core';
-import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/former-teammates-gateway';
-import {FormerTeammatesStore} from '@app/domains/former-teammates/former-teammates-store';
+import {Component, computed, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatSortModule} from '@angular/material/sort';
 import {FormerTeammate} from '@app/domains/former-teammates/former-teammates';
+import {FormerTeammatesStore} from '@app/domains/former-teammates/former-teammates-store';
+import {FormerTable} from '@app/domains/former-teammates/former-list/former-table/former-table';
 import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable, MatTableDataSource
-} from '@angular/material/table';
-import {MatPaginator} from '@angular/material/paginator';
+  FormerFilter,
+  FormerTeammatesFilter
+} from '@app/domains/former-teammates/former-list/former-filter/former-filter';
 
 @Component({
   selector: 'app-former-list',
   standalone: true,
   imports: [
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCell,
-    MatCellDef,
-    MatHeaderCellDef,
-    MatHeaderRow,
-    MatRow,
-    MatRowDef,
-    MatHeaderRowDef,
-    MatPaginator,
+    MatSortModule,
+    ReactiveFormsModule,
+    FormerTable,
+    FormerFilter,
   ],
   templateUrl: './former-list.html',
   styleUrl: './former-list.scss'
 })
 export class FormerList {
-  private readonly matPaginator = viewChild.required(MatPaginator);
-  readonly formerTeammatesResource :ResourceRef<FormerTeammate[] |  undefined> = inject(FormerTeammatesStore).formerTeammatesResourceRef;
-  dataSource = new MatTableDataSource<FormerTeammate>([]);
-  readonly columnsToDisplayed = ['firstName', 'lastName', 'phone'];
 
+  // Injected services
+  readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined> = inject(FormerTeammatesStore).formerTeammatesResourceRef;
+
+  // Table configuration
+  readonly filteredFormerTeammates = this.filterData();
+
+  // Signals
+  private readonly formerTeammatesFilterSignal: WritableSignal<FormerTeammatesFilter> = signal({
+    gender: [],
+    contactStatus: [],
+    searchByName: ''
+  });
+
+  /**
+   * Constructeur du composant.
+   * Initialise les effets pour la mise à jour automatique des données filtrées
+   * et la configuration de la pagination et du tri.
+   */
   constructor() {
-    effect(() => {
-      if(this.formerTeammatesResource.hasValue()) {
-        this.dataSource.data = this.formerTeammatesResource.value();
+
+
+
+  }
+
+  /**
+   * Crée un signal computed qui filtre les données des anciens coéquipiers
+   * en appliquant successivement les filtres par genre, statut de contact et nom.
+   * @returns Signal computed contenant la liste filtrée des anciens coéquipiers
+   */
+  filterData() {
+    return computed(() => {
+      if(!this.formerTeammatesResource.hasValue()) {
+        return [];
       }
+
+      return this.formerTeammatesResource.value()
+        .filter((formerTeammate) => this.filterByGender(formerTeammate))
+        .filter((formerTeammate) => this.filterByContactStatus(formerTeammate))
+        .filter((formerTeammate) => this.filterByName(formerTeammate))
     })
-    effect(() => {
-      this.dataSource.paginator = this.matPaginator()
-    });
+  }
+
+  /**
+   * Filtre un ancien coéquipier par genre selon les critères sélectionnés.
+   * @param formerTeammate L'ancien coéquipier à filtrer
+   * @returns true si l'ancien coéquipier correspond aux critères de genre ou si aucun filtre n'est appliqué
+   */
+  private filterByGender(formerTeammate: FormerTeammate):boolean {
+    let genderFilter = this.formerTeammatesFilterSignal().gender;
+    if(genderFilter.length === 0) {
+      return true;
+    }
+    return genderFilter.includes(formerTeammate.gender);
+  }
+
+  /**
+   * Filtre un ancien coéquipier par statut de contact selon les critères sélectionnés.
+   * @param formerTeammate L'ancien coéquipier à filtrer
+   * @returns true si l'ancien coéquipier correspond aux critères de statut ou si aucun filtre n'est appliqué
+   */
+  private filterByContactStatus(formerTeammate: FormerTeammate):boolean {
+    let contactStatusFilter = this.formerTeammatesFilterSignal().contactStatus;
+    if(contactStatusFilter.length === 0) {
+      return true;
+    }
+    return contactStatusFilter.includes(formerTeammate.status);
+  }
+
+  /**
+   * Filtre un ancien coéquipier par nom (prénom ou nom de famille) selon le terme de recherche.
+   * @param formerTeammate L'ancien coéquipier à filtrer
+   * @returns true si le prénom ou nom de famille contient le terme de recherche ou si aucun terme n'est saisi
+   */
+  private filterByName(formerTeammate: FormerTeammate):boolean {
+    let searchByNameFilter = this.formerTeammatesFilterSignal().searchByName;
+    if(searchByNameFilter.trim().length === 0) {
+      return true;
+    }
+    return formerTeammate.firstName.includes(searchByNameFilter) || formerTeammate.lastName.includes(searchByNameFilter);
+  }
+
+
+  filterChange($event: FormerTeammatesFilter) {
+    this.formerTeammatesFilterSignal.set($event)
   }
 }

@@ -1,23 +1,7 @@
-@for(formerTeammate of formerTeammatesResource.value(); track formerTeammate.id) {
-  <p>{{ formerTeammate.firstName }}</p>
-}
-@if(formerTeammatesResource.hasValue()) {
-<table mat-table [dataSource]="formerTeammatesResource.value()">
-  <ng-container matColumnDef="firstName">
-    <th mat-header-cell *matHeaderCellDef> Nom </th>
-    <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.firstName}} </td>
-  </ng-container>
-  <ng-container matColumnDef="lastName">
-    <th mat-header-cell *matHeaderCellDef> Prénom </th>
-    <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.lastName}} </td>
-  </ng-container>
-  <ng-container matColumnDef="phone">
-    <th mat-header-cell *matHeaderCellDef> Téléphone </th>
-    <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.phone ?? 'Aucun contact'}} </td>
-  </ng-container>
-  <tr mat-header-row *matHeaderRowDef="columnsToDisplayed"></tr>
-  <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplayed"></tr>
-</table>
-  <mat-paginator [pageSize]="10" [pageSizeOptions]="[2, 10, 25]"></mat-paginator>
+<!-- Section de filtrage des anciens coéquipiers -->
 
+
+<app-former-filter (filterChange)="filterChange($event)" />
+@if(formerTeammatesResource.hasValue()) {
+<app-former-table [filterFormerTeammates]="filteredFormerTeammates()"/>
 }
