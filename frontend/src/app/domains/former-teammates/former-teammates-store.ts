@@ -1,6 +1,7 @@
 import {computed, inject, Injectable, ResourceRef} from '@angular/core';
 import {FormerTeammate} from '@app/domains/former-teammates/former-teammates';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/former-teammates-gateway';
+import {UUID} from '@app/shared/types/uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class FormerTeammatesStore {
     return this.formerTeammatesResource;
   }
 
-  getFormerTeammateById(id: string) {
+  getFormerTeammateById(id: string | UUID) {
     return computed(() => this.formerTeammatesResource.value()?.find((formerTeammate) => formerTeammate.id === id))
   }
 }
