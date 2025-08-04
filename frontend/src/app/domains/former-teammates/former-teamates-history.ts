@@ -10,5 +10,5 @@ export interface FormerTeammatesHistory {
   previousValue?: FormerTeammate;       // Valeur précédente (optionnelle, selon contexte)
   newValue: FormerTeammate;            // Nouvelle valeur (optionnelle, selon contexte)
   changedAt: Date;         // ISODate
-  changedBy: UUID;         // UserId ayant effectué le changement
+  changedBy?: UUID;         // UserId ayant effectué le changement
 }

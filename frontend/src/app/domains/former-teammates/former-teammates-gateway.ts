@@ -1,5 +1,5 @@
-import {Injectable, InjectionToken, ResourceRef, Signal} from '@angular/core';
-import {UUID} from '../../shared/types/uuid';
+import {InjectionToken} from '@angular/core';
+import {UUID} from '@app/shared/types/uuid';
 import {CreateFormerTeammate} from './dto/payloads/createFormerTeammate';
 import {UpdateFormerTeammate} from './dto/payloads/updateFormerTeammate';
 import {FormerTeammate} from './former-teammates';

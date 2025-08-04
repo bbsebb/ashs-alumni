@@ -1,4 +1,4 @@
-import {inject, Injectable, ResourceRef} from '@angular/core';
+import {computed, inject, Injectable, ResourceRef} from '@angular/core';
 import {FormerTeammate} from '@app/domains/former-teammates/former-teammates';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/former-teammates-gateway';
 
@@ -13,7 +13,10 @@ export class FormerTeammatesStore {
   }
 
   get formerTeammatesResourceRef() {
-
     return this.formerTeammatesResource;
+  }
+
+  getFormerTeammateById(id: string) {
+    return computed(() => this.formerTeammatesResource.value()?.find((formerTeammate) => formerTeammate.id === id))
   }
 }

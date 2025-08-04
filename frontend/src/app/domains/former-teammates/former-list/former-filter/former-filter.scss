@@ -1,23 +1,40 @@
 @use '@angular/material' as mat;
 
-// Use Material Angular's recommended override approach
-
-
 :host {
-  @include mat.button-toggle-overrides((
-    selected-state-background-color: var(--mat-sys-primary-container),
-    selected-state-text-color: var(--mat-sys-on-primary-container),
-  ));
+  @include mat.form-field-density(-3);
   display: block;
-  padding: var(--mat-sys-spacing-4, 16px);
-  margin-bottom: var(--mat-sys-spacing-4, 16px);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+
+// Main filters container
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+// Button toggle groups styling
+mat-button-toggle-group {
+
+}
+
+mat-form-field {
+  height: 45px;
 }
 
 
 
-.filters {
-  display: flex;
-  flex-direction: column;
+
+// Responsive design
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
 
 }
 
