@@ -1,0 +1,219 @@
+@use '@angular/material' as mat;
+
+.teammate-card {
+  max-width: 600px;
+  margin: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+
+  .avatar {
+    background-color: #2196f3;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  mat-card-subtitle {
+    margin-bottom: 0;
+
+    mat-chip-set {
+      margin-top: 8px;
+    }
+
+    mat-chip {
+      font-size: 0.75rem;
+      height: 24px;
+      margin-right: 4px;
+    }
+  }
+
+  mat-card-content {
+    padding-top: 16px;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0 12px 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #616161;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .info-section {
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px;
+          background-color: #fafafa;
+          border-radius: 4px;
+
+          mat-icon {
+            color: #757575;
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+
+          span {
+            font-size: 0.9rem;
+            color: #424242;
+          }
+        }
+      }
+    }
+
+    .status-section {
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        background-color: #fafafa;
+        border-radius: 8px;
+        margin-bottom: 16px;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+
+        .status-text {
+          font-weight: 500;
+          font-size: 1rem;
+
+          &.status-validated {
+            color: #4caf50;
+          }
+
+          &.status-pending {
+            color: #ff9800;
+          }
+
+          &.status-submitted {
+            color: #2196f3;
+          }
+
+          &.status-not_requested {
+            color: #757575;
+          }
+
+          &.status-unreachable {
+            color: #f44336;
+          }
+        }
+      }
+    }
+
+    .history-section {
+      mat-expansion-panel {
+        box-shadow: none;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+
+        mat-expansion-panel-header {
+          mat-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            mat-icon {
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+            }
+          }
+        }
+
+        .history-list {
+          .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eeeeee;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            .history-header {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              mat-icon {
+                font-size: 20px;
+                width: 20px;
+                height: 20px;
+              }
+
+              .action-text {
+                font-weight: 500;
+                color: #424242;
+                flex: 1;
+              }
+
+              .date-text {
+                font-size: 0.85rem;
+                color: #757575;
+              }
+            }
+
+            .history-details {
+              margin-top: 8px;
+              padding-left: 32px;
+
+              .changes-text {
+                color: #757575;
+                font-style: italic;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    mat-divider {
+      margin: 16px 0;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .teammate-card {
+    margin: 8px;
+
+    .info-section .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
