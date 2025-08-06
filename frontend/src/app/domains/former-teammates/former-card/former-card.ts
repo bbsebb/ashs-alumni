@@ -6,10 +6,17 @@ import {MatBadgeModule} from '@angular/material/badge';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {CommonModule} from '@angular/common';
-import {FormerTeammate} from '../former-teammates';
+import {FormerTeammate} from '../models/former-teammates';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute} from '@angular/router';
-import {FormerTeammatesStore} from '@app/domains/former-teammates/former-teammates-store';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
+import {FormerTeammateHistoryStore} from '@app/domains/former-teammates/store/former-teammate-history-store';
+import {FormerTeammateHistory} from '@app/domains/former-teammates/models/former-teamate-history';
+import {ContactStatusChip} from '@app/shared/components/contact-status-chip/contact-status-chip';
+import {GenderIcon} from '@app/shared/components/gender-icon/gender-icon';
+import {MatButton} from '@angular/material/button';
+import {ActionFormerTeammateHistoryPipe} from '@app/shared/pipes/action-former-teammate-history-pipe';
+import {RolePipe} from '@app/shared/pipes/role-pipe';
 
 @Component({
   selector: 'app-former-card',
@@ -20,24 +27,48 @@ import {FormerTeammatesStore} from '@app/domains/former-teammates/former-teammat
     MatIconModule,
     MatBadgeModule,
     MatDividerModule,
-    MatExpansionModule
+    MatExpansionModule,
+    ContactStatusChip,
+    GenderIcon,
+    RouterLink,
+    MatButton,
+    ActionFormerTeammateHistoryPipe,
+    RolePipe
   ],
   templateUrl: './former-card.html',
   styleUrl: './former-card.scss'
 })
 export class FormerCard {
+  private readonly formerTeammatesStore = inject(FormerTeammatesStore);
+  private readonly formerTeammateHistoriesStore = inject(FormerTeammateHistoryStore);
   paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe());
   formerTeammateSignal: Signal<FormerTeammate | undefined>;
+  formerTeammateHistoriesSignal: Signal<FormerTeammateHistory[]> ;
 
   constructor() {
-    const formerTeammatesStore = inject(FormerTeammatesStore);
-    this.formerTeammateSignal = computed(() => {
-      const formerTeammateId:string |undefined = this.paramsRouteSignal()?.['id'];
-      if(formerTeammateId === undefined) {
-        return undefined
-      }
-      return formerTeammatesStore.getFormerTeammateById(formerTeammateId)();
-    })
+    this.formerTeammateSignal = computed(this.findFormerTeammate());
+    this.formerTeammateHistoriesSignal = computed(this.getFormerTeammateHistories())
   }
 
+  private getFormerTeammateHistories() {
+    return () => {
+      const formerTeammateId = this.formerTeammateSignal()?.id;
+      if (formerTeammateId === undefined) {
+        return []
+      }
+      let formerTeammateHistoriesById = this.formerTeammateHistoriesStore.getFormerTeammateHistoriesById(formerTeammateId);
+      return formerTeammateHistoriesById();
+    };
+  }
+
+  private findFormerTeammate() {
+    return () => {
+      const formerTeammateId: string | undefined = this.paramsRouteSignal()?.['id'];
+      if (formerTeammateId === undefined) {
+        return undefined
+      }
+      let formerTeammateById = this.formerTeammatesStore.getFormerTeammateById(formerTeammateId);
+      return formerTeammateById();
+    };
+  }
 }

@@ -1,9 +1,11 @@
-import {Component, inject} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {MatToolbar} from '@angular/material/toolbar';
 import {MatButton} from '@angular/material/button';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {AuthenticationService} from '@app/shared/services/authentication';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'header[appHeader]',
@@ -11,14 +13,18 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
     MatToolbar,
     MatButton,
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
+    MatIcon
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
 export class Header {
   readonly breakpointObserver =  toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
-  login() {
-
+  readonly authService = inject(AuthenticationService);
+  constructor() {
+    effect(() => {
+      console.log(this.authService.isAuthenticatedSignal());
+    });
   }
 }

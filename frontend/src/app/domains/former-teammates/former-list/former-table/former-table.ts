@@ -14,15 +14,13 @@ import {
 } from "@angular/material/table";
 import {MatSort, MatSortHeader} from "@angular/material/sort";
 import {MatPaginator} from '@angular/material/paginator';
-import {FormerTeammate} from '@app/domains/former-teammates/former-teammates';
+import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ContactStatusPipe} from '@app/shared/pipes/contact-status-pipe';
-import {MatTooltip} from '@angular/material/tooltip';
-import {ContactStatusDetailPipe} from '@app/shared/pipes/contact-status-detail-pipe';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {RouterLink} from '@angular/router';
+import {ContactStatusChip} from '@app/shared/components/contact-status-chip/contact-status-chip';
 
 @Component({
   selector: 'app-former-table',
@@ -40,12 +38,10 @@ import {RouterLink} from '@angular/router';
     MatSortHeader,
     MatTable,
     MatHeaderCellDef,
-    ContactStatusPipe,
-    MatTooltip,
-    ContactStatusDetailPipe,
     MatIcon,
     MatIconButton,
     RouterLink,
+    ContactStatusChip,
 
   ],
   templateUrl: './former-table.html',
@@ -70,7 +66,7 @@ export class FormerTable {
     const breakpointObserver =  toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
     this.columnsToDisplayedSignal = computed(() => {
       if(breakpointObserver()?.matches) {
-        return ['firstName', 'lastName', 'phone','view'];
+        return ['firstName', 'lastName', 'phone'];
       } else {
         return ['gender', 'firstName', 'lastName', 'phone', 'status','view'];
       }

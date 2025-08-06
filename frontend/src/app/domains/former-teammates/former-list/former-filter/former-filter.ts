@@ -2,7 +2,7 @@ import {Component, inject, OnInit, output} from '@angular/core';
 import {FormBuilder, FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
-import {ContactStatus, Gender} from '@app/domains/former-teammates/former-teammates';
+import {ContactStatus, Gender} from '@app/domains/former-teammates/models/former-teammates';
 import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
 import {ContactStatusPipe} from '@app/shared/pipes/contact-status-pipe';
 

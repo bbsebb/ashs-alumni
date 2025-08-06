@@ -1,14 +1,15 @@
 import {FormerTeammate} from './former-teammates';
 import {UUID} from '@app/shared/types/uuid';
 
+export type Action = 'CREATE' | 'UPDATE' |  'DELETE';
 
-
-export interface FormerTeammatesHistory {
+export interface FormerTeammateHistory {
   id: UUID;                // UUID
   contactId: UUID;         // Référence vers Contact
-  action: 'CREATE' | 'UPDATE' |  'DELETE';
+  action: Action;
   previousValue?: FormerTeammate;       // Valeur précédente (optionnelle, selon contexte)
   newValue: FormerTeammate;            // Nouvelle valeur (optionnelle, selon contexte)
   changedAt: Date;         // ISODate
-  changedBy?: UUID;         // UserId ayant effectué le changement
+  changedByUserId?: UUID; // UserId ayant effectué le changement
+  changedByUserName?: string;
 }

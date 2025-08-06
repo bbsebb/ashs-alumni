@@ -1,6 +1,6 @@
 import {computed, inject, Injectable, ResourceRef} from '@angular/core';
-import {FormerTeammate} from '@app/domains/former-teammates/former-teammates';
-import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/former-teammates-gateway';
+import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
+import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
 
 @Injectable({

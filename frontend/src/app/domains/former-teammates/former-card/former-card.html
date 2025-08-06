@@ -1,1 +1,81 @@
-<p>{{formerTeammateSignal()?.firstName}}</p>
+@let formerTeammate = formerTeammateSignal();
+@if(formerTeammate) {
+  <mat-card>
+    <!-- Header with name and status -->
+    <mat-card-header>
+      <mat-card-title>
+        <app-gender-icon [gender]="formerTeammate.gender"/>
+        <span id="left-mat-card-title">
+          {{ formerTeammate.firstName }} {{ formerTeammate.lastName }}
+        </span>
+        <div id="right-mat-card-title">
+          <app-contact-status-chip [status]="formerTeammate.status"/>
+          @if (formerTeammate.phone) {
+            <span>
+              <mat-icon>phone</mat-icon>
+              {{ formerTeammate.phone }}
+            </span>
+          } @else {
+            <span class="unknown">
+              <mat-icon>phone_disabled</mat-icon>
+              Aucun contact
+            </span>
+          }
+        </div>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <span [class.unknown]="!formerTeammate.birthDate">{{(formerTeammate.birthDate | date:'yyyy') ?? 'non renseignée'}}</span>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <!-- Roles Section -->
+
+      <section>
+        <h3>Rôles</h3>
+        <mat-chip-set>
+          @for(role of formerTeammate.roles; track role) {
+            <mat-chip>{{ role | role }}</mat-chip>
+          } @empty {
+            <p class="unknown">Aucun role renseigné</p>
+          }
+        </mat-chip-set>
+      </section>
+      <mat-divider></mat-divider>
+
+
+      <!-- History Section -->
+      @if(formerTeammateHistoriesSignal().length > 0) {
+        <section>
+          <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>history</mat-icon>
+                Historique des modifications
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="history-list">
+              @for(formerTeammateHistory of formerTeammateHistoriesSignal(); track formerTeammateHistory.id) {
+                <article class="history-item">
+                  <p><strong>Action:</strong> {{ formerTeammateHistory.action | actionFormerTeammateHistory }}</p>
+                  <p><strong>Date:</strong> {{ formerTeammateHistory.changedAt | date:'EEEE d MMMM y, HH:mm' }}</p>
+                  <p><strong>Par:</strong> {{ formerTeammateHistory.changedByUserName ?? 'utilisateur non inscrit'}}</p>
+                </article>
+                <mat-divider></mat-divider>
+              } @empty {
+                <p>Aucun historique</p>
+              }
+            </div>
+          </mat-expansion-panel>
+        </section>
+      }
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button [routerLink]="['/former-teammates/former-list']">
+        <mat-icon>arrow_back</mat-icon>
+        Retour
+      </button>
+    </mat-card-actions>
+  </mat-card>
+}

@@ -1,7 +1,13 @@
 <!-- Section de filtrage des anciens coéquipiers -->
 
 
-<app-former-filter (filterChange)="filterChange($event)" />
-@if(formerTeammatesResource.hasValue()) {
+
+@if (formerTeammatesResource.isLoading()) {
+  <h2>Chargement des données</h2>
+  <mat-spinner></mat-spinner>
+}@else if (formerTeammatesResource.error()) {
+  <p>Une erreur est survenu</p>
+} @else if(formerTeammatesResource.hasValue()) {
+  <app-former-filter (filterChange)="filterChange($event)" />
 <app-former-table [filterFormerTeammates]="filteredFormerTeammates()"/>
 }

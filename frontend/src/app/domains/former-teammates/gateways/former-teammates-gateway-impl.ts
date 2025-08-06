@@ -1,9 +1,9 @@
-import {Injectable, ResourceRef, Signal} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FormerTeammatesGateway} from './former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
-import {CreateFormerTeammate} from './dto/payloads/createFormerTeammate';
-import {UpdateFormerTeammate} from './dto/payloads/updateFormerTeammate';
-import {FormerTeammate} from './former-teammates';
+import {CreateFormerTeammate} from '../dto/payloads/createFormerTeammate';
+import {UpdateFormerTeammate} from '../dto/payloads/updateFormerTeammate';
+import {FormerTeammate} from '../models/former-teammates';
 import {HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
 

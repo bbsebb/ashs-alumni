@@ -1,13 +1,14 @@
 import {Component, computed, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatSortModule} from '@angular/material/sort';
-import {FormerTeammate} from '@app/domains/former-teammates/former-teammates';
-import {FormerTeammatesStore} from '@app/domains/former-teammates/former-teammates-store';
+import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
+import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {FormerTable} from '@app/domains/former-teammates/former-list/former-table/former-table';
 import {
   FormerFilter,
   FormerTeammatesFilter
 } from '@app/domains/former-teammates/former-list/former-filter/former-filter';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-former-list',
@@ -17,6 +18,7 @@ import {
     ReactiveFormsModule,
     FormerTable,
     FormerFilter,
+    MatProgressSpinner,
   ],
   templateUrl: './former-list.html',
   styleUrl: './former-list.scss'
@@ -42,8 +44,6 @@ export class FormerList {
    * et la configuration de la pagination et du tri.
    */
   constructor() {
-
-
 
   }
 
