@@ -22,9 +22,5 @@ import {MatIcon} from '@angular/material/icon';
 export class Header {
   readonly breakpointObserver =  toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
   readonly authService = inject(AuthenticationService);
-  constructor() {
-    effect(() => {
-      console.log(this.authService.isAuthenticatedSignal());
-    });
-  }
+
 }
