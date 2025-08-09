@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {MatError, MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {FormControl, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
-import {Role} from '@app/domains/former-teammates/models/former-teammates';
+import {FormerTeammate, Role} from '@app/domains/former-teammates/models/former-teammates';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
@@ -10,6 +10,7 @@ import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-t
 import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/former-teammate-dto';
 import {BackButton} from '@app/shared/components/back-button/back-button';
 import {NotificationService} from '@app/shared/services/notification';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -37,9 +38,13 @@ import {NotificationService} from '@app/shared/services/notification';
 })
 export class FormerCreate {
   private readonly notification = inject(NotificationService);
-  readonly startAt = new Date(1975, 0, 1);
+  private readonly router = inject(Router);
+
+
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
+
+  readonly startAt = new Date(1975, 0, 1);
 
 // Définition du formulaire
   formerForm = this.formBuilder.group({
@@ -62,11 +67,13 @@ export class FormerCreate {
   onSubmit(): void {
     if (this.formerForm.valid) {
       this.formerTeammatesStore.createFormerTeammate(this.formerForm.getRawValue()).subscribe({
-        next: (formerTeammate: FormerTeammateDTO) => {console.log(formerTeammate)},
-        error: (error) => {console.log(error)},
-        complete: () => {console.log('FormerTeammate created successfully')}
+        next: (formerTeammate: FormerTeammate) => {
+          this.notification.showSuccess('Le contact a été crée');
+          void this.router.navigate(['/former-teammates',formerTeammate.id])
+        },
+        error: (error) => {this.notification.showError('Une erreur est survenue, Veuillez réessayer plus tard')},
+        complete: () => console.log('Contact crée.')
       });
-      this.notification.showSuccess('Contact crée avec succès')
     }
   }
 }

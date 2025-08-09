@@ -12,11 +12,11 @@ export class NotificationService {
 
 
   showInfo(message: string) {
-    this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'info'))
+    this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'info',0))
   }
 
   showError(message: string) {
-    this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'error'))
+    this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'error',0))
   }
 
   showSuccess(message: string) {
@@ -25,9 +25,10 @@ export class NotificationService {
 }
 
 
-function buildNotificationConfig(message: string,level:'info' | 'error' | 'success' = 'info') {
+function buildNotificationConfig(message: string,level:'info' | 'error' | 'success' = 'info',duration = 5000) {
   return {
     panelClass: [`${level}-notification`],
     data: message,
+    duration: duration,
   };
 }
