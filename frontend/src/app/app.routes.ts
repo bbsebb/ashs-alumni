@@ -13,5 +13,6 @@ export const routes: Routes = [
   { path: 'former-teammates/former-list', component: FormerList },
   { path: 'former-teammates/create', component: FormerCreate },
   { path: 'former-teammates/:id', component: FormerCard },
+  { path: 'error', component: NotFound },
   { path: '**', component: NotFound }
 ];

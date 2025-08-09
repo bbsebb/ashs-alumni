@@ -8,13 +8,12 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {CommonModule} from '@angular/common';
 import {FormerTeammate} from '../models/former-teammates';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {FormerTeammateHistoryStore} from '@app/domains/former-teammates/store/former-teammate-history-store';
 import {FormerTeammateHistory} from '@app/domains/former-teammates/models/former-teamate-history';
 import {ContactStatusChip} from '@app/shared/components/contact-status-chip/contact-status-chip';
 import {GenderIcon} from '@app/shared/components/gender-icon/gender-icon';
-import {MatButton} from '@angular/material/button';
 import {ActionFormerTeammateHistoryPipe} from '@app/shared/pipes/action-former-teammate-history-pipe';
 import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {BackButton} from '@app/shared/components/back-button/back-button';
@@ -31,8 +30,6 @@ import {BackButton} from '@app/shared/components/back-button/back-button';
     MatExpansionModule,
     ContactStatusChip,
     GenderIcon,
-    RouterLink,
-    MatButton,
     ActionFormerTeammateHistoryPipe,
     RolePipe,
     BackButton
@@ -41,6 +38,7 @@ import {BackButton} from '@app/shared/components/back-button/back-button';
   styleUrl: './former-card.scss'
 })
 export class FormerCard {
+  private readonly router = inject(Router);
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
   private readonly formerTeammateHistoriesStore = inject(FormerTeammateHistoryStore);
   paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe());
@@ -50,6 +48,9 @@ export class FormerCard {
   constructor() {
     this.formerTeammateSignal = computed(this.findFormerTeammate());
     this.formerTeammateHistoriesSignal = computed(this.getFormerTeammateHistories())
+    if(this.formerTeammateSignal() === undefined) {
+      void this.router.navigate(['/error']);
+    }
   }
 
   private getFormerTeammateHistories() {

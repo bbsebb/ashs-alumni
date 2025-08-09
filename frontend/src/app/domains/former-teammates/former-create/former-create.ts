@@ -7,7 +7,6 @@ import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-to
 import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
-import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/former-teammate-dto';
 import {BackButton} from '@app/shared/components/back-button/back-button';
 import {NotificationService} from '@app/shared/services/notification';
 import {Router} from '@angular/router';
@@ -71,7 +70,8 @@ export class FormerCreate {
           this.notification.showSuccess('Le contact a été crée');
           void this.router.navigate(['/former-teammates',formerTeammate.id])
         },
-        error: (error) => {this.notification.showError('Une erreur est survenue, Veuillez réessayer plus tard')},
+        error: (err) => {this.notification.showError('Une erreur est survenue, Veuillez réessayer plus tard');
+          console.error(err)},
         complete: () => console.log('Contact crée.')
       });
     }

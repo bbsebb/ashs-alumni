@@ -24,7 +24,7 @@
         </div>
       </mat-card-title>
       <mat-card-subtitle>
-        <span [class.unknown]="!formerTeammate.birthDate">{{(formerTeammate.birthDate | date:'yyyy') ?? 'non renseignée'}}</span>
+        <span [class.unknown]="!formerTeammate.birthDate">Génération : {{(formerTeammate.birthDate | date:'yyyy') ?? 'non renseignée'}}</span>
       </mat-card-subtitle>
     </mat-card-header>
 
