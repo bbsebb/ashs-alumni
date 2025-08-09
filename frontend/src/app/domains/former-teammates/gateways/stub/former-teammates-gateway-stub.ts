@@ -6,7 +6,6 @@ import {UpdateFormerTeammate} from '../../dto/payloads/updateFormerTeammate';
 import {FormerTeammate, Gender} from '../../models/former-teammates';
 import {httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
-import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/former-teammate-dto';
 
 @Injectable({
   providedIn: 'root'

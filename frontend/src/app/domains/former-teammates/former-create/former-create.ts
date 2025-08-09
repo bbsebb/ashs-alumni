@@ -1,21 +1,11 @@
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {MatError, MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {FormControl, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
-import {ContactStatus, FormerTeammate, Role} from '@app/domains/former-teammates/models/former-teammates';
+import {Role} from '@app/domains/former-teammates/models/former-teammates';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import {map} from 'rxjs';
-import {FormerTeammateForm} from '@app/domains/former-teammates/dto/former-teammate-form';
-import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/former-teammate-dto';
 import {BackButton} from '@app/shared/components/back-button/back-button';

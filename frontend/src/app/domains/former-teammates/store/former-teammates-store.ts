@@ -2,10 +2,8 @@ import {computed, effect, inject, Injectable, ResourceRef} from '@angular/core';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
-import {FormerTeammateForm} from '@app/domains/former-teammates/dto/former-teammate-form';
 import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
-import {map, tap} from 'rxjs';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {tap} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

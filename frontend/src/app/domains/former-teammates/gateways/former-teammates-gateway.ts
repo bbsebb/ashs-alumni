@@ -5,7 +5,6 @@ import {UpdateFormerTeammate} from '../dto/payloads/updateFormerTeammate';
 import {FormerTeammate} from '../models/former-teammates';
 import {HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/former-teammate-dto';
 
 
 export interface  FormerTeammatesGateway {
