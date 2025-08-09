@@ -9,6 +9,7 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/m
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/former-teammate-dto';
 import {BackButton} from '@app/shared/components/back-button/back-button';
+import {NotificationService} from '@app/shared/services/notification';
 
 
 @Component({
@@ -35,6 +36,7 @@ import {BackButton} from '@app/shared/components/back-button/back-button';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormerCreate {
+  private readonly notification = inject(NotificationService);
   readonly startAt = new Date(1975, 0, 1);
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
@@ -64,6 +66,7 @@ export class FormerCreate {
         error: (error) => {console.log(error)},
         complete: () => {console.log('FormerTeammate created successfully')}
       });
+      this.notification.showSuccess('Contact crée avec succès')
     }
   }
 }
