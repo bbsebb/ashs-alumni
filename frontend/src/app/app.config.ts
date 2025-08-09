@@ -19,6 +19,7 @@ import {registerLocaleData} from '@angular/common';
 import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import localeFr from '@angular/common/locales/fr';
 import { provideKeycloak } from 'keycloak-angular';
+import {environment} from '@environments/environment';
 
 registerLocaleData(localeFr);
 
@@ -33,9 +34,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideKeycloak({
       config: {
-        url: 'http://localhost:8080',
-        realm: 'ashs-alumni',
-        clientId: 'angular-frontend'
+        url: environment.keycloak.url,
+        realm: environment.keycloak.realm,
+        clientId: environment.keycloak.clientId,
       },
       initOptions: {
         onLoad: 'check-sso',

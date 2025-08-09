@@ -46,7 +46,8 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
 
 
 
-    return of(newFormerTeammate);
+     // return throwError(() => new Error('Erreur lors de la création')); // Simule un erreur de l'API
+    return of(newFormerTeammate)
 
   }
     updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {

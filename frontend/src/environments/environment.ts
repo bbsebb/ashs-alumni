@@ -1,4 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: ''
+  apiUrl: '',
+  keycloak: {
+    url: '',
+    realm: 'ashs-alumni',
+    clientId: 'ashs-alumni-frontend'
+  }
 };

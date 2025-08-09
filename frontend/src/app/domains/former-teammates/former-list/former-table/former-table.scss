@@ -23,4 +23,12 @@
   border-top: none;
 }
 
+.mat-mdc-no-data-row {
+
+  text-align: center;
+  vertical-align: baseline;
+  td {
+    padding: 16px;
+  }
+}
 
