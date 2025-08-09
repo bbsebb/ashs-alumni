@@ -1,6 +1,6 @@
 <!-- Tableau des anciens coéquipiers (affiché uniquement si les données sont chargées) -->
 
-  <table mat-table matSort  [dataSource]="dataSource">
+  <table mat-table matSort  [dataSource]="dataSource" >
     <!-- Colonne Genre -->
     <ng-container matColumnDef="gender">
       <th mat-header-cell *matHeaderCellDef> Genre </th>
@@ -62,7 +62,7 @@
         }"
       [routerLink]="['/former-teammates', formerTeammate.id]"
 
-      mat-row *matRowDef="let formerTeammate; columns: columnsToDisplayedSignal()"></tr>
+      mat-row *matRowDef="let formerTeammate; columns: columnsToDisplayedSignal(),"></tr>
   </table>
 
   <!-- Pagination du tableau -->

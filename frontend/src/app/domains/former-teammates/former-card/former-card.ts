@@ -17,6 +17,7 @@ import {GenderIcon} from '@app/shared/components/gender-icon/gender-icon';
 import {MatButton} from '@angular/material/button';
 import {ActionFormerTeammateHistoryPipe} from '@app/shared/pipes/action-former-teammate-history-pipe';
 import {RolePipe} from '@app/shared/pipes/role-pipe';
+import {BackButton} from '@app/shared/components/back-button/back-button';
 
 @Component({
   selector: 'app-former-card',
@@ -33,7 +34,8 @@ import {RolePipe} from '@app/shared/pipes/role-pipe';
     RouterLink,
     MatButton,
     ActionFormerTeammateHistoryPipe,
-    RolePipe
+    RolePipe,
+    BackButton
   ],
   templateUrl: './former-card.html',
   styleUrl: './former-card.scss'

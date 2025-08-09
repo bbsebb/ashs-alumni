@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -45,7 +45,8 @@ import {ContactStatusChip} from '@app/shared/components/contact-status-chip/cont
 
   ],
   templateUrl: './former-table.html',
-  styleUrl: './former-table.scss'
+  styleUrl: './former-table.scss',
+
 })
 export class FormerTable {
 
@@ -73,13 +74,11 @@ export class FormerTable {
     })
 
 
-    effect(() => {
-      this.dataSource.sort = this.matSort() ?? null;
-      this.dataSource.paginator = this.matPaginator() ?? null;
-    })
+
 
     effect(() => {
       this.dataSource.data = this.filterFormerTeammates();
+      console.log('changement de data dans le tableau')
     });
     effect(() => {
       this.dataSource.paginator = this.matPaginator() ?? null;

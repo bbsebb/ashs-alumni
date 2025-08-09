@@ -8,6 +8,17 @@
 }@else if (formerTeammatesResource.error()) {
   <p>Une erreur est survenu</p>
 } @else if(formerTeammatesResource.hasValue()) {
-  <app-former-filter (filterChange)="filterChange($event)" />
+  <menu>
+    <app-former-filter (filterChange)="filterChange($event)"/>
+    <button
+      [class.floating-button]="breakpointObserver()?.matches"
+      matFab
+      extended
+      [routerLink]="['/former-teammates/create']"
+    >
+      <mat-icon>add</mat-icon>
+      Ajouter
+    </button>
+  </menu>
 <app-former-table [filterFormerTeammates]="filteredFormerTeammates()"/>
 }

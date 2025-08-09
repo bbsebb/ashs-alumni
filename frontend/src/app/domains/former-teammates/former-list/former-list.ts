@@ -1,4 +1,4 @@
-import {Component, computed, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
+import {Component, computed, effect, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatSortModule} from '@angular/material/sort';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
@@ -9,6 +9,11 @@ import {
   FormerTeammatesFilter
 } from '@app/domains/former-teammates/former-list/former-filter/former-filter';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatFabButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-former-list',
@@ -19,6 +24,10 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
     FormerTable,
     FormerFilter,
     MatProgressSpinner,
+    MatFabButton,
+    MatIcon,
+    RouterLink,
+
   ],
   templateUrl: './former-list.html',
   styleUrl: './former-list.scss'
@@ -27,6 +36,7 @@ export class FormerList {
 
   // Injected services
   readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined> = inject(FormerTeammatesStore).formerTeammatesResourceRef;
+  readonly breakpointObserver =  toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
 
   // Table configuration
   readonly filteredFormerTeammates = this.filterData();
@@ -44,7 +54,6 @@ export class FormerList {
    * et la configuration de la pagination et du tri.
    */
   constructor() {
-
   }
 
   /**

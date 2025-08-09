@@ -4,7 +4,6 @@
   @include mat.form-field-density(-3);
   display: block;
   max-width: 800px;
-  margin: 0 auto;
 }
 
 
@@ -17,10 +16,7 @@
   align-items: center;
 }
 
-// Button toggle groups styling
-mat-button-toggle-group {
 
-}
 
 mat-form-field {
   height: 45px;
@@ -29,12 +25,5 @@ mat-form-field {
 
 
 
-// Responsive design
-@media (max-width: 768px) {
 
-}
-
-@media (max-width: 480px) {
-
-}
 
