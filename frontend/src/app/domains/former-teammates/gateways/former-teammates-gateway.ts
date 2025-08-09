@@ -9,8 +9,8 @@ import {FormerTeammateDTO} from '@app/domains/former-teammates/dto/responses/for
 
 
 export interface  FormerTeammatesGateway {
-  createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammateDTO>;
-  updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammateDTO>;
+  createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammate>;
+  updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate>;
   deleteFormerTeammate(formerTeammateId: UUID): Observable<void>;
   getFormerTeammates(): HttpResourceRef<FormerTeammate[] |  undefined>;
 }

@@ -16,7 +16,7 @@ import {
   FormerTeammateHistoryGatewayStub
 } from '@app/domains/former-teammates/gateways/stub/former-teammate-history-gateway-stub';
 import {registerLocaleData} from '@angular/common';
-import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import localeFr from '@angular/common/locales/fr';
 import { provideKeycloak } from 'keycloak-angular';
 
@@ -25,6 +25,7 @@ registerLocaleData(localeFr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideNativeDateAdapter(),
     provideHttpClient(),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
