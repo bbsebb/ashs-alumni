@@ -3,7 +3,9 @@ import {FormerTeammate} from '@app/domains/former-teammates/models/former-teamma
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
 import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
-import {tap} from 'rxjs';
+import {EMPTY, empty, Observable, tap} from 'rxjs';
+import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
+import {Form} from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -29,15 +31,43 @@ export class FormerTeammatesStore {
 
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate) {
     return this.formerTeammatesGateway.createFormerTeammate(createFormerTeammate).pipe(
-      tap(this.updateStore()
+      tap(this.updateStore('create')
     ));
   }
 
+  updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate):Observable<FormerTeammate> {
+    return this.formerTeammatesGateway.updateFormerTeammate(updateFormerTeammate).pipe(
+      tap(this.updateStore('update')));
+  }
 
-  private updateStore(): (formerTeammate: FormerTeammate) => void {
+  deleteTeammate(id: UUID): Observable<void> {
+    return this.formerTeammatesGateway.deleteFormerTeammate(id).pipe(
+      tap(() => this.formerTeammatesResource.update(formerTeammates => formerTeammates?.filter(formerTeammate => formerTeammate.id!==id)))
+    )
+  }
+
+
+
+  private updateStore(operationType: 'create' | 'update'): (formerTeammate: FormerTeammate) => void {
     return newFormerTeammate => {
-      this.formerTeammatesResource.update(this.addCreatedFormerTeammateInStore(newFormerTeammate));
+      switch (operationType) {
+        case 'create' : {
+          this.formerTeammatesResource.update(this.addCreatedFormerTeammateInStore(newFormerTeammate));
+          break;
+        }
+        case 'update' : {
+          this.formerTeammatesResource.update(this.updateTeammateInStore(newFormerTeammate));
+          break;
+        }
+        default: {
+          throw new Error('Invalid operation type');
+        }
+      }
     };
+  }
+
+  private updateTeammateInStore(newFormerTeammate: FormerTeammate) : (formerTeammates: FormerTeammate[] | undefined) => FormerTeammate[] | undefined {
+    return formerTeammates => formerTeammates?.map(formerTeammate => formerTeammate.id === newFormerTeammate.id ? newFormerTeammate : formerTeammate);
   }
 
   private addCreatedFormerTeammateInStore(newFormerTeammate: FormerTeammate) : (formerTeammates: FormerTeammate[] | undefined) => FormerTeammate[] | undefined {
@@ -48,4 +78,7 @@ export class FormerTeammatesStore {
       return [...formerTeammates, newFormerTeammate]
     };
   }
+
+
+
 }

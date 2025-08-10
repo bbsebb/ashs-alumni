@@ -73,6 +73,9 @@
     </mat-card-content>
     <mat-card-actions>
       <app-back-button link='/former-teammates/former-list' />
+      <a mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true" [routerLink]="['/former-teammates/edit',formerTeammate.id]">Modifier</a>
+      <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="delete()">Supprimer</button>
+      <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" >Renvoyer SMS</button>
     </mat-card-actions>
   </mat-card>
 }

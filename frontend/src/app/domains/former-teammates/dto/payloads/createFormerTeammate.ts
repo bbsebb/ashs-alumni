@@ -1,7 +1,7 @@
-import {Role} from '@app/domains/former-teammates/models/former-teammates';
+import {Gender, Role} from '@app/domains/former-teammates/models/former-teammates';
 
 export interface CreateFormerTeammate {
-  gender: string;
+  gender: Gender;
   firstName: string;
   lastName: string ;
   phone: string | null;

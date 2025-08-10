@@ -5,7 +5,7 @@ import {CreateFormerTeammate} from '../../dto/payloads/createFormerTeammate';
 import {UpdateFormerTeammate} from '../../dto/payloads/updateFormerTeammate';
 import {FormerTeammate, Gender} from '../../models/former-teammates';
 import {httpResource, HttpResourceRef} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {EMPTY, Observable, of} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -51,10 +51,28 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
 
   }
     updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {
-        throw new Error('Method not implemented.');
+      const updatedFormerTeammate: FormerTeammate = {
+        id: updateFormerTeammate.id,
+        firstName: updateFormerTeammate.firstName,
+        lastName: updateFormerTeammate.lastName,
+        gender: updateFormerTeammate.gender as Gender,
+        phone: updateFormerTeammate.phone || undefined,
+        birthDate: updateFormerTeammate.birthDate || undefined,
+        roles: updateFormerTeammate.roles,
+        status: 'SUBMITTED' // Statut par défaut pour un nouvel ancien coéquipier
+      };
+      this.mockData.map(formerTeammate => {
+        if (formerTeammate.id === updateFormerTeammate.id) {
+          return updatedFormerTeammate;
+        }
+        return formerTeammate;
+      })
+
+      return of(updatedFormerTeammate)
     }
     deleteFormerTeammate(formerTeammateId: UUID): Observable<void> {
-        throw new Error('Method not implemented.');
+        this.mockData = this.mockData.filter(formerTeammate => formerTeammate.id !== formerTeammateId);
+        return of(undefined);
     }
     getFormerTeammates(): HttpResourceRef<FormerTeammate[] |  undefined> {
         return this.stubItemResourceRef ;

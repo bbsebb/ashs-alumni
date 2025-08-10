@@ -34,6 +34,6 @@
   </mat-button-toggle-group>
   <div id="action">
     <app-back-button link='/former-teammates/former-list'/>
-    <button mat-button type="submit">Enregistrer</button>
+    <button mat-button type="submit">{{ isCreateModeSignal() ? 'Enregistrer' : 'Modifier' }}</button>
   </div>
 </form>

@@ -4,6 +4,6 @@ export const environment = {
   keycloak: {
     url: '',
     realm: 'ashs-alumni',
-    clientId: 'ashs-alumni-frontend'
+    clientId: 'angular-frontend'
   }
 };
