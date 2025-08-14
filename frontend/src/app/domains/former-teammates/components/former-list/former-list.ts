@@ -1,19 +1,20 @@
-import {Component, computed, effect, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatSortModule} from '@angular/material/sort';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
-import {FormerTable} from '@app/domains/former-teammates/former-list/former-table/former-table';
+import {FormerTable} from '@app/domains/former-teammates/components/former-list/former-table/former-table';
 import {
   FormerFilter,
   FormerTeammatesFilter
-} from '@app/domains/former-teammates/former-list/former-filter/former-filter';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
+} from '@app/domains/former-teammates/components/former-list/former-filter/former-filter';
 import {MatFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {RouterLink} from '@angular/router';
+import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
+import {LoadingComponent} from '@app/shared/components/loading/loading';
 
 @Component({
   selector: 'app-former-list',
@@ -23,10 +24,11 @@ import {RouterLink} from '@angular/router';
     ReactiveFormsModule,
     FormerTable,
     FormerFilter,
-    MatProgressSpinner,
+    LoadingComponent,
     MatFabButton,
     MatIcon,
     RouterLink,
+    LoadErrorComponent,
 
   ],
   templateUrl: './former-list.html',
@@ -36,7 +38,7 @@ export class FormerList {
 
   // Injected services
   readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined> = inject(FormerTeammatesStore).formerTeammatesResourceRef;
-  readonly breakpointObserver =  toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
+  readonly breakpointObserver = toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
 
   // Table configuration
   readonly filteredFormerTeammates = this.filterData();
@@ -63,7 +65,7 @@ export class FormerList {
    */
   filterData() {
     return computed(() => {
-      if(!this.formerTeammatesResource.hasValue()) {
+      if (!this.formerTeammatesResource.hasValue()) {
         return [];
       }
 
@@ -74,14 +76,18 @@ export class FormerList {
     })
   }
 
+  filterChange($event: FormerTeammatesFilter) {
+    this.formerTeammatesFilterSignal.set($event)
+  }
+
   /**
    * Filtre un ancien coéquipier par genre selon les critères sélectionnés.
    * @param formerTeammate L'ancien coéquipier à filtrer
    * @returns true si l'ancien coéquipier correspond aux critères de genre ou si aucun filtre n'est appliqué
    */
-  private filterByGender(formerTeammate: FormerTeammate):boolean {
+  private filterByGender(formerTeammate: FormerTeammate): boolean {
     let genderFilter = this.formerTeammatesFilterSignal().gender;
-    if(genderFilter.length === 0) {
+    if (genderFilter.length === 0) {
       return true;
     }
     return genderFilter.includes(formerTeammate.gender);
@@ -92,9 +98,9 @@ export class FormerList {
    * @param formerTeammate L'ancien coéquipier à filtrer
    * @returns true si l'ancien coéquipier correspond aux critères de statut ou si aucun filtre n'est appliqué
    */
-  private filterByContactStatus(formerTeammate: FormerTeammate):boolean {
+  private filterByContactStatus(formerTeammate: FormerTeammate): boolean {
     let contactStatusFilter = this.formerTeammatesFilterSignal().contactStatus;
-    if(contactStatusFilter.length === 0) {
+    if (contactStatusFilter.length === 0) {
       return true;
     }
     return contactStatusFilter.includes(formerTeammate.status);
@@ -105,16 +111,11 @@ export class FormerList {
    * @param formerTeammate L'ancien coéquipier à filtrer
    * @returns true si le prénom ou nom de famille contient le terme de recherche ou si aucun terme n'est saisi
    */
-  private filterByName(formerTeammate: FormerTeammate):boolean {
+  private filterByName(formerTeammate: FormerTeammate): boolean {
     let searchByNameFilter = this.formerTeammatesFilterSignal().searchByName;
-    if(searchByNameFilter.trim().length === 0) {
+    if (searchByNameFilter.trim().length === 0) {
       return true;
     }
     return formerTeammate.firstName.includes(searchByNameFilter) || formerTeammate.lastName.includes(searchByNameFilter);
-  }
-
-
-  filterChange($event: FormerTeammatesFilter) {
-    this.formerTeammatesFilterSignal.set($event)
   }
 }

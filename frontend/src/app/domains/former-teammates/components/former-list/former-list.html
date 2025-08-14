@@ -3,11 +3,10 @@
 
 
 @if (formerTeammatesResource.isLoading()) {
-  <h2>Chargement des données</h2>
-  <mat-spinner></mat-spinner>
-}@else if (formerTeammatesResource.error()) {
-  <p>Une erreur est survenu</p>
-} @else if(formerTeammatesResource.hasValue()) {
+  <app-loading message="Chargement des données"/>
+} @else if (formerTeammatesResource.error()) {
+  <app-load-error></app-load-error>
+} @else if (formerTeammatesResource.hasValue()) {
   <menu>
     <app-former-filter (filterChange)="filterChange($event)"/>
     <button
@@ -20,5 +19,5 @@
       Ajouter
     </button>
   </menu>
-<app-former-table [filterFormerTeammates]="filteredFormerTeammates()"/>
+  <app-former-table [filterFormerTeammates]="filteredFormerTeammates()"/>
 }

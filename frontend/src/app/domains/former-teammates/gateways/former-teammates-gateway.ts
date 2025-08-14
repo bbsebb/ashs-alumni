@@ -7,10 +7,18 @@ import {HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 
-export interface  FormerTeammatesGateway {
+export interface FormerTeammatesGateway {
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammate>;
+
   updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate>;
+
   deleteFormerTeammate(formerTeammateId: UUID): Observable<void>;
-  getFormerTeammates(): HttpResourceRef<FormerTeammate[] |  undefined>;
+
+  getFormerTeammates(): HttpResourceRef<FormerTeammate[] | undefined>;
+
+  getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined>;
+
+  getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined>;
 }
+
 export const FORMER_TEAMMATES_GATEWAY = new InjectionToken<FormerTeammatesGateway>('FormerTeammatesGateway');

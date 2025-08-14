@@ -6,7 +6,7 @@ import {MatBadgeModule} from '@angular/material/badge';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {CommonModule} from '@angular/common';
-import {FormerTeammate} from '../models/former-teammates';
+
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
@@ -22,6 +22,7 @@ import {HasRolesDirective} from 'keycloak-angular';
 import {NotificationService} from '@app/shared/services/notification';
 import {DialogService} from '@app/shared/services/dialog';
 import {EMPTY, switchMap} from 'rxjs';
+import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 
 /**
  * FormerCard Component
@@ -62,31 +63,24 @@ import {EMPTY, switchMap} from 'rxjs';
 export class FormerCard {
   // ===== DEPENDENCY INJECTIONS =====
 
+  /** Signal containing current route parameters, used to extract teammate ID */
+  paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe());
+  /** Signal containing the current former teammate data based on route parameters */
+  formerTeammateSignal: Signal<FormerTeammate | undefined>;
+  /** Signal containing the history records for the current former teammate */
+  formerTeammateHistoriesSignal: Signal<FormerTeammateHistory[]>;
   /** Service for displaying notifications to the user */
   private readonly notificationService = inject(NotificationService);
-
   /** Service for displaying confirmation and other dialogs */
   private readonly dialogService = inject(DialogService);
 
+  // ===== SIGNALS AND COMPUTED PROPERTIES =====
   /** Angular router for navigation */
   private readonly router = inject(Router);
-
   /** Store for managing former teammates data */
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
-
   /** Store for managing former teammate history records */
   private readonly formerTeammateHistoriesStore = inject(FormerTeammateHistoryStore);
-
-  // ===== SIGNALS AND COMPUTED PROPERTIES =====
-
-  /** Signal containing current route parameters, used to extract teammate ID */
-  paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe());
-
-  /** Signal containing the current former teammate data based on route parameters */
-  formerTeammateSignal: Signal<FormerTeammate | undefined>;
-
-  /** Signal containing the history records for the current former teammate */
-  formerTeammateHistoriesSignal: Signal<FormerTeammateHistory[]>;
 
   // ===== CONSTRUCTOR AND INITIALIZATION =====
 
@@ -105,51 +99,6 @@ export class FormerCard {
   }
 
   // ===== PRIVATE METHODS - DATA RETRIEVAL =====
-
-  /**
-   * Creates a computed function to retrieve former teammate histories
-   *
-   * @returns A function that returns the histories for the current teammate
-   *          or an empty array if no teammate ID is available
-   */
-  private getFormerTeammateHistories() {
-    return () => {
-      const formerTeammateId = this.formerTeammateSignal()?.id;
-
-      // Return an empty array if no teammate is selected
-      if (formerTeammateId === undefined) {
-        return [];
-      }
-
-      // Retrieve histories from the store and return the signal value
-      const formerTeammateHistoriesById = this.formerTeammateHistoriesStore.getFormerTeammateHistoriesById(formerTeammateId);
-      return formerTeammateHistoriesById();
-    };
-  }
-
-  /**
-   * Creates a computed function to find the former teammate based on route parameters
-   *
-   * @returns A function that returns the former teammate matching the route ID,
-   *          or undefined if no ID is provided or teammate is not found
-   */
-  private findFormerTeammate() {
-    return () => {
-      // Extract teammate ID from route parameters
-      const formerTeammateId: string | undefined = this.paramsRouteSignal()?.['id'];
-
-      // Return undefined if no ID is provided in the route
-      if (formerTeammateId === undefined) {
-        return undefined;
-      }
-
-      // Retrieve teammate from the store and return the signal value
-      const formerTeammateById = this.formerTeammatesStore.getFormerTeammateById(formerTeammateId);
-      return formerTeammateById();
-    };
-  }
-
-  // ===== PUBLIC METHODS - USER ACTIONS =====
 
   /**
    * Handles the deletion of the current former teammate
@@ -197,5 +146,50 @@ export class FormerCard {
         this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
       }
     });
+  }
+
+  /**
+   * Creates a computed function to retrieve former teammate histories
+   *
+   * @returns A function that returns the histories for the current teammate
+   *          or an empty array if no teammate ID is available
+   */
+  private getFormerTeammateHistories() {
+    return () => {
+      const formerTeammateId = this.formerTeammateSignal()?.id;
+
+      // Return an empty array if no teammate is selected
+      if (formerTeammateId === undefined) {
+        return [];
+      }
+
+      // Retrieve histories from the store and return the signal value
+      const formerTeammateHistoriesById = this.formerTeammateHistoriesStore.getFormerTeammateHistoriesById(formerTeammateId);
+      return formerTeammateHistoriesById();
+    };
+  }
+
+  // ===== PUBLIC METHODS - USER ACTIONS =====
+
+  /**
+   * Creates a computed function to find the former teammate based on route parameters
+   *
+   * @returns A function that returns the former teammate matching the route ID,
+   *          or undefined if no ID is provided or teammate is not found
+   */
+  private findFormerTeammate() {
+    return () => {
+      // Extract teammate ID from route parameters
+      const formerTeammateId: string | undefined = this.paramsRouteSignal()?.['id'];
+
+      // Return undefined if no ID is provided in the route
+      if (formerTeammateId === undefined) {
+        return undefined;
+      }
+
+      // Retrieve teammate from the store and return the signal value
+      const formerTeammateById = this.formerTeammatesStore.getFormerTeammateById(formerTeammateId);
+      return formerTeammateById();
+    };
   }
 }

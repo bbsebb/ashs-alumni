@@ -1,11 +1,13 @@
-import {effect, Injectable} from '@angular/core';
+import {computed, inject, Injectable, Signal} from '@angular/core';
 import {FormerTeammatesGateway} from '../former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
 import {CreateFormerTeammate} from '../../dto/payloads/createFormerTeammate';
 import {UpdateFormerTeammate} from '../../dto/payloads/updateFormerTeammate';
-import {FormerTeammate, Gender} from '../../models/former-teammates';
-import {httpResource, HttpResourceRef} from '@angular/common/http';
-import {EMPTY, Observable, of} from 'rxjs';
+import {FormerTeammate} from '../../models/former-teammates';
+import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {environment} from '@environments/environment';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
@@ -13,118 +15,50 @@ import {EMPTY, Observable, of} from 'rxjs';
 export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
 
 
-    private stubItemResourceRef: HttpResourceRef<FormerTeammate[] |  undefined> = httpResource(() => '')
+  private readonly httpClient = inject(HttpClient);
 
-    constructor() {
-      this.stubItemResourceRef.set([...this.mockData])
-      effect(() => {
-        this.stubItemResourceRef.value()
-        console.log('Mise à jour de la resource dans la gateway');
-      });
 
-    }
+  constructor() {
+
+
+  }
+
+  getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined> {
+    return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/${id}`)
+  }
+
+  getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined> {
+    const codesSignal = toSignal(this.httpClient.get<SMS[]>(`${environment.apiUrl}/code-SMS?code=${code}`));
+    const codeSignal: Signal<string | undefined> = computed(() => codesSignal()?.at(0)?.formerTeammateId)
+    return httpResource(() => `${environment.apiUrl}/former-teammates/${codeSignal()}`);
+    // return httpResource(() => `${environment.apiUrl}/error`); // simulate an error
+  }
 
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammate> {
-    // Générer un nouvel ID UUID
-    const newId: UUID = this.generateUUID();
-
-    // Créer le nouvel ancien coéquipier
-    const newFormerTeammate: FormerTeammate = {
-      id: newId,
-      firstName: createFormerTeammate.firstName,
-      lastName: createFormerTeammate.lastName,
-      gender: createFormerTeammate.gender as Gender,
-      phone: createFormerTeammate.phone || undefined,
-      birthDate: createFormerTeammate.birthDate || undefined,
-      roles: createFormerTeammate.roles,
-      status: 'SUBMITTED' // Statut par défaut pour un nouvel ancien coéquipier
-    };
-
-    // Ajouter à la liste mock
-    this.mockData.push(newFormerTeammate);
-
-
-
-
-     // return throwError(() => new Error('Erreur lors de la création')); // Simule un erreur de l'API
-    return of(newFormerTeammate)
-
+    return this.httpClient.post<FormerTeammate>(`${environment.apiUrl}/former-teammates`, createFormerTeammate)
   }
-    updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {
-      const updatedFormerTeammate: FormerTeammate = {
-        id: updateFormerTeammate.id,
-        firstName: updateFormerTeammate.firstName,
-        lastName: updateFormerTeammate.lastName,
-        gender: updateFormerTeammate.gender as Gender,
-        phone: updateFormerTeammate.phone || undefined,
-        birthDate: updateFormerTeammate.birthDate || undefined,
-        roles: updateFormerTeammate.roles,
-        status: 'SUBMITTED' // Statut par défaut pour un nouvel ancien coéquipier
-      };
-      this.mockData.map(formerTeammate => {
-        if (formerTeammate.id === updateFormerTeammate.id) {
-          return updatedFormerTeammate;
-        }
-        return formerTeammate;
-      })
 
-      return of(updatedFormerTeammate)
-    }
-    deleteFormerTeammate(formerTeammateId: UUID): Observable<void> {
-        this.mockData = this.mockData.filter(formerTeammate => formerTeammate.id !== formerTeammateId);
-        return of(undefined);
-    }
-    getFormerTeammates(): HttpResourceRef<FormerTeammate[] |  undefined> {
-        return this.stubItemResourceRef ;
-    }
+  updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {
 
-  private generateUUID(): UUID {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    }) as UUID;
+    return this.httpClient.patch<FormerTeammate>(`${environment.apiUrl}/former-teammates/${updateFormerTeammate.id}`, updateFormerTeammate)
+  }
+
+  deleteFormerTeammate(formerTeammateId: UUID): Observable<void> {
+    return this.httpClient.delete<void>(`${environment.apiUrl}/former-teammates/${formerTeammateId}`)
+  }
+
+  getFormerTeammates(): HttpResourceRef<FormerTeammate[] | undefined> {
+    return httpResource<FormerTeammate[] | undefined>(() => `${environment.apiUrl}/former-teammates`)
+    //return httpResource<FormerTeammate[] | undefined>(() => `${environment.apiUrl}/error`) // simulate an error
   }
 
 
-  private mockData: FormerTeammate[] = [
-    {
-      id: '550e8400-e29b-41d4-a716-446655440001',
-      firstName: 'Jean',
-      lastName: 'Dupont',
-      gender: 'M',
-      phone: '+33123456789',
-      birthDate: new Date('1990-05-15'),
-      roles: [],
-      status: 'VALIDATED'
-    },
-    {
-      id: '550e8400-e29b-41d4-a716-446655440002',
-      firstName: 'Marie',
-      lastName: 'Martin',
-      gender: 'M',
-      phone: '+33987654321',
-      birthDate: new Date('1988-12-03'),
-      roles: ['COACH', 'PLAYER'],
-      status: 'PENDING'
-    },
-    {
-      id: '550e8400-e29b-41d4-a716-446655440003',
-      firstName: 'Sébastien',
-      lastName: 'Burckhardt',
-      gender: 'M',
-      birthDate: new Date('1985-08-22'),
-      roles: ['PRESIDENT'],
-      status: 'SUBMITTED'
-    },
-    {
-      id: '550e8400-e29b-41d4-a716-446655440004',
-      firstName: 'Sophie',
-      lastName: 'Leroy',
-      gender: 'F',
-      phone: '+33555666777',
-      roles: ['ASSISTANT'],
-      status: 'NOT_REQUESTED'
-    }
-  ];
+}
+
+type SMS = {
+  "id": string;
+  "formerTeammateId": string;
+  "code": string;
+  "isUsed": boolean;
+  "usedAt": string;
 }

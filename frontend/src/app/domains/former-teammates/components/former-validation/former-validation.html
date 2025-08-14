@@ -1,0 +1,10 @@
+@if (loadedResource.isLoading()) {
+  <mat-spinner></mat-spinner>
+} @else if (loadedResource.error()) {
+  <app-load-error></app-load-error>
+} @else if (loadedResource.hasValue()) {
+  <app-former-form (formerTeammateFormValueSubmitted)="onSubmit($event)"
+                   [prefillFormerTeammate]="prefillFormerTeammateFormSignal()" action="Valider"
+                   title="Validation de vos informations">
+  </app-former-form>
+}

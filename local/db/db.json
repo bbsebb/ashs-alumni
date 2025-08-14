@@ -1,0 +1,255 @@
+{
+  "former-teammates": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "gender": "F",
+      "phone": "+33123456789",
+      "birthDate": "1990-05-15T00:00:00.000Z",
+      "roles": [],
+      "status": "VALIDATED"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "gender": "F",
+      "firstName": "Marie",
+      "lastName": "Martin",
+      "phone": "+33987654321",
+      "birthDate": "1988-12-03T00:00:00.000Z",
+      "roles": [
+        "COACH",
+        "PLAYER"
+      ],
+      "status": "SUBMITTED"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "gender": "F",
+      "firstName": "Sébastien",
+      "lastName": "Burckhardt",
+      "phone": null,
+      "birthDate": "1985-08-22T00:00:00.000Z",
+      "roles": [
+        "PRESIDENT"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "firstName": "Sophie",
+      "lastName": "Leroy",
+      "gender": "F",
+      "phone": "+33555666777",
+      "roles": [
+        "ASSISTANT"
+      ],
+      "status": "NOT_REQUESTED"
+    }
+  ],
+  "code-SMS": [
+    {
+      "id": "code-001",
+      "formerTeammateId": "550e8400-e29b-41d4-a716-446655440001",
+      "code": "550e8400-e29b-41d4-a716-446655440001",
+      "isUsed": true,
+      "usedAt": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": "code-002",
+      "formerTeammateId": "550e8400-e29b-41d4-a716-446655440002",
+      "code": "550e8400-e29b-41d4-a716-446655440002",
+      "isUsed": true,
+      "usedAt": "2024-01-20T09:15:00.000Z"
+    },
+    {
+      "id": "code-003",
+      "formerTeammateId": "550e8400-e29b-41d4-a716-446655440003",
+      "code": "550e8400-e29b-41d4-a716-446655440003",
+      "isUsed": true,
+      "usedAt": "2024-02-05T11:00:00.000Z"
+    },
+    {
+      "id": "code-004",
+      "formerTeammateId": "550e8400-e29b-41d4-a716-446655440004",
+      "code": "550e8400-e29b-41d4-a716-446655440004",
+      "isUsed": false,
+      "usedAt": null
+    }
+  ],
+  "former-teammate-histories": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440101",
+      "contactId": "550e8400-e29b-41d4-a716-446655440001",
+      "action": "CREATE",
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "firstName": "Jean",
+        "lastName": "Dupont",
+        "phone": "+33123456789",
+        "gender": "M",
+        "birthDate": "1990-05-15T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "SUBMITTED"
+      },
+      "changedAt": "2024-01-15T10:30:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440999",
+      "changedByUserName": "Dubois Michel"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440102",
+      "contactId": "550e8400-e29b-41d4-a716-446655440001",
+      "action": "UPDATE",
+      "previousValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "firstName": "Jean",
+        "lastName": "Dupont",
+        "gender": "M",
+        "phone": "+33123456789",
+        "birthDate": "1990-05-15T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "SUBMITTED"
+      },
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "firstName": "Jean",
+        "lastName": "Dupont",
+        "gender": "M",
+        "phone": "+33123456789",
+        "birthDate": "1990-05-15T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "VALIDATED"
+      },
+      "changedAt": "2024-02-01T14:20:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440998",
+      "changedByUserName": "Moreau Claire"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440201",
+      "contactId": "550e8400-e29b-41d4-a716-446655440002",
+      "action": "CREATE",
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "firstName": "Marie",
+        "lastName": "Martin",
+        "gender": "F",
+        "phone": "+33987654321",
+        "birthDate": "1988-12-03T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "SUBMITTED"
+      },
+      "changedAt": "2024-01-20T09:15:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440999",
+      "changedByUserName": "Dubois Michel"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440202",
+      "contactId": "550e8400-e29b-41d4-a716-446655440002",
+      "action": "UPDATE",
+      "previousValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "firstName": "Marie",
+        "lastName": "Martin",
+        "gender": "F",
+        "phone": "+33987654321",
+        "birthDate": "1988-12-03T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "SUBMITTED"
+      },
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "firstName": "Marie",
+        "lastName": "Martin",
+        "gender": "M",
+        "phone": "+33987654321",
+        "birthDate": "1988-12-03T00:00:00.000Z",
+        "roles": [
+          "COACH",
+          "PLAYER"
+        ],
+        "status": "PENDING"
+      },
+      "changedAt": "2024-03-10T16:45:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440997",
+      "changedByUserName": "Lefebvre Antoine"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440301",
+      "contactId": "550e8400-e29b-41d4-a716-446655440003",
+      "action": "CREATE",
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440003",
+        "firstName": "Pierre",
+        "lastName": "Durand",
+        "gender": "M",
+        "birthDate": "1985-08-22T00:00:00.000Z",
+        "roles": [
+          "PRESIDENT"
+        ],
+        "status": "SUBMITTED"
+      },
+      "changedAt": "2024-02-05T11:00:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440999",
+      "changedByUserName": "Dubois Michel"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440401",
+      "contactId": "550e8400-e29b-41d4-a716-446655440004",
+      "action": "CREATE",
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440004",
+        "firstName": "Sophie",
+        "lastName": "Leroy",
+        "gender": "F",
+        "phone": "+33555666777",
+        "roles": [
+          "ASSISTANT"
+        ],
+        "status": "NOT_REQUESTED"
+      },
+      "changedAt": "2024-03-01T08:30:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440999",
+      "changedByUserName": "Dubois Michel"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440501",
+      "contactId": "550e8400-e29b-41d4-a716-446655440005",
+      "action": "DELETE",
+      "previousValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440005",
+        "firstName": "Antoine",
+        "lastName": "Bernard",
+        "gender": "M",
+        "birthDate": "1992-03-18T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "VALIDATED"
+      },
+      "newValue": {
+        "id": "550e8400-e29b-41d4-a716-446655440005",
+        "firstName": "Antoine",
+        "lastName": "Bernard",
+        "gender": "M",
+        "birthDate": "1992-03-18T00:00:00.000Z",
+        "roles": [
+          "PLAYER"
+        ],
+        "status": "VALIDATED"
+      },
+      "changedAt": "2024-04-15T13:20:00.000Z",
+      "changedByUserId": "550e8400-e29b-41d4-a716-446655440998",
+      "changedByUserName": "Moreau Claire"
+    }
+  ]
+}

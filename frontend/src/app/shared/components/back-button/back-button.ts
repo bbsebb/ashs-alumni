@@ -19,5 +19,23 @@ import {MatIcon} from '@angular/material/icon';
   styles: ``
 })
 export class BackButton {
+  /**
+   * The return link route path for the back button navigation.
+   *
+   * This property defines the route that the back button will navigate to when clicked.
+   * It should be a valid Angular router path string.
+   *
+   * @example
+   * // Navigate back to the home page
+   * <app-back-button link="/home" />
+   *
+   * @example
+   * // Navigate back to a list view
+   * <app-back-button link="/former-teammates" />
+   *
+   * @example
+   * // Navigate back with route parameters
+   * <app-back-button link="/users/123" />
+   */
   link = input.required<string>();
 }

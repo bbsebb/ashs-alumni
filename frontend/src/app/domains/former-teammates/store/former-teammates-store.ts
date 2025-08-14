@@ -3,16 +3,17 @@ import {FormerTeammate} from '@app/domains/former-teammates/models/former-teamma
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
 import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
-import {EMPTY, empty, Observable, tap} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
-import {Form} from '@angular/forms';
+import {HttpResourceRef} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormerTeammatesStore {
-  private readonly formerTeammatesResource :ResourceRef<FormerTeammate[] |  undefined>;
+  private readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined>;
   private formerTeammatesGateway = inject(FORMER_TEAMMATES_GATEWAY)
+
   constructor() {
     this.formerTeammatesResource = this.formerTeammatesGateway.getFormerTeammates();
     effect(() => {
@@ -29,29 +30,29 @@ export class FormerTeammatesStore {
     return computed(() => this.formerTeammatesResource.value()?.find((formerTeammate) => formerTeammate.id === id))
   }
 
+
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate) {
     return this.formerTeammatesGateway.createFormerTeammate(createFormerTeammate).pipe(
-      tap(this.updateStore('create')
-    ));
+      tap(this.updateStore('add')
+      ));
   }
 
-  updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate):Observable<FormerTeammate> {
+  updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {
     return this.formerTeammatesGateway.updateFormerTeammate(updateFormerTeammate).pipe(
       tap(this.updateStore('update')));
   }
 
   deleteTeammate(id: UUID): Observable<void> {
     return this.formerTeammatesGateway.deleteFormerTeammate(id).pipe(
-      tap(() => this.formerTeammatesResource.update(formerTeammates => formerTeammates?.filter(formerTeammate => formerTeammate.id!==id)))
+      tap(() => this.formerTeammatesResource.update(formerTeammates => formerTeammates?.filter(formerTeammate => formerTeammate.id !== id)))
     )
   }
 
 
-
-  private updateStore(operationType: 'create' | 'update'): (formerTeammate: FormerTeammate) => void {
+  private updateStore(operationType: 'add' | 'update'): (formerTeammate: FormerTeammate) => void {
     return newFormerTeammate => {
       switch (operationType) {
-        case 'create' : {
+        case 'add' : {
           this.formerTeammatesResource.update(this.addCreatedFormerTeammateInStore(newFormerTeammate));
           break;
         }
@@ -66,11 +67,11 @@ export class FormerTeammatesStore {
     };
   }
 
-  private updateTeammateInStore(newFormerTeammate: FormerTeammate) : (formerTeammates: FormerTeammate[] | undefined) => FormerTeammate[] | undefined {
+  private updateTeammateInStore(newFormerTeammate: FormerTeammate): (formerTeammates: FormerTeammate[] | undefined) => FormerTeammate[] | undefined {
     return formerTeammates => formerTeammates?.map(formerTeammate => formerTeammate.id === newFormerTeammate.id ? newFormerTeammate : formerTeammate);
   }
 
-  private addCreatedFormerTeammateInStore(newFormerTeammate: FormerTeammate) : (formerTeammates: FormerTeammate[] | undefined) => FormerTeammate[] | undefined {
+  private addCreatedFormerTeammateInStore(newFormerTeammate: FormerTeammate): (formerTeammates: FormerTeammate[] | undefined) => FormerTeammate[] | undefined {
     return (formerTeammates) => {
       if (formerTeammates === undefined) {
         return undefined;
@@ -80,5 +81,7 @@ export class FormerTeammatesStore {
   }
 
 
-
+  getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined> {
+    return this.formerTeammatesGateway.getFormerTeammateByCode(code);
+  }
 }
