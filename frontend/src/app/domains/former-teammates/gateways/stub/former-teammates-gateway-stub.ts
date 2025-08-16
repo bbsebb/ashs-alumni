@@ -31,7 +31,7 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
     const codesSignal = toSignal(this.httpClient.get<SMS[]>(`${environment.apiUrl}/code-SMS?code=${code}`));
     const codeSignal: Signal<string | undefined> = computed(() => codesSignal()?.at(0)?.formerTeammateId)
     return httpResource(() => `${environment.apiUrl}/former-teammates/${codeSignal()}`);
-    // return httpResource(() => `${environment.apiUrl}/error`); // simulate an error
+    //return httpResource(() => `${environment.apiUrl}/error`); // simulate an error
   }
 
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammate> {

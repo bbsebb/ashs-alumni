@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, Signal} from '@angular/core';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatIconModule} from '@angular/material/icon';
@@ -23,6 +23,9 @@ import {NotificationService} from '@app/shared/services/notification';
 import {DialogService} from '@app/shared/services/dialog';
 import {EMPTY, switchMap} from 'rxjs';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
+import {LoadingComponent} from '@app/shared/components/loading/loading';
+import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 /**
  * FormerCard Component
@@ -36,7 +39,7 @@ import {FormerTeammate} from '@app/domains/former-teammates/models/former-teamma
  * - Shows teammate history information
  * - Handles route parameters to identify the teammate
  * - Provides delete functionality with confirmation dialog
- * - Redirects to the error page if teammate is not found
+ * - Displays loading and error states using dedicated components
  */
 @Component({
   selector: 'app-former-card',
@@ -55,7 +58,10 @@ import {FormerTeammate} from '@app/domains/former-teammates/models/former-teamma
     BackButton,
     MatButton,
     HasRolesDirective,
-    RouterLink
+    RouterLink,
+    LoadingComponent,
+    LoadErrorComponent,
+    MatProgressBar
   ],
   templateUrl: './former-card.html',
   styleUrl: './former-card.scss'
@@ -64,12 +70,16 @@ export class FormerCard {
   // ===== DEPENDENCY INJECTIONS =====
 
   /** Signal containing current route parameters, used to extract teammate ID */
-  paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe());
+  paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe(), {requireSync: true});
   /** Signal containing the current former teammate data based on route parameters */
   formerTeammateSignal: Signal<FormerTeammate | undefined>;
   /** Signal containing the history records for the current former teammate */
   formerTeammateHistoriesSignal: Signal<FormerTeammateHistory[]>;
-  /** Service for displaying notifications to the user */
+  /** Loading state signal for the former teammates resource */
+  isLoading: Signal<boolean>;
+  /** Error state signal for the former teammates resource */
+  hasError: Signal<boolean>;
+  isDeleting = signal(false);
   private readonly notificationService = inject(NotificationService);
   /** Service for displaying confirmation and other dialogs */
   private readonly dialogService = inject(DialogService);
@@ -81,21 +91,19 @@ export class FormerCard {
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
   /** Store for managing former teammate history records */
   private readonly formerTeammateHistoriesStore = inject(FormerTeammateHistoryStore);
+  readonly historiesIsLoading = this.formerTeammateHistoriesStore.isLoading();
+  readonly historiesHasError = this.formerTeammateHistoriesStore.hasError();
 
   // ===== CONSTRUCTOR AND INITIALIZATION =====
 
   constructor() {
     // Initialize computed signals for teammate and their histories
-    this.formerTeammateSignal = computed(this.findFormerTeammate());
+    this.formerTeammateSignal = this.findFormerTeammate();
     this.formerTeammateHistoriesSignal = computed(this.getFormerTeammateHistories());
 
-    // Effect to handle navigation when a teammate is not found
-    // Automatically redirects to the error page if the teammate doesn't exist
-    effect(() => {
-      if (this.formerTeammateSignal() === undefined) {
-        void this.router.navigate(['/error']);
-      }
-    });
+    this.isLoading = this.formerTeammatesStore.isLoading();
+    this.hasError = this.formerTeammatesStore.hasError()
+
   }
 
   // ===== PRIVATE METHODS - DATA RETRIEVAL =====
@@ -111,6 +119,7 @@ export class FormerCard {
    * 5. Navigates back to the teammate's list on success
    */
   delete() {
+    this.isDeleting.set(true);
     const formerTeammate = this.formerTeammateSignal();
 
     // Defensive check to ensure teammate exists before attempting deletion
@@ -131,17 +140,20 @@ export class FormerCard {
           return this.formerTeammatesStore.deleteTeammate(formerTeammate.id);
         } else {
           // User cancelled deletion - return empty observable
+          this.isDeleting.set(false);
           return EMPTY;
         }
       })
     ).subscribe({
       next: () => {
+
         // Deletion successful - show a success message and navigate away
         this.notificationService.showSuccess('Le contact a été supprimé');
-        void this.router.navigate(['/former-teammates/former-list']);
+        void this.router.navigate(['/former-teammates']);
         console.log('Contact deleted.');
       },
       error: () => {
+        this.isDeleting.set(false);
         // Deletion failed - show an error message
         this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
       }
@@ -178,18 +190,6 @@ export class FormerCard {
    *          or undefined if no ID is provided or teammate is not found
    */
   private findFormerTeammate() {
-    return () => {
-      // Extract teammate ID from route parameters
-      const formerTeammateId: string | undefined = this.paramsRouteSignal()?.['id'];
-
-      // Return undefined if no ID is provided in the route
-      if (formerTeammateId === undefined) {
-        return undefined;
-      }
-
-      // Retrieve teammate from the store and return the signal value
-      const formerTeammateById = this.formerTeammatesStore.getFormerTeammateById(formerTeammateId);
-      return formerTeammateById();
-    };
+    return this.formerTeammatesStore.getFormerTeammateById(this.paramsRouteSignal()['id'])
   }
 }

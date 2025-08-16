@@ -26,6 +26,14 @@ export class FormerTeammatesStore {
     return this.formerTeammatesResource;
   }
 
+  isLoading() {
+    return computed(() => this.formerTeammatesResource.isLoading());
+  }
+
+  hasError() {
+    return computed(() => !!this.formerTeammatesResource.error());
+  }
+
   getFormerTeammateById(id: string | UUID) {
     return computed(() => this.formerTeammatesResource.value()?.find((formerTeammate) => formerTeammate.id === id))
   }

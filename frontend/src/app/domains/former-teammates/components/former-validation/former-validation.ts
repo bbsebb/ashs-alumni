@@ -1,4 +1,4 @@
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {NotificationService} from '@app/shared/services/notification';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
@@ -9,15 +9,15 @@ import {FormerTeammate} from '@app/domains/former-teammates/models/former-teamma
 import {FormerForm, FormerTeammateFormValue} from '@app/domains/former-teammates/components/former-form/former-form';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
+import {LoadingComponent} from '@app/shared/components/loading/loading';
 
 @Component({
   selector: 'app-former-validation',
   imports: [
     FormerForm,
-    MatProgressSpinner,
-    LoadErrorComponent
+    LoadErrorComponent,
+    LoadingComponent
   ],
   templateUrl: './former-validation.html',
   styleUrl: './former-validation.scss'
@@ -26,9 +26,9 @@ export class FormerValidation {
   // === DEPENDENCY INJECTION ===
   private readonly mapper = inject(FormerTeammateMapper);
   private readonly notificationService = inject(NotificationService);
-  private readonly router = inject(Router);
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
 
   // === COMPONENT STATE ===
@@ -37,6 +37,9 @@ export class FormerValidation {
 
   //readonly formerTeammate;
   readonly loadedResource
+  readonly isLoading
+  readonly isSubmitting = signal(false);
+  hasError;
 
   constructor() {
     // Initialize the identifier from route parameters
@@ -44,6 +47,9 @@ export class FormerValidation {
 
     this.loadedResource = this.formerTeammatesStore.getFormerTeammateByCode(this.code());
 
+
+    this.hasError = computed(() => !!this.loadedResource.error());
+    this.isLoading = this.loadedResource.isLoading;
 
     // Initialize the form prefill signal
     this.prefillFormerTeammateFormSignal = this.getPrefillFormerTeammateFormSignal();
@@ -74,6 +80,7 @@ export class FormerValidation {
    * @param updateFormerTeammate - The contact update object
    */
   private updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate) {
+    this.isSubmitting.set(true);
     this.formerTeammatesStore.updateFormerTeammate(updateFormerTeammate).subscribe({
       next: this.handleSuccess(),
       error: this.handleError(),
@@ -87,12 +94,13 @@ export class FormerValidation {
    * @returns Signal containing form data or undefined
    */
   private getPrefillFormerTeammateFormSignal() {
-    const formerTeammate = this.loadedResource;
+
     return computed(() => {
-      if (!formerTeammate.hasValue()) {
+      const formerTeammate = this.loadedResource.value();
+      if (!formerTeammate) {
         return undefined;
       }
-      return this.mapper.mapFormerTeammateToFormerTeammateFormValue(formerTeammate.value());
+      return this.mapper.mapFormerTeammateToFormerTeammateFormValue(formerTeammate);
     })
   }
 
@@ -108,7 +116,10 @@ export class FormerValidation {
    */
   private handleSuccess(): (formValue: FormerTeammate) => void {
     return (_: FormerTeammate) => {
+      this.isSubmitting.set(false);
       this.showSuccessNotification();
+      // Navigate to the success page to propose next steps
+      void this.router.navigate(['/former-teammates/validated']);
     }
   }
 
@@ -119,6 +130,7 @@ export class FormerValidation {
    */
   private handleError(): (err: any) => void {
     return (err: any) => {
+      this.isSubmitting.set(false);
       this.showErrorNotification();
       console.error(err);
     }
@@ -155,13 +167,6 @@ export class FormerValidation {
    */
   private showErrorNotification() {
     this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
-  }
-
-  /**
-   * Navigates to 404 error page
-   */
-  private navigateToError404() {
-    void this.router.navigate(['/error']);
   }
 
 

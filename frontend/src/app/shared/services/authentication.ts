@@ -1,11 +1,12 @@
 import {computed, inject, Injectable} from '@angular/core';
 import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType, ReadyArgs, typeEventArgs} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
-  isAuthenticatedSignal ;
+  isAuthenticatedSignal;
   private readonly keycloakEventSignal = inject(KEYCLOAK_EVENT_SIGNAL);
   private readonly keycloak = inject(Keycloak);
 
@@ -21,14 +22,23 @@ export class AuthenticationService {
     })
   }
 
-  async login() {
-    await this.keycloak.login();
+  async login(url: string = '/former-teammates') {
+    await this.keycloak.login({
+      redirectUri: `${window.location.origin}${url}`,
+    });
   }
 
-  async logout() {
-    await this.keycloak.logout();
+  async logout(url: string = '/former-teammates') {
+    await this.keycloak.logout({
+      redirectUri: `${window.location.origin}${url}`,
+    });
   }
 
+  async register(url: string = '/former-teammates') {
+    await this.keycloak.register({
+      redirectUri: `${window.location.origin}${url}`,
+    });
+  }
 
 
 }

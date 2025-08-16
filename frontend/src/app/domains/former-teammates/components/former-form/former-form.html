@@ -33,10 +33,14 @@
       <mat-button-toggle [value]="role">{{ role | role }}</mat-button-toggle>
     }
   </mat-button-toggle-group>
-
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else {
+    <mat-divider/>
+  }
   <div id="action">
     <app-back-button link='/former-teammates'/>
-    <button mat-button type="submit">
+    <button mat-button type="submit" [disabled]="isLoading()">
       {{ actionInputSignal() }}
     </button>
   </div>

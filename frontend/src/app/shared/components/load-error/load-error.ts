@@ -11,6 +11,6 @@ import {BackButton} from '@app/shared/components/back-button/back-button';
   styleUrl: './load-error.scss'
 })
 export class LoadErrorComponent {
-  message = input<string>('Une erreur de chargement de la ressource est survenue.');
-  backLink = input<string>('/home');
+  messageSignal = input<string>('Une erreur de chargement de la ressource est survenue.', {alias: 'message'});
+  backLinkSignal = input<string | undefined>(undefined, {alias: 'backLink'});
 }

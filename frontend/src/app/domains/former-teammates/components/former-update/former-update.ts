@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {FormerForm, FormerTeammateFormValue} from '@app/domains/former-teammates/components/former-form/former-form';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
@@ -9,11 +9,16 @@ import {UUID} from '@app/shared/types/uuid';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
 import {NotificationService} from '@app/shared/services/notification';
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
+import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
+import {LoadingComponent} from '@app/shared/components/loading/loading';
+
 
 @Component({
   selector: 'app-former-update',
   imports: [
-    FormerForm
+    FormerForm,
+    LoadErrorComponent,
+    LoadingComponent
   ],
   templateUrl: './former-update.html',
   styleUrl: './former-update.scss'
@@ -29,19 +34,18 @@ export class FormerUpdate {
   // === COMPONENT STATE ===
   prefillFormerTeammateFormSignal;
   private readonly id;
+  isLoading;
+  hasError;
+  isSubmitting = signal(false)
 
   constructor() {
     // Initialize the identifier from route parameters
-    this.id = toSignal(this.getIdFromRoute());
+    this.id = toSignal(this.getIdFromRoute(), {requireSync: true});
 
     // Initialize the form prefill signal
     this.prefillFormerTeammateFormSignal = this.getPrefillFormerTeammateFormSignal();
-
-
-    // Effect to redirect to 404 error if no contact is found
-    effect(() => {
-      this.redirectIfNotPrefillFormerTeammateFound();
-    })
+    this.isLoading = this.formerTeammatesStore.isLoading();
+    this.hasError = this.formerTeammatesStore.hasError()
   }
 
   // ==========================================
@@ -55,10 +59,6 @@ export class FormerUpdate {
    */
   onSubmit(formerTeammateFormValue: FormerTeammateFormValue) {
     const id = this.id();
-    if (!id) {
-      return;
-    }
-
     this.updateFormerTeammate(this.mapper.mapFormValueToUpdateFormerTeammate(formerTeammateFormValue, id));
   }
 
@@ -72,6 +72,7 @@ export class FormerUpdate {
    * @param updateFormerTeammate - The contact update object
    */
   private updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate) {
+    this.isSubmitting.set(true);
     this.formerTeammatesStore.updateFormerTeammate(updateFormerTeammate).subscribe({
       next: this.handleSuccess(),
       error: this.handleError(),
@@ -86,7 +87,7 @@ export class FormerUpdate {
    */
   private getPrefillFormerTeammateFormSignal() {
     return computed(() => {
-      const formerTeammate = this.formerTeammatesStore.getFormerTeammateById(this.id() ?? '')()
+      const formerTeammate = this.formerTeammatesStore.getFormerTeammateById(this.id())()
       if (!formerTeammate) {
         return undefined;
       }
@@ -94,17 +95,6 @@ export class FormerUpdate {
     })
   }
 
-  /**
-   * Checks if a contact exists for the provided ID and redirects to 404 if necessary
-   * Used in an effect to monitor state changes
-   */
-  private redirectIfNotPrefillFormerTeammateFound() {
-    const id = this.id();
-    const prefillFormerTeammateFormValue = this.prefillFormerTeammateFormSignal();
-    if (id && !prefillFormerTeammateFormValue) {
-      this.navigateToError404();
-    }
-  }
 
   // ==========================================
   // === LEVEL 3: HANDLERS AND UTILITIES ===
@@ -117,6 +107,7 @@ export class FormerUpdate {
    */
   private handleSuccess(): (formValue: FormerTeammate) => void {
     return (updatedFormerTeammate: FormerTeammate) => {
+      this.isSubmitting.set(false);
       this.showSuccessNotification();
       this.navigateToDetail(updatedFormerTeammate.id);
     }
@@ -129,6 +120,7 @@ export class FormerUpdate {
    */
   private handleError(): (err: any) => void {
     return (err: any) => {
+      this.isSubmitting.set(false);
       this.showErrorNotification();
       console.error(err);
     }
@@ -149,7 +141,7 @@ export class FormerUpdate {
    */
   private getIdFromRoute() {
     return this.activatedRoute.params.pipe(
-      map(params => params['id'] as UUID | undefined))
+      map(params => params['id'] as UUID))
   }
 
   /**
@@ -180,4 +172,5 @@ export class FormerUpdate {
   private navigateToDetail(id: string) {
     void this.router.navigate(['/former-teammates', id]);
   }
+
 }

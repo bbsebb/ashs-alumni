@@ -6,7 +6,7 @@ import {UUID} from '@app/shared/types/uuid';
   providedIn: 'root'
 })
 export class FormerTeammateHistoryStore {
-  private readonly  formerTeammateHistoryResource ;
+  private readonly formerTeammateHistoryResource;
   private readonly formerTeammateHistoryGateway = inject(FORMER_TEAMMATE_HISTORY_GATEWAY);
 
   constructor() {
@@ -17,12 +17,19 @@ export class FormerTeammateHistoryStore {
     return this.formerTeammateHistoryResource;
   }
 
+  isLoading() {
+    return this.formerTeammateHistoryResource.isLoading;
+  }
+
+  hasError() {
+    return computed(() => !!this.formerTeammateHistoryResource.error());
+  }
+
   getFormerTeammateHistoriesById(contactId: UUID) {
     return computed(() => {
-      if(!this.formerTeammateHistoryResource.hasValue()){
+      if (!this.formerTeammateHistoryResource.hasValue()) {
         return [];
       }
-
       return this.formerTeammateHistoryResource.value()?.filter((formerTeammateHistory) => formerTeammateHistory.contactId === contactId)
     })
   }

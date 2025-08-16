@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormerForm, FormerTeammateFormValue} from '@app/domains/former-teammates/components/former-form/former-form';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
@@ -21,6 +21,7 @@ export class FormerCreate {
   private readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
   private readonly mapper = inject(FormerTeammateMapper)
+  isSubmitting = signal(false);
 
   // ==========================================
   // === LEVEL 1: PUBLIC INTERFACE ===
@@ -45,6 +46,7 @@ export class FormerCreate {
    * @param formValue - The contact creation object
    */
   private createFormerTeammate(formValue: CreateFormerTeammate) {
+    this.isSubmitting.set(true);
     this.formerTeammatesStore.createFormerTeammate(formValue).subscribe({
       next: this.handleSuccess(),
       error: this.handleError(),
@@ -63,6 +65,7 @@ export class FormerCreate {
    */
   private handleSuccess(): (formValue: FormerTeammate) => void {
     return (createdFormerTeammate: FormerTeammate) => {
+      this.isSubmitting.set(false);
       this.showSuccessNotification();
       this.navigateToDetail(createdFormerTeammate.id);
     }
@@ -75,6 +78,7 @@ export class FormerCreate {
    */
   private handleError(): (err: any) => void {
     return (err: any) => {
+      this.isSubmitting.set(false);
       this.showErrorNotification();
       console.error(err);
     }

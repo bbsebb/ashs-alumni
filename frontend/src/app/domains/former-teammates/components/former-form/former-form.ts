@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, inject, input, output} from '@angular/core';
+import {Component, effect, inject, input, output} from '@angular/core';
 import {FormControl, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatError, MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
@@ -7,6 +7,8 @@ import {Gender, Role} from '@app/domains/former-teammates/models/former-teammate
 import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {BackButton} from '@app/shared/components/back-button/back-button';
 import {MatButton} from '@angular/material/button';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatDivider} from '@angular/material/divider';
 
 /**
  * Component for creating and editing former teammates.
@@ -29,16 +31,18 @@ import {MatButton} from '@angular/material/button';
     MatSuffix,
     MatError,
     BackButton,
-    MatButton
+    MatButton,
+    MatProgressBar,
+    MatDivider
   ],
   templateUrl: './former-form.html',
   styleUrl: './former-form.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormerForm {
   titleInputSignal = input.required<string>({alias: 'title'});
   actionInputSignal = input.required<string>({alias: 'action'});
   prefillFormerTeammateFormValueSignal = input<FormerTeammateFormValue | undefined>(undefined, {alias: 'prefillFormerTeammate'});
+  isLoading = input<boolean>(false);
   formerTeammateFormValueSubmitted = output<FormerTeammateFormValue>();
 
   /** Start date for date picker (set to 1975) */
@@ -71,6 +75,13 @@ export class FormerForm {
       const prefillFormerTeammate = this.prefillFormerTeammateFormValueSignal();
       if (prefillFormerTeammate) {
         this.populateFormFields(prefillFormerTeammate);
+      }
+    });
+    effect(() => {
+      if (this.isLoading()) {
+        this.formerForm.disable();
+      } else {
+        this.formerForm.enable();
       }
     });
 
@@ -115,6 +126,7 @@ export class FormerForm {
   // ===========================
   // PUBLIC METHODS
   // ===========================
+
 
   /**
    * Builds and configures the reactive form with validation rules.

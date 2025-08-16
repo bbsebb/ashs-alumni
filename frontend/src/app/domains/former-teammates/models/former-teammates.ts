@@ -13,5 +13,4 @@ export interface FormerTeammate {
   birthDate?: Date;            // format ISO (YYYY-MM-DD)
   roles: Role[];
   status: ContactStatus;
-  code: string;
 }

@@ -1,0 +1,155 @@
+@use '@angular/material' as mat;
+
+
+// Main success card
+.success-card {
+  max-width: 680px;
+  width: 100%;
+  margin: 16px auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  background: #ffffff;
+
+  @media (max-width: 768px) {
+    margin: 8px;
+    border-radius: 12px;
+  }
+}
+
+// Header section with success icon and title
+mat-card-header {
+  padding: 32px 24px 24px;
+  background: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+  justify-content: space-evenly;
+
+  mat-icon.success-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+
+  mat-card-title {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: white;
+    line-height: 1.2;
+    width: 100%;
+
+  }
+
+  mat-card-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    margin: 0;
+  }
+}
+
+// Content section
+.success-content {
+  padding: 32px 24px;
+
+  .confirmation-message {
+    text-align: center;
+
+    .message-text {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    .benefits-section {
+
+      border-radius: 12px;
+      padding: 24px;
+      border-left: 4px solid var(--mat-sys-on-tertiary-container);
+
+      .benefits-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--mat-sys-on-tertiary-container);
+        margin: 0 0 16px 0;
+        text-align: left;
+      }
+
+      .benefits-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          display: flex;
+          align-items: center;
+          padding: 8px 0;
+          font-size: 1rem;
+
+          &:before {
+            content: '✓';
+            color: var(--mat-sys-on-tertiary-container);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Actions section
+.success-actions {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+
+  .secondary-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+
+  @media (max-width: 768px) {
+    .secondary-actions {
+      flex-direction: column;
+      align-items: center;
+
+      .secondary-action {
+        min-width: 200px;
+      }
+    }
+  }
+}
+
+// Animations and transitions
+.success-card {
+  animation: slideInUp 1.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .success-card {
+    animation: none;
+  }
+}

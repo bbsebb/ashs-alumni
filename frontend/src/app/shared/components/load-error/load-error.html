@@ -3,10 +3,13 @@
     <mat-icon aria-hidden="false" aria-label="Erreur">error</mat-icon>
     <div class="text">
       <div class="title">Erreur de chargement</div>
-      <div class="message">{{ message() }}</div>
+      <div class="message">{{ messageSignal() }}</div>
     </div>
   </mat-card-content>
-  <mat-card-actions>
-    <app-back-button [link]="backLink()"/>
-  </mat-card-actions>
+  @let backLink = backLinkSignal();
+  @if (backLink) {
+    <mat-card-actions>
+      <app-back-button [link]="backLink"/>
+    </mat-card-actions>
+  }
 </mat-card>
