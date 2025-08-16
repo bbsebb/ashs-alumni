@@ -1,5 +1,7 @@
 plugins {
     id("java")
+    id("org.springframework.boot") version "3.5.4" apply false
+    id("io.spring.dependency-management") version "1.1.7" apply false
 }
 
 java {
@@ -9,18 +11,27 @@ java {
 }
 
 
-group = "fr.hoenheimsports"
-version = "1.0-SNAPSHOT"
+allprojects {
+    group = "fr.hoenheimsports"
+    version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+    repositories {
+        mavenCentral()
+    }
 }
 
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
+subprojects {
+    apply(plugin = "java")
+    apply(plugin = "io.spring.dependency-management")
 
-tasks.test {
-    useJUnitPlatform()
+    dependencies {
+        testImplementation(platform("org.junit:junit-bom:5.10.0"))
+        testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    }
+
+    tasks.test {
+        useJUnitPlatform()
+    }
 }

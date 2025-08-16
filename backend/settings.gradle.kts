@@ -1,6 +1,7 @@
 rootProject.name = "backend"
 
 
-include("module-user")
-include("module-user:domain")
-include("module-user:infrastructure")
+
+include("app")
+include("module-former-teammate:domain")
+include("module-former-teammate:infrastructure")

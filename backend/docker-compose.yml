@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: ashs-alumni-postgres
+    environment:
+      POSTGRES_DB: ashs_alumni
+      POSTGRES_USER: ashs_user
+      POSTGRES_PASSWORD: ashs_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ashs-alumni-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ashs_user -d ashs_alumni" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  ashs-alumni-network:
+    driver: bridge
