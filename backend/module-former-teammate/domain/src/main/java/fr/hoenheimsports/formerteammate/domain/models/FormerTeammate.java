@@ -67,10 +67,10 @@ public record FormerTeammate(
             return this;
         }
 
-        public Builder addRole(Role role) {
+/*        public Builder addRole(Role role) {
             this.roles.add(role);
             return this;
-        }
+        }*/
 
         public Builder status(ContactStatus status) {
             this.status = status;

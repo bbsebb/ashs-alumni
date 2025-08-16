@@ -12,9 +12,8 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
     List<FormerTeammate> formerTeammates = new ArrayList<>();
 
     @Override
-    public FormerTeammate save(FormerTeammate formerTeammate) {
+    public void save(FormerTeammate formerTeammate) {
         formerTeammates.add(formerTeammate);
-        return formerTeammate;
     }
 
     // For test purpose

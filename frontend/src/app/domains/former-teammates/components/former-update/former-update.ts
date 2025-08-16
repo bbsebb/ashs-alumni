@@ -158,12 +158,6 @@ export class FormerUpdate {
     this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
   }
 
-  /**
-   * Navigates to 404 error page
-   */
-  private navigateToError404() {
-    void this.router.navigate(['/error']);
-  }
 
   /**
    * Navigates to contact detail page
