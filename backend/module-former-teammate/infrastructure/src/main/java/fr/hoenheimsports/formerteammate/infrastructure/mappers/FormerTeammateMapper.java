@@ -1,0 +1,16 @@
+package fr.hoenheimsports.formerteammate.infrastructure.mappers;
+
+import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
+import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.FormerTeammateResponse;
+import org.mapstruct.Mapper;
+
+import java.util.List;
+
+
+@Mapper(componentModel = "spring")
+public interface FormerTeammateMapper {
+
+    FormerTeammateResponse toResponse(FormerTeammate formerTeammate);
+
+    List<FormerTeammateResponse> toResponseList(List<FormerTeammate> formerTeammates);
+}

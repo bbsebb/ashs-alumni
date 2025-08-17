@@ -4,7 +4,9 @@ import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;
 import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
 import fr.hoenheimsports.formerteammate.domain.models.Role;
+import fr.hoenheimsports.formerteammate.domain.spi.GenerateId;
 import fr.hoenheimsports.formerteammate.domain.spi.stub.FormerTeammateRepositoryStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stub.UUIDGeneratorStub;
 import fr.hoenheimsports.formerteammate.domain.usecases.commands.CreateFormerTeammateCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +21,13 @@ class FormerTeammateCreatorTest {
     private FormerTeammateRepositoryStub repository;
     private FormerTeammateCreator formerTeammateCreator;
 
+
     @BeforeEach
     void setUp() {
         repository = new FormerTeammateRepositoryStub();
-        formerTeammateCreator = new FormerTeammateCreator(repository);
+        repository.clear();
+        GenerateId generateId = new UUIDGeneratorStub();
+        formerTeammateCreator = new FormerTeammateCreator(repository, generateId);
     }
 
     @Test
@@ -41,11 +46,11 @@ class FormerTeammateCreatorTest {
         FormerTeammate result = formerTeammateCreator.execute(command);
 
         // Then
-        // Verify result is not null
+        // Verify that the result is not null
         assertNotNull(result, "Result should not be null");
 
-        // Verify UUID is generated (not null)
-        assertNotNull(result.id(), "UUID should be generated");
+        // Verify UUID is assigned (not null)
+        assertNotNull(result.id(), "UUID should be assigned");
 
         // Verify entity construction with command data
         assertEquals("John", result.firstName(), "FirstName should match command");

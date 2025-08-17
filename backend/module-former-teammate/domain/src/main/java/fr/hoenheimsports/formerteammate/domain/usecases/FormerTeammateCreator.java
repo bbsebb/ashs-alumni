@@ -5,16 +5,17 @@ import fr.hoenheimsports.formerteammate.domain.api.CreateFormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;
 import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.spi.FormerTeammateRepository;
+import fr.hoenheimsports.formerteammate.domain.spi.GenerateId;
 import fr.hoenheimsports.formerteammate.domain.usecases.commands.CreateFormerTeammateCommand;
-
-import java.util.UUID;
 
 @DomainService
 public class FormerTeammateCreator implements CreateFormerTeammate {
     private final FormerTeammateRepository formerTeammateRepository;
+    private final GenerateId generateId;
 
-    public FormerTeammateCreator(FormerTeammateRepository formerTeammateRepository) {
+    public FormerTeammateCreator(FormerTeammateRepository formerTeammateRepository, GenerateId generateId) {
         this.formerTeammateRepository = formerTeammateRepository;
+        this.generateId = generateId;
     }
 
     @Override
@@ -26,7 +27,7 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
 
     private FormerTeammate createFormerTeammate(CreateFormerTeammateCommand createFormerTeammateCommand) {
         return FormerTeammate.builder()
-                .id(this.generateUUID())
+                .id(this.generateId.generate())
                 .firstName(createFormerTeammateCommand.firstName())
                 .lastName(createFormerTeammateCommand.lastName())
                 .gender(createFormerTeammateCommand.gender())
@@ -37,9 +38,6 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
                 .build();
     }
 
-    private UUID generateUUID() {
-        return UUID.randomUUID();
-    }
 
     private ContactStatus generateStatus() {
         return ContactStatus.SUBMITTED;
