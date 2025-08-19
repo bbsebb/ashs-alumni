@@ -5,13 +5,13 @@ import fr.hoenheimsports.formerteammate.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.formerteammate.infrastructure.entity.FormerTeammateEntity;
 import fr.hoenheimsports.formerteammate.infrastructure.mappers.FormerTeammateMapper;
 import fr.hoenheimsports.formerteammate.infrastructure.repository.FormerTeammateEntityRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
+@Repository
 public class FormerTeammateRepositoryAdapter implements FormerTeammateRepository {
 
     private final FormerTeammateEntityRepository entityRepository;

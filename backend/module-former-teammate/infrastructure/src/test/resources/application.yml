@@ -1,0 +1,23 @@
+spring:
+  flyway:
+    enabled: true
+    locations:
+      filesystem:C:\Users\bbseb\Documents\programmation\ashs-alumni\backend\app\src\main\resources\db.migration
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+    hibernate:
+      ddl-auto: create-drop
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace
