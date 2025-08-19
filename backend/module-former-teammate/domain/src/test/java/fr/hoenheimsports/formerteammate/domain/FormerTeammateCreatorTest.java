@@ -1,5 +1,6 @@
-package fr.hoenheimsports.formerteammate.domain.usecases;
+package fr.hoenheimsports.formerteammate.domain;
 
+import fr.hoenheimsports.formerteammate.domain.commands.CreateFormerTeammateCommand;
 import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;
 import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
@@ -7,7 +8,6 @@ import fr.hoenheimsports.formerteammate.domain.models.Role;
 import fr.hoenheimsports.formerteammate.domain.spi.GenerateId;
 import fr.hoenheimsports.formerteammate.domain.spi.stub.FormerTeammateRepositoryStub;
 import fr.hoenheimsports.formerteammate.domain.spi.stub.UUIDGeneratorStub;
-import fr.hoenheimsports.formerteammate.domain.usecases.commands.CreateFormerTeammateCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
