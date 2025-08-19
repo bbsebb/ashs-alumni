@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
-public record CreateFormerTeammateRequest(
+public record UpdateFormerTeammateRequest(
         @NotNull Gender gender,
         @NotEmpty String firstName,
         @NotEmpty String lastName,

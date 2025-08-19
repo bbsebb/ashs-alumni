@@ -1,4 +1,4 @@
-package fr.hoenheimsports.formerteammate.domain.usecases.commands;
+package fr.hoenheimsports.formerteammate.domain.commands;
 
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
 import fr.hoenheimsports.formerteammate.domain.models.Role;

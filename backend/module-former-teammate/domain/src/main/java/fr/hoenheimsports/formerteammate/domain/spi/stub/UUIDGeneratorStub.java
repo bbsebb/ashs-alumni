@@ -7,8 +7,11 @@ import java.util.UUID;
 
 @Stub
 public class UUIDGeneratorStub implements GenerateId {
+
+
     @Override
     public UUID generate() {
+        System.out.println("UUIDGeneratorStub is stubbed");
         return UUID.randomUUID();
     }
 }

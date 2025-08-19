@@ -30,7 +30,9 @@ subprojects {
 
         // Dépendances communes Spring Boot (pour les modules qui en ont besoin)
         if (name.contains("infrastructure") || name == "app") {
+
             implementation("org.springframework.boot:spring-boot-starter-web")
+            implementation("org.springframework.boot:spring-boot-starter-test")
             implementation("org.springframework.boot:spring-boot-starter-actuator")
             implementation("org.flywaydb:flyway-core")
             implementation("org.flywaydb:flyway-database-postgresql")
@@ -47,12 +49,19 @@ subprojects {
 
             // Bridge Lombok <-> MapStruct
             annotationProcessor("org.projectlombok:lombok-mapstruct-binding:$lombokMapstructBindingVersion")
+
+            testImplementation("org.springframework.boot:spring-boot-testcontainers")
+
+            testImplementation("org.testcontainers:junit-jupiter")
+            testImplementation("org.testcontainers:postgresql")
         }
 
         testImplementation(platform("org.junit:junit-bom:5.10.0"))
         testImplementation("org.junit.jupiter:junit-jupiter")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testImplementation("org.assertj:assertj-core:3.24.2")
+        testImplementation("org.mockito:mockito-core:5.5.0")
+        testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
     }
 
     tasks.test {

@@ -5,6 +5,7 @@ import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
 import fr.hoenheimsports.formerteammate.domain.models.Role;
 import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.FormerTeammateResponse;
+import fr.hoenheimsports.formerteammate.infrastructure.entity.FormerTeammateEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -196,6 +197,183 @@ class FormerTeammateMapperTest {
                         Gender.M,
                         "0333333333",
                         LocalDate.of(1995, 12, 5),
+                        Collections.emptyList(),
+                        ContactStatus.PENDING
+                )
+        );
+    }
+
+    @Test
+    void toEntity_shouldMapAllFieldsCorrectly() {
+        // Given
+        UUID id = UUID.randomUUID();
+        FormerTeammate formerTeammate = FormerTeammate.builder()
+                .id(id)
+                .firstName("John")
+                .lastName("Doe")
+                .gender(Gender.M)
+                .phone("0123456789")
+                .birthDate(LocalDate.of(1990, 1, 15))
+                .roles(Arrays.asList(Role.PLAYER, Role.COACH))
+                .status(ContactStatus.VALIDATED)
+                .build();
+
+        // When
+        FormerTeammateEntity entity = mapper.toEntity(formerTeammate);
+
+        // Then
+        assertThat(entity).isNotNull();
+        assertThat(entity.getId()).isEqualTo(id);
+        assertThat(entity.getFirstName()).isEqualTo("John");
+        assertThat(entity.getLastName()).isEqualTo("Doe");
+        assertThat(entity.getGender()).isEqualTo(Gender.M);
+        assertThat(entity.getPhone()).isEqualTo("0123456789");
+        assertThat(entity.getBirthDate()).isEqualTo(LocalDate.of(1990, 1, 15));
+        assertThat(entity.getRoles()).containsExactly(Role.PLAYER, Role.COACH);
+        assertThat(entity.getStatus()).isEqualTo(ContactStatus.VALIDATED);
+    }
+
+    @Test
+    void toEntity_withNullInput_shouldReturnNull() {
+        // When
+        FormerTeammateEntity entity = mapper.toEntity(null);
+
+        // Then
+        assertThat(entity).isNull();
+    }
+
+    @Test
+    void toDomain_shouldMapAllFieldsCorrectly() {
+        // Given
+        UUID id = UUID.randomUUID();
+        FormerTeammateEntity entity = FormerTeammateEntity.builder()
+                .id(id)
+                .firstName("Jane")
+                .lastName("Smith")
+                .gender(Gender.F)
+                .phone("0987654321")
+                .birthDate(LocalDate.of(1985, 5, 20))
+                .roles(Arrays.asList(Role.COACH, Role.PLAYER))
+                .status(ContactStatus.PENDING)
+                .build();
+
+        // When
+        FormerTeammate formerTeammate = mapper.toDomain(entity);
+
+        // Then
+        assertThat(formerTeammate).isNotNull();
+        assertThat(formerTeammate.id()).isEqualTo(id);
+        assertThat(formerTeammate.firstName()).isEqualTo("Jane");
+        assertThat(formerTeammate.lastName()).isEqualTo("Smith");
+        assertThat(formerTeammate.gender()).isEqualTo(Gender.F);
+        assertThat(formerTeammate.phone()).isEqualTo("0987654321");
+        assertThat(formerTeammate.birthDate()).isEqualTo(LocalDate.of(1985, 5, 20));
+        assertThat(formerTeammate.roles()).containsExactly(Role.COACH, Role.PLAYER);
+        assertThat(formerTeammate.status()).isEqualTo(ContactStatus.PENDING);
+    }
+
+    @Test
+    void toDomain_withNullInput_shouldReturnNull() {
+        // When
+        FormerTeammate formerTeammate = mapper.toDomain(null);
+
+        // Then
+        assertThat(formerTeammate).isNull();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEntityData")
+    void toEntity_withDifferentInputs_shouldMapCorrectly(UUID id, String firstName, String lastName,
+                                                         Gender gender, String phone, LocalDate birthDate,
+                                                         List<Role> roles, ContactStatus status) {
+        // Given
+        FormerTeammate formerTeammate = FormerTeammate.builder()
+                .id(id)
+                .firstName(firstName)
+                .lastName(lastName)
+                .gender(gender)
+                .phone(phone)
+                .birthDate(birthDate)
+                .roles(roles)
+                .status(status)
+                .build();
+
+        // When
+        FormerTeammateEntity entity = mapper.toEntity(formerTeammate);
+
+        // Then
+        assertThat(entity).isNotNull();
+        assertThat(entity.getId()).isEqualTo(id);
+        assertThat(entity.getFirstName()).isEqualTo(firstName);
+        assertThat(entity.getLastName()).isEqualTo(lastName);
+        assertThat(entity.getGender()).isEqualTo(gender);
+        assertThat(entity.getPhone()).isEqualTo(phone);
+        assertThat(entity.getBirthDate()).isEqualTo(birthDate);
+        assertThat(entity.getRoles()).isEqualTo(roles);
+        assertThat(entity.getStatus()).isEqualTo(status);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEntityData")
+    void toDomain_withDifferentInputs_shouldMapCorrectly(UUID id, String firstName, String lastName,
+                                                         Gender gender, String phone, LocalDate birthDate,
+                                                         List<Role> roles, ContactStatus status) {
+        // Given
+        FormerTeammateEntity entity = FormerTeammateEntity.builder()
+                .id(id)
+                .firstName(firstName)
+                .lastName(lastName)
+                .gender(gender)
+                .phone(phone)
+                .birthDate(birthDate)
+                .roles(roles)
+                .status(status)
+                .build();
+
+        // When
+        FormerTeammate formerTeammate = mapper.toDomain(entity);
+
+        // Then
+        assertThat(formerTeammate).isNotNull();
+        assertThat(formerTeammate.id()).isEqualTo(id);
+        assertThat(formerTeammate.firstName()).isEqualTo(firstName);
+        assertThat(formerTeammate.lastName()).isEqualTo(lastName);
+        assertThat(formerTeammate.gender()).isEqualTo(gender);
+        assertThat(formerTeammate.phone()).isEqualTo(phone);
+        assertThat(formerTeammate.birthDate()).isEqualTo(birthDate);
+        assertThat(formerTeammate.roles()).isEqualTo(roles);
+        assertThat(formerTeammate.status()).isEqualTo(status);
+    }
+
+    private static Stream<Arguments> provideEntityData() {
+        return Stream.of(
+                Arguments.of(
+                        UUID.randomUUID(),
+                        "Michael",
+                        "Brown",
+                        Gender.M,
+                        "0444444444",
+                        LocalDate.of(1991, 7, 12),
+                        List.of(Role.PLAYER),
+                        ContactStatus.VALIDATED
+                ),
+                Arguments.of(
+                        UUID.randomUUID(),
+                        "Sarah",
+                        "Davis",
+                        Gender.F,
+                        "0555555555",
+                        LocalDate.of(1993, 11, 8),
+                        Arrays.asList(Role.COACH, Role.PLAYER),
+                        ContactStatus.SUBMITTED
+                ),
+                Arguments.of(
+                        UUID.randomUUID(),
+                        "Alex",
+                        "Wilson",
+                        Gender.M,
+                        null,
+                        LocalDate.of(1987, 4, 3),
                         Collections.emptyList(),
                         ContactStatus.PENDING
                 )

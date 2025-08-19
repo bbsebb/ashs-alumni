@@ -1,4 +1,4 @@
-package fr.hoenheimsports.formerteammate.domain.usecases;
+package fr.hoenheimsports.formerteammate.domain;
 
 import fr.hoenheimsports.formerteammate.domain.annotations.DomainService;
 import fr.hoenheimsports.formerteammate.domain.api.GetAllFormerTeammates;

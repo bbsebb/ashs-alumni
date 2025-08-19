@@ -1,12 +1,12 @@
-package fr.hoenheimsports.formerteammate.domain.usecases;
+package fr.hoenheimsports.formerteammate.domain;
 
 import fr.hoenheimsports.formerteammate.domain.annotations.DomainService;
 import fr.hoenheimsports.formerteammate.domain.api.CreateFormerTeammate;
+import fr.hoenheimsports.formerteammate.domain.commands.CreateFormerTeammateCommand;
 import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;
 import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.formerteammate.domain.spi.GenerateId;
-import fr.hoenheimsports.formerteammate.domain.usecases.commands.CreateFormerTeammateCommand;
 
 @DomainService
 public class FormerTeammateCreator implements CreateFormerTeammate {
