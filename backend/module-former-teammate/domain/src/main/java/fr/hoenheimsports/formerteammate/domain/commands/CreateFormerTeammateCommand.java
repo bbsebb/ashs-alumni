@@ -12,7 +12,9 @@ public record CreateFormerTeammateCommand(
         String lastName,
         String phone,
         LocalDate birthDate,
-        List<Role> roles
+        List<Role> roles,
+        boolean isAuthenticated,
+        boolean isAdmin
 ) {
 }
 

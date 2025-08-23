@@ -2,8 +2,8 @@ package fr.hoenheimsports;
 
 import fr.hoenheimsports.formerteammate.domain.annotations.DomainService;
 import fr.hoenheimsports.formerteammate.domain.annotations.Stub;
-import fr.hoenheimsports.formerteammate.domain.spi.stub.FormerTeammateRepositoryStub;
-import fr.hoenheimsports.formerteammate.domain.spi.stub.UUIDGeneratorStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stubs.FormerTeammateRepositoryStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stubs.UUIDGeneratorStub;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;

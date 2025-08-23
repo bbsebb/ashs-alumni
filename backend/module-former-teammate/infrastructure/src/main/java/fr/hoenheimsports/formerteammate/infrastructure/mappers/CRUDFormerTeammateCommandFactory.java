@@ -4,22 +4,29 @@ import fr.hoenheimsports.formerteammate.domain.commands.CreateFormerTeammateComm
 import fr.hoenheimsports.formerteammate.domain.commands.UpdateFormerTeammateCommand;
 import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.CreateFormerTeammateRequest;
 import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.UpdateFormerTeammateRequest;
+import fr.hoenheimsports.user.domain.models.CurrentUser;
+import fr.hoenheimsports.user.domain.models.Role;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class CRUDFormerTeammateCommandFactory {
 
-    public CreateFormerTeammateCommand createFrom(CreateFormerTeammateRequest request) {
 
+    public CreateFormerTeammateCommand createFrom(CreateFormerTeammateRequest request, Optional<CurrentUser> currentUser) {
+        var isAdmin = currentUser.map((cu) -> cu.roles().contains(Role.ADMIN)).orElse(false);
         return new CreateFormerTeammateCommand(
                 request.gender(),
                 request.firstName().trim(),
                 request.lastName().trim(),
                 request.phone(),
                 request.birthDate(),
-                request.roles()
+                request.roles(),
+                currentUser.isPresent(),
+                isAdmin
+
         );
     }
 

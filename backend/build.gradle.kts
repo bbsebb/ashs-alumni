@@ -54,6 +54,10 @@ subprojects {
 
             testImplementation("org.testcontainers:junit-jupiter")
             testImplementation("org.testcontainers:postgresql")
+
+            implementation("org.springframework.boot:spring-boot-starter-security")
+            implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+            testImplementation("org.springframework.security:spring-security-test")
         }
 
         testImplementation(platform("org.junit:junit-bom:5.10.0"))

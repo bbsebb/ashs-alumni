@@ -9,6 +9,7 @@ import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.FormerTea
 import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.UpdateFormerTeammateRequest;
 import fr.hoenheimsports.formerteammate.infrastructure.mappers.CRUDFormerTeammateCommandFactory;
 import fr.hoenheimsports.formerteammate.infrastructure.mappers.FormerTeammateMapper;
+import fr.hoenheimsports.user.domain.api.GetCurrentUser;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +27,17 @@ public class FormerTeammateController {
     private final GetAllFormerTeammates getAllFormerTeammatesService;
     private final CRUDFormerTeammateCommandFactory crudFormerTeammateCommandFactory;
     private final FormerTeammateMapper formerTeammateMapper;
+    private final GetCurrentUser getCurrentUser;
 
 
-    public FormerTeammateController(CreateFormerTeammate createFormerTeammateService, UpdateFormerTeammate updateFormerTeammateService, DeleteFormerTeammate deleteFormerTeammateService, GetAllFormerTeammates getAllFormerTeammatesService, CRUDFormerTeammateCommandFactory crudFormerTeammateCommandFactory, FormerTeammateMapper formerTeammateMapper) {
+    public FormerTeammateController(CreateFormerTeammate createFormerTeammateService, UpdateFormerTeammate updateFormerTeammateService, DeleteFormerTeammate deleteFormerTeammateService, GetAllFormerTeammates getAllFormerTeammatesService, CRUDFormerTeammateCommandFactory crudFormerTeammateCommandFactory, FormerTeammateMapper formerTeammateMapper, GetCurrentUser getCurrentUser) {
         this.createFormerTeammateService = createFormerTeammateService;
         this.updateFormerTeammateService = updateFormerTeammateService;
         this.deleteFormerTeammateService = deleteFormerTeammateService;
         this.getAllFormerTeammatesService = getAllFormerTeammatesService;
         this.crudFormerTeammateCommandFactory = crudFormerTeammateCommandFactory;
         this.formerTeammateMapper = formerTeammateMapper;
+        this.getCurrentUser = getCurrentUser;
     }
 
     @GetMapping("/former-teammmates")
@@ -46,7 +49,7 @@ public class FormerTeammateController {
 
     @PostMapping("/former-teammmates")
     ResponseEntity<FormerTeammateResponse> createFormerTeammate(@RequestBody @Valid CreateFormerTeammateRequest createFormerTeammateRequest) {
-        var command = crudFormerTeammateCommandFactory.createFrom(createFormerTeammateRequest);
+        var command = crudFormerTeammateCommandFactory.createFrom(createFormerTeammateRequest, this.getCurrentUser.execute());
         var createdFormerTeammate = this.createFormerTeammateService.execute(command);
         var response = this.formerTeammateMapper.toResponse(createdFormerTeammate);
         var location = URI.create("/api/former-teammates/" + response.id());

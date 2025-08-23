@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CRUDFormerTeammateCommandFactoryTest {
 
@@ -36,7 +36,7 @@ class CRUDFormerTeammateCommandFactoryTest {
         );
 
         // Act
-        CreateFormerTeammateCommand command = factory.createFrom(request);
+        CreateFormerTeammateCommand command = factory.createFrom(request, Optional.empty());
 
         // Assert
         assertEquals(Gender.M, command.gender());
@@ -45,6 +45,8 @@ class CRUDFormerTeammateCommandFactoryTest {
         assertEquals("0123456789", command.phone());
         assertEquals(LocalDate.of(1990, 1, 1), command.birthDate());
         assertEquals(List.of(Role.PLAYER, Role.COACH), command.roles());
+        assertFalse(command.isAuthenticated());
+        assertFalse(command.isAdmin());
     }
 
     @Test
@@ -61,7 +63,7 @@ class CRUDFormerTeammateCommandFactoryTest {
         );
 
         // Act
-        CreateFormerTeammateCommand command = factory.createFrom(request);
+        CreateFormerTeammateCommand command = factory.createFrom(request, Optional.empty());
 
         // Assert
         assertEquals(Gender.F, command.gender());
@@ -70,6 +72,8 @@ class CRUDFormerTeammateCommandFactoryTest {
         assertEquals("9876543210", command.phone());
         assertEquals(LocalDate.of(1995, 5, 15), command.birthDate());
         assertEquals(List.of(), command.roles());
+        assertFalse(command.isAuthenticated());
+        assertFalse(command.isAdmin());
     }
 
     @Test
@@ -86,7 +90,7 @@ class CRUDFormerTeammateCommandFactoryTest {
         );
 
         // Act
-        CreateFormerTeammateCommand command = factory.createFrom(request);
+        CreateFormerTeammateCommand command = factory.createFrom(request, Optional.empty());
 
         // Assert
         assertEquals(Gender.M, command.gender());
@@ -95,6 +99,8 @@ class CRUDFormerTeammateCommandFactoryTest {
         assertNull(command.phone());
         assertEquals(LocalDate.of(2000, 3, 20), command.birthDate());
         assertEquals(List.of(Role.COACH), command.roles());
+        assertFalse(command.isAuthenticated());
+        assertFalse(command.isAdmin());
     }
 
     @Test
@@ -111,7 +117,7 @@ class CRUDFormerTeammateCommandFactoryTest {
         );
 
         // Act
-        CreateFormerTeammateCommand command = factory.createFrom(request);
+        CreateFormerTeammateCommand command = factory.createFrom(request, Optional.empty());
 
         // Assert
         assertEquals(Gender.F, command.gender());
@@ -120,5 +126,7 @@ class CRUDFormerTeammateCommandFactoryTest {
         assertEquals("1234567890", command.phone());
         assertEquals(LocalDate.of(1985, 8, 25), command.birthDate());
         assertEquals(List.of(Role.ASSISTANT), command.roles());
+        assertFalse(command.isAuthenticated());
+        assertFalse(command.isAdmin());
     }
 }

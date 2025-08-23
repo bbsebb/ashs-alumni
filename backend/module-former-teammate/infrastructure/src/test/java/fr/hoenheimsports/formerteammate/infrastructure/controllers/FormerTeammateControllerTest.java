@@ -15,6 +15,7 @@ import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.FormerTea
 import fr.hoenheimsports.formerteammate.infrastructure.controllers.dto.UpdateFormerTeammateRequest;
 import fr.hoenheimsports.formerteammate.infrastructure.mappers.CRUDFormerTeammateCommandFactory;
 import fr.hoenheimsports.formerteammate.infrastructure.mappers.FormerTeammateMapper;
+import fr.hoenheimsports.user.domain.api.GetCurrentUser;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +58,9 @@ class FormerTeammateControllerTest {
     @Mock
     private FormerTeammateMapper formerTeammateMapper;
 
+    @Mock
+    private GetCurrentUser getCurrentUser;
+
     private FormerTeammateController controller;
 
     @BeforeEach
@@ -65,7 +71,8 @@ class FormerTeammateControllerTest {
                 deleteFormerTeammateService,
                 getAllFormerTeammatesService,
                 crudFormerTeammateCommandFactory,
-                formerTeammateMapper
+                formerTeammateMapper,
+                getCurrentUser
         );
     }
 
@@ -162,7 +169,8 @@ class FormerTeammateControllerTest {
 
         CreateFormerTeammateCommand command = new CreateFormerTeammateCommand(
                 Gender.M, "John", "Doe", "0123456789",
-                LocalDate.of(1990, 1, 15), List.of(Role.PLAYER)
+                LocalDate.of(1990, 1, 15), List.of(Role.PLAYER),
+                false, false
         );
 
         FormerTeammate createdTeammate = FormerTeammate.builder()
@@ -181,7 +189,7 @@ class FormerTeammateControllerTest {
                 LocalDate.of(1990, 1, 15), List.of(Role.PLAYER), ContactStatus.PENDING
         );
 
-        when(crudFormerTeammateCommandFactory.createFrom(request)).thenReturn(command);
+        when(crudFormerTeammateCommandFactory.createFrom(eq(request), any())).thenReturn(command);
         when(createFormerTeammateService.execute(command)).thenReturn(createdTeammate);
         when(formerTeammateMapper.toResponse(createdTeammate)).thenReturn(response);
 
@@ -219,7 +227,8 @@ class FormerTeammateControllerTest {
 
         CreateFormerTeammateCommand command = new CreateFormerTeammateCommand(
                 Gender.M, "John", "Doe", "0123456789",
-                LocalDate.of(1990, 1, 15), List.of(Role.PLAYER)
+                LocalDate.of(1990, 1, 15), List.of(Role.PLAYER),
+                false, false
         );
 
         FormerTeammate createdTeammate = FormerTeammate.builder()
@@ -238,7 +247,7 @@ class FormerTeammateControllerTest {
                 LocalDate.of(1985, 5, 20), multipleRoles, ContactStatus.VALIDATED
         );
 
-        when(crudFormerTeammateCommandFactory.createFrom(request)).thenReturn(command);
+        when(crudFormerTeammateCommandFactory.createFrom(eq(request), any())).thenReturn(command);
         when(createFormerTeammateService.execute(command)).thenReturn(createdTeammate);
         when(formerTeammateMapper.toResponse(createdTeammate)).thenReturn(response);
 

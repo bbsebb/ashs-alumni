@@ -1,6 +1,7 @@
 # Analyse Fonctionnelle Détaillée - Application ASHS Alumni
 
 ## Table des matières
+
 1. [Introduction](#1-introduction)
 2. [Architecture fonctionnelle](#2-architecture-fonctionnelle)
 3. [Spécifications détaillées par module](#3-spécifications-détaillées-par-module)
@@ -17,9 +18,13 @@
 ## 1. Introduction
 
 ### 1.1 Contexte
-Cette analyse fonctionnelle détaillée s'appuie sur l'analyse des besoins pour définir précisément les spécifications fonctionnelles de l'application web ASHS Alumni. Elle vise à permettre aux anciens et actuels membres des équipes 1 de l'ASHS de se retrouver et de s'inscrire à des soirées retrouvailles.
+
+Cette analyse fonctionnelle détaillée s'appuie sur l'analyse des besoins pour définir précisément les spécifications
+fonctionnelles de l'application web ASHS Alumni. Elle vise à permettre aux anciens et actuels membres des équipes 1 de
+l'ASHS de se retrouver et de s'inscrire à des soirées retrouvailles.
 
 ### 1.2 Objectifs de l'analyse
+
 - Définir les spécifications fonctionnelles détaillées de chaque module
 - Établir les règles métier précises
 - Spécifier les modèles de données
@@ -27,7 +32,9 @@ Cette analyse fonctionnelle détaillée s'appuie sur l'analyse des besoins pour 
 - Préciser les workflows et processus métier
 
 ### 1.3 Périmètre fonctionnel
+
 L'application couvre les domaines fonctionnels suivants :
+
 - **Gestion des contacts** : CRUD complet avec historisation
 - **Gestion des utilisateurs** : Authentification et autorisation
 - **Processus d'invitation** : Workflow complet d'invitation et validation
@@ -40,7 +47,8 @@ L'application couvre les domaines fonctionnels suivants :
 
 ### 2.1 Vue d'ensemble architecturale
 
-Le diagramme suivant présente l'architecture fonctionnelle globale du système sous forme de composants et leurs dépendances :
+Le diagramme suivant présente l'architecture fonctionnelle globale du système sous forme de composants et leurs
+dépendances :
 
 ```plantuml
 @startuml
@@ -51,42 +59,47 @@ Le diagramme suivant présente l'architecture fonctionnelle globale du système 
 ### 2.2 Modules principaux
 
 #### Module Gestion des Contacts (MGC)
+
 - **Responsabilité** : Gestion complète du cycle de vie des contacts
 - **Sous-modules** :
-  - Création et modification des contacts
-  - Validation et statuts
-  - Historisation des modifications
-  - Prévention des doublons
+    - Création et modification des contacts
+    - Validation et statuts
+    - Historisation des modifications
+    - Prévention des doublons
 
 #### Module Gestion des Utilisateurs (MGU)
+
 - **Responsabilité** : Authentification, autorisation et profils utilisateurs
 - **Sous-modules** :
-  - Authentification
-  - Gestion des profils
-  - Association contact-utilisateur
+    - Authentification
+    - Gestion des profils
+    - Association contact-utilisateur
 
 #### Module Invitation et Validation (MIV)
+
 - **Responsabilité** : Processus d'invitation et de validation des contacts
 - **Sous-modules** :
-  - Génération des invitations
-  - Envoi de SMS
-  - Validation des contacts
-  - Inscription spontanée
+    - Génération des invitations
+    - Envoi de SMS
+    - Validation des contacts
+    - Inscription spontanée
 
 #### Module Gestion des Événements (MGE)
+
 - **Responsabilité** : Création et gestion des soirées retrouvailles
 - **Sous-modules** :
-  - Création d'événements
-  - Inscriptions aux événements
-  - Liste des participants
+    - Création d'événements
+    - Inscriptions aux événements
+    - Liste des participants
 
 #### Module Administration (MAD)
+
 - **Responsabilité** : Outils d'administration et de supervision
 - **Sous-modules** :
-  - Gestion des administrateurs
-  - Supervision des contacts
-  - Gestion des listes de référence
-  - Historiques et audits
+    - Gestion des administrateurs
+    - Supervision des contacts
+    - Gestion des listes de référence
+    - Historiques et audits
 
 ### 2.2 Interactions entre modules
 
@@ -105,9 +118,11 @@ MAD → * : Supervision et administration de tous les modules
 
 #### 3.1.1 Fonctionnalité : Création d'un contact
 
-**Description** : Permet à toute personne (authentifiée ou anonyme) de créer un nouveau contact dans le système. Le statut initial dépend du type d'utilisateur.
+**Description** : Permet à toute personne (authentifiée ou anonyme) de créer un nouveau contact dans le système. Le
+statut initial dépend du type d'utilisateur.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-creation-contact.puml
@@ -115,6 +130,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-creation-contact.puml
@@ -124,25 +140,30 @@ MAD → * : Supervision et administration de tous les modules
 **Acteurs** : Utilisateur anonyme, Utilisateur authentifié, Administrateur
 
 **Pré-conditions** :
+
 - Aucune pré-condition pour les utilisateurs anonymes
 - Pour les utilisateurs authentifiés : être authentifié via Keycloak
 
 **Post-conditions** :
+
 - **Utilisateur anonyme** : Contact créé avec le statut "Submitted", en attente d'approbation admin
-- **Utilisateur authentifié** : Contact créé avec le statut "Pending" (si numéro valide) ou "Unreachable" (si pas de numéro valide)
+- **Utilisateur authentifié** : Contact créé avec le statut "Pending" (si numéro valide) ou "Unreachable" (si pas de
+  numéro valide)
 - Un historique de création est enregistré
-- Pour les utilisateurs authentifiés : Si le contact a un numéro de téléphone valide, un SMS d'invitation est envoyé automatiquement
+- Pour les utilisateurs authentifiés : Si le contact a un numéro de téléphone valide, un SMS d'invitation est envoyé
+  automatiquement
 
 **Scénario principal** :
+
 1. L'utilisateur (anonyme ou authentifié) accède au formulaire de création de contact
 2. L'utilisateur saisit les informations obligatoires :
-   - Nom (obligatoire, 2-50 caractères)
-   - Prénom (obligatoire, 2-50 caractères)
-   - Genre (obligatoire : Masculin/Féminin)
-   - Date de naissance (obligatoire, format DD/MM/YYYY)
-   - Email (obligatoire, format valide)
-   - Numéro de téléphone (optionnel, format français)
-   - Rôles dans l'équipe 1 (au moins un rôle obligatoire)
+    - Nom (obligatoire, 2-50 caractères)
+    - Prénom (obligatoire, 2-50 caractères)
+    - Genre (obligatoire : Masculin/Féminin)
+    - Date de naissance (obligatoire, format DD/MM/YYYY)
+    - Email (obligatoire, format valide)
+    - Numéro de téléphone (optionnel, format français)
+    - Rôles dans l'équipe 1 (au moins un rôle obligatoire)
 3. Le système vérifie l'absence de doublons
 4. Le système crée le contact avec le statut approprié selon le type d'utilisateur
 5. Le système enregistre l'historique de création
@@ -150,15 +171,17 @@ MAD → * : Supervision et administration de tous les modules
 7. **Si utilisateur anonyme** : Le contact reste en attente d'approbation admin
 
 **Scénarios alternatifs** :
+
 - **3a. Doublon détecté** :
-  - Le système affiche un message d'erreur
-  - Le système propose de consulter le contact existant
-  - La création est annulée
+    - Le système affiche un message d'erreur
+    - Le système propose de consulter le contact existant
+    - La création est annulée
 - **6a. Numéro de téléphone invalide** :
-  - Le contact est créé avec le statut "Non joignable"
-  - Aucun SMS n'est envoyé
+    - Le contact est créé avec le statut "Non joignable"
+    - Aucun SMS n'est envoyé
 
 **Règles de validation** :
+
 - Nom : 2-50 caractères, lettres et espaces uniquement
 - Prénom : 2-50 caractères, lettres et espaces uniquement
 - Email : format RFC 5322 valide
@@ -167,9 +190,11 @@ MAD → * : Supervision et administration de tous les modules
 
 #### 3.1.2 Fonctionnalité : Modification d'un contact
 
-**Description** : Permet la modification des informations d'un contact selon les droits de l'utilisateur. Seuls les utilisateurs inscrits peuvent modifier les contacts.
+**Description** : Permet la modification des informations d'un contact selon les droits de l'utilisateur. Seuls les
+utilisateurs inscrits peuvent modifier les contacts.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-modification-contact.puml
@@ -177,6 +202,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-modification-contact.puml
@@ -186,16 +212,19 @@ MAD → * : Supervision et administration de tous les modules
 **Acteurs** : Utilisateur authentifié, Administrateur
 
 **Pré-conditions** :
+
 - L'utilisateur doit être authentifié via Keycloak
 - Pour un utilisateur standard : le contact doit être en statut "Pending" ou "Submitted"
 - Pour un administrateur : aucune restriction sur tous les contacts
 
 **Post-conditions** :
+
 - Les informations du contact sont mises à jour
 - Un historique de modification est enregistré
 - Si le statut change, les actions appropriées sont déclenchées
 
 **Scénario principal** :
+
 1. L'utilisateur accède à la fiche du contact
 2. L'utilisateur modifie les champs autorisés
 3. Le système valide les modifications
@@ -203,6 +232,7 @@ MAD → * : Supervision et administration de tous les modules
 5. Le système enregistre l'historique de modification
 
 **Règles métier spécifiques** :
+
 - Un utilisateur standard ne peut pas modifier le statut d'un contact
 - Seuls les administrateurs peuvent passer un contact de "Validé" à un autre statut
 - La modification de l'email ou du téléphone déclenche une nouvelle vérification de doublons
@@ -212,6 +242,7 @@ MAD → * : Supervision et administration de tous les modules
 **Description** : Gestion du cycle de vie des statuts des contacts.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-gestion-statuts.puml
@@ -219,6 +250,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-gestion-statuts.puml
@@ -226,6 +258,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Statuts possibles** :
+
 1. **Submitted** : Contact créé par un utilisateur anonyme, en attente d'approbation admin
 2. **Pending** : Contact approuvé et en attente de validation
 3. **Validated** : Contact confirmé et validé
@@ -233,10 +266,12 @@ MAD → * : Supervision et administration de tous les modules
 5. **Unreachable** : Contact sans numéro de téléphone valide
 
 **Transitions autorisées** :
+
 - Submitted → Pending (approbation admin avec numéro valide + envoi SMS)
 - Submitted → Unreachable (approbation admin sans numéro valide)
 - Submitted → Suppression (suppression admin)
-- Pending → Validated (via processus complet d'inscription SMS incluant création compte utilisateur, ou validation admin)
+- Pending → Validated (via processus complet d'inscription SMS incluant création compte utilisateur, ou validation
+  admin)
 - Pending → Not requested (via lien de refus ou admin)
 - Pending → Unreachable (automatique si pas de téléphone)
 - Validated → Not requested (admin uniquement)
@@ -247,9 +282,11 @@ MAD → * : Supervision et administration de tous les modules
 
 #### 3.2.1 Fonctionnalité : Création de compte utilisateur
 
-**Description** : Permet à une personne de créer un compte utilisateur via Keycloak. La création de compte est indépendante de la gestion des contacts.
+**Description** : Permet à une personne de créer un compte utilisateur via Keycloak. La création de compte est
+indépendante de la gestion des contacts.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-creation-compte-utilisateur.puml
@@ -257,6 +294,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-creation-compte-utilisateur.puml
@@ -266,14 +304,17 @@ MAD → * : Supervision et administration de tous les modules
 **Acteurs** : Visiteur, Administrateur
 
 **Pré-conditions** :
+
 - Aucune pré-condition spécifique
 
 **Post-conditions** :
+
 - Un compte utilisateur est créé dans Keycloak
 - L'utilisateur peut se connecter à l'application
 - L'utilisateur a accès aux fonctionnalités selon ses rôles
 
 **Scénario principal (création via Keycloak)** :
+
 1. L'utilisateur accède à l'interface de création de compte
 2. L'utilisateur est redirigé vers Keycloak
 3. L'utilisateur saisit ses informations (nom, email, mot de passe)
@@ -281,12 +322,14 @@ MAD → * : Supervision et administration de tous les modules
 5. L'utilisateur peut se connecter à l'application
 
 **Scénario alternatif (création par admin)** :
+
 1. L'administrateur accède à l'interface d'administration Keycloak
 2. L'administrateur crée un nouveau compte utilisateur
 3. L'administrateur définit les rôles et permissions
 4. L'utilisateur reçoit ses identifiants de connexion
 
 **Règles de sécurité** :
+
 - Mot de passe : minimum 8 caractères, au moins une majuscule, une minuscule, un chiffre
 - Session : expiration après 24h d'inactivité
 - Tentatives de connexion : blocage après 5 échecs pendant 15 minutes
@@ -296,6 +339,7 @@ MAD → * : Supervision et administration de tous les modules
 **Description** : Processus de connexion des utilisateurs à l'application.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-authentification.puml
@@ -303,6 +347,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-authentification.puml
@@ -310,10 +355,12 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Méthodes d'authentification** :
+
 - Email + mot de passe
 - Lien de connexion temporaire (optionnel)
 
 **Gestion des sessions** :
+
 - Durée de session : 24 heures
 - Renouvellement automatique si activité
 - Déconnexion automatique après inactivité
@@ -325,6 +372,7 @@ MAD → * : Supervision et administration de tous les modules
 **Description** : Envoi automatique d'un SMS d'invitation lors de la création d'un contact avec numéro valide.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-envoi-invitation-sms.puml
@@ -332,6 +380,7 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-envoi-invitation-sms.puml
@@ -339,11 +388,13 @@ MAD → * : Supervision et administration de tous les modules
 ```
 
 **Déclencheurs** :
+
 - Création d'un nouveau contact avec numéro de téléphone valide
 - Aucun doublon détecté
 - Contact en statut "En attente"
 
 **Contenu du SMS** :
+
 ```
 Bonjour [Prénom],
 Vous êtes invité(e) à rejoindre la communauté ASHS Alumni.
@@ -352,6 +403,7 @@ Pour refuser : [lien_refus]
 ```
 
 **Caractéristiques techniques** :
+
 - Lien personnalisé avec token unique (validité 30 jours)
 - Lien de refus avec token unique
 - Limitation : 1 SMS par numéro par période de 24h
@@ -361,6 +413,7 @@ Pour refuser : [lien_refus]
 **Description** : Processus de validation d'un contact via SMS ou action administrative.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-validation-contact.puml
@@ -368,6 +421,7 @@ Pour refuser : [lien_refus]
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-validation-contact.puml
@@ -375,10 +429,12 @@ Pour refuser : [lien_refus]
 ```
 
 **Méthodes de validation** :
+
 1. **Via SMS** : Validation via le lien dans le SMS
 2. **Administrative** : Action d'un administrateur
 
 **Processus de validation via SMS** :
+
 1. La personne clique sur le lien de validation
 2. Le système vérifie la validité du token
 3. Le système affiche les informations du contact
@@ -393,6 +449,7 @@ Pour refuser : [lien_refus]
 **Description** : Permet aux administrateurs de créer des soirées retrouvailles.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-creation-evenement.puml
@@ -400,6 +457,7 @@ Pour refuser : [lien_refus]
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-creation-evenement.puml
@@ -409,6 +467,7 @@ Pour refuser : [lien_refus]
 **Acteurs** : Administrateur
 
 **Informations de l'événement** :
+
 - Titre (obligatoire)
 - Description
 - Date et heure (obligatoire)
@@ -422,6 +481,7 @@ Pour refuser : [lien_refus]
 **Description** : Permet aux utilisateurs avec contact validé de s'inscrire à un événement.
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-inscription-evenement.puml
@@ -429,6 +489,7 @@ Pour refuser : [lien_refus]
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-inscription-evenement.puml
@@ -438,11 +499,13 @@ Pour refuser : [lien_refus]
 **Acteurs** : Utilisateur authentifié
 
 **Pré-conditions** :
+
 - L'utilisateur doit être authentifié via Keycloak
 - L'événement doit être ouvert aux inscriptions
 - Des places doivent être disponibles (si limitation)
 
 **Processus d'inscription** :
+
 1. L'utilisateur consulte la liste des événements
 2. L'utilisateur sélectionne un événement
 3. L'utilisateur confirme son inscription
@@ -456,6 +519,7 @@ Pour refuser : [lien_refus]
 **Description** : Permet aux administrateurs de gérer les listes "à ne pas contacter" et "anciens participants".
 
 **Diagramme d'activité** :
+
 ```plantuml
 @startuml
 !include ../diagrams/functionality-gestion-listes-reference.puml
@@ -463,6 +527,7 @@ Pour refuser : [lien_refus]
 ```
 
 **Diagramme d'interaction** :
+
 ```plantuml
 @startuml
 !include ../diagrams/interaction-gestion-listes-reference.puml
@@ -470,16 +535,18 @@ Pour refuser : [lien_refus]
 ```
 
 **Types de listes** :
+
 1. **Liste "à ne pas contacter"** :
-   - Contacts qui ont explicitement refusé
-   - Contacts marqués comme non sollicités
-   - Invisibles pour les utilisateurs standards
+    - Contacts qui ont explicitement refusé
+    - Contacts marqués comme non sollicités
+    - Invisibles pour les utilisateurs standards
 
 2. **Liste "anciens participants"** :
-   - Historique des participations aux éditions précédentes
-   - Utilisée pour enrichir la base de contacts
+    - Historique des participations aux éditions précédentes
+    - Utilisée pour enrichir la base de contacts
 
 **Fonctionnalités** :
+
 - Import/export CSV
 - Ajout/suppression manuel
 - Recherche et filtrage
@@ -637,22 +704,26 @@ Le diagramme suivant illustre les différents statuts possibles d'un contact et 
 ```
 
 #### RG-C001 : Unicité des contacts
+
 - Un contact est unique par numéro de téléphone (si renseigné)
 - Pour les contacts sans téléphone : unicité par combinaison nom/prénom/email
 - La vérification s'effectue avant toute création ou modification
 
 #### RG-C002 : Validation des données
+
 - Nom et prénom : 2-50 caractères, lettres, espaces, apostrophes et tirets uniquement
 - Email : format RFC 5322 valide et domaine existant
 - Téléphone : format français uniquement (mobile ou fixe)
 - Date de naissance : âge entre 16 et 100 ans
 
 #### RG-C003 : Gestion des statuts
+
 - Statut initial : "En attente" (sauf si pas de téléphone → "Non joignable")
 - Seuls les administrateurs peuvent modifier le statut d'un contact validé
 - Un contact "Non sollicité" est invisible pour les utilisateurs standards
 
 #### RG-C004 : Historisation
+
 - Toute création/modification doit être tracée
 - L'historique inclut : qui, quand, quoi, valeurs avant/après
 - Conservation permanente de l'historique
@@ -660,15 +731,18 @@ Le diagramme suivant illustre les différents statuts possibles d'un contact et 
 ### 5.2 Règles de gestion des utilisateurs
 
 #### RG-U001 : Authentification Keycloak
+
 - Authentification déléguée entièrement à Keycloak
 - Gestion des mots de passe via Keycloak
 - Tokens JWT émis par Keycloak avec durée configurable
 
 #### RG-U002 : Droits d'accès
+
 - Utilisateur standard : création et modification des contacts
 - Administrateur : tous droits sur tous les contacts et utilisateurs
 
 #### RG-U003 : Indépendance des entités
+
 - Les utilisateurs et contacts sont des entités complètement indépendantes
 - Aucune association obligatoire entre utilisateur et contact
 - Un utilisateur peut exister sans contact associé
@@ -676,16 +750,19 @@ Le diagramme suivant illustre les différents statuts possibles d'un contact et 
 ### 5.3 Règles de gestion des invitations
 
 #### RG-I001 : Envoi de SMS
+
 - Un seul SMS par numéro de téléphone par période de 24h
 - Envoi uniquement si numéro de téléphone français valide
 - Pas d'envoi si doublon détecté
 
 #### RG-I002 : Tokens de validation
+
 - Durée de validité : 30 jours
 - Token unique et non prédictible
 - Un seul token actif par contact à la fois
 
 #### RG-I003 : Processus de validation
+
 - Validation possible uniquement avec token valide
 - Possibilité de corriger les informations lors de la validation
 - Passage automatique au statut "Validé" après validation
@@ -693,11 +770,13 @@ Le diagramme suivant illustre les différents statuts possibles d'un contact et 
 ### 5.4 Règles de gestion des événements
 
 #### RG-E001 : Inscription aux événements
+
 - Seuls les utilisateurs authentifiés via Keycloak peuvent s'inscrire
 - Respect du nombre de places maximum (si défini)
 - Respect de la date limite d'inscription
 
 #### RG-E002 : Gestion des places
+
 - Inscription dans l'ordre d'arrivée si limitation de places
 - Possibilité de liste d'attente (fonctionnalité future)
 
@@ -718,17 +797,20 @@ Le diagramme suivant présente les maquettes des principales interfaces utilisat
 ### 6.2 Principes généraux
 
 #### Accessibilité
+
 - Conformité RGAA (Référentiel Général d'Amélioration de l'Accessibilité)
 - Support des lecteurs d'écran
 - Navigation au clavier
 - Contrastes suffisants
 
 #### Responsive Design
+
 - Adaptation mobile-first
 - Breakpoints : 320px, 768px, 1024px, 1200px
 - Interface tactile optimisée
 
 #### Expérience utilisateur
+
 - Interface intuitive et épurée
 - Feedback immédiat sur les actions
 - Messages d'erreur explicites
@@ -737,35 +819,45 @@ Le diagramme suivant présente les maquettes des principales interfaces utilisat
 ### 6.2 Pages principales
 
 #### 6.2.1 Page d'accueil (non connecté)
+
 **Éléments** :
+
 - Présentation de l'ASHS Alumni
 - Lien vers inscription spontanée
 - Lien vers connexion
 - Liste publique des événements (sans détails sensibles)
 
 #### 6.2.2 Page de connexion
+
 **Éléments** :
+
 - Formulaire email/mot de passe
 - Lien "Mot de passe oublié"
 - Lien vers inscription spontanée
 - Messages d'erreur contextuels
 
 #### 6.2.3 Tableau de bord utilisateur
+
 **Éléments** :
+
 - Informations du profil utilisateur
 - Événements à venir
 - Mes inscriptions
 - Accès rapide aux fonctionnalités principales
 
 #### 6.2.4 Gestion des contacts
+
 **Éléments** :
+
 - Liste des contacts avec filtres (statut, rôle, date)
 - Formulaire de création/modification
 - Historique des modifications
 - Actions en lot (admin uniquement)
 
 #### 6.2.5 Gestion des événements
+
 **Éléments** :
+
 - Liste des événements
 - Détail d'un événement
 - Formulaire d'inscription
@@ -774,18 +866,21 @@ Le diagramme suivant présente les maquettes des principales interfaces utilisat
 ### 6.3 Composants d'interface
 
 #### 6.3.1 Formulaires
+
 - Validation en temps réel
 - Messages d'erreur contextuels
 - Indicateurs de champs obligatoires
 - Sauvegarde automatique (brouillon)
 
 #### 6.3.2 Listes et tableaux
+
 - Pagination (25 éléments par page)
 - Tri par colonnes
 - Filtres avancés
 - Export CSV (admin)
 
 #### 6.3.3 Notifications
+
 - Toast notifications pour les actions
 - Alertes pour les erreurs
 - Confirmations pour les suppressions
@@ -806,39 +901,42 @@ Le diagramme suivant visualise la matrice des droits d'accès pour chaque type d
 
 #### Tableau détaillé des permissions
 
-| Fonctionnalité | Visiteur/Anonyme | Utilisateur | Admin |
-|----------------|------------------|-------------|-------|
-| Consulter événements publics | ✓ | ✓ | ✓ |
-| Créer un contact (statut SUBMITTED) | ✓ | - | - |
-| S'inscrire spontanément | ✓ | - | - |
-| Se connecter | - | ✓ | ✓ |
-| Consulter son profil | - | ✓ | ✓ |
-| Modifier son contact | - | ✓ | ✓ |
-| Créer un contact (statut PENDING/UNREACHABLE) | - | ✓ | ✓ |
-| Modifier contact en attente/submitted | - | ✓ | ✓ |
-| Modifier tout contact | - | - | ✓ |
-| Approuver contacts submitted | - | - | ✓ |
-| Gérer les statuts | - | - | ✓ |
-| Créer des événements | - | - | ✓ |
-| Gérer les inscriptions | - | - | ✓ |
-| Accéder aux historiques | - | - | ✓ |
-| Gérer les utilisateurs | - | - | ✓ |
+| Fonctionnalité                                | Visiteur/Anonyme | Utilisateur | Admin |
+|-----------------------------------------------|------------------|-------------|-------|
+| Consulter événements publics                  | ✓                | ✓           | ✓     |
+| Créer un contact (statut SUBMITTED)           | ✓                | -           | -     |
+| S'inscrire spontanément                       | ✓                | -           | -     |
+| Se connecter                                  | -                | ✓           | ✓     |
+| Consulter son profil                          | -                | ✓           | ✓     |
+| Modifier son contact                          | -                | ✓           | ✓     |
+| Créer un contact (statut PENDING/UNREACHABLE) | -                | ✓           | ✓     |
+| Modifier contact en attente/submitted         | -                | ✓           | ✓     |
+| Modifier tout contact                         | -                | -           | ✓     |
+| Approuver contacts submitted                  | -                | -           | ✓     |
+| Gérer les statuts                             | -                | -           | ✓     |
+| Créer des événements                          | -                | -           | ✓     |
+| Gérer les inscriptions                        | -                | -           | ✓     |
+| Accéder aux historiques                       | -                | -           | ✓     |
+| Gérer les utilisateurs                        | -                | -           | ✓     |
 
 ### 7.2 Sécurité des données
 
 #### Protection des données personnelles
+
 - Chiffrement des mots de passe (bcrypt, coût 12)
 - Masquage partiel des numéros de téléphone côté frontend
 - Logs d'accès et de modification
 - Anonymisation possible des données (RGPD)
 
 #### Sécurité applicative
+
 - Protection CSRF
 - Validation et échappement des entrées
 - Limitation du taux de requêtes (rate limiting)
 - Headers de sécurité (HSTS, CSP, etc.)
 
 #### Audit et traçabilité
+
 - Logs d'authentification
 - Historique des modifications de données
 - Monitoring des actions sensibles
@@ -851,17 +949,20 @@ Le diagramme suivant visualise la matrice des droits d'accès pour chaque type d
 ### 8.1 Service SMS
 
 #### Fournisseur recommandé
+
 - OVH SMS API ou équivalent français
 - Conformité RGPD
 - Tarification compétitive
 
 #### Spécifications techniques
+
 - API REST
 - Authentification par clé API
 - Gestion des erreurs et retry
 - Limitation : 1000 SMS/mois (estimation)
 
 #### Contenu des SMS
+
 - Messages courts (< 160 caractères)
 - Liens raccourcis sécurisés
 - Personnalisation avec prénom
@@ -870,11 +971,13 @@ Le diagramme suivant visualise la matrice des droits d'accès pour chaque type d
 ### 8.2 Service Email (optionnel)
 
 #### Utilisation
+
 - Notifications administratives
 - Confirmations d'inscription
 - Rappels d'événements
 
 #### Spécifications
+
 - SMTP sécurisé (TLS)
 - Templates HTML/texte
 - Gestion des bounces
@@ -890,7 +993,7 @@ Le diagramme suivant présente les parcours utilisateur complets pour les princi
 
 ```plantuml
 @startuml
-!include ../diagrams/user-journey-flows.puml
+!include ../diagrams/currentUser-journey-flows.puml
 @enduml
 ```
 
@@ -962,16 +1065,19 @@ graph TD
 ### 10.1 Critères généraux
 
 #### Performance
+
 - Temps de réponse < 2 secondes pour les pages standards
 - Temps de réponse < 5 secondes pour les exports
 - Support de 100 utilisateurs simultanés minimum
 
 #### Disponibilité
+
 - Disponibilité 99% minimum
 - Sauvegarde quotidienne des données
 - Plan de reprise d'activité documenté
 
 #### Compatibilité
+
 - Navigateurs : Chrome, Firefox, Safari, Edge (2 dernières versions)
 - Mobiles : iOS 12+, Android 8+
 - Responsive design sur toutes les tailles d'écran
@@ -979,6 +1085,7 @@ graph TD
 ### 10.2 Critères par fonctionnalité
 
 #### Gestion des contacts
+
 - ✅ Création d'un contact avec toutes les informations obligatoires
 - ✅ Validation des formats (email, téléphone, dates)
 - ✅ Détection des doublons avant création
@@ -986,24 +1093,28 @@ graph TD
 - ✅ Gestion des statuts selon les règles métier
 
 #### Processus d'invitation
+
 - ✅ Envoi automatique de SMS pour les contacts avec numéro valide
 - ✅ Génération de liens personnalisés sécurisés
 - ✅ Validation de contact via SMS indépendante de la création de compte
 - ✅ Gestion des refus et des non-réponses
 
 #### Gestion des utilisateurs
+
 - ✅ Création de compte via Keycloak indépendante des contacts
 - ✅ Authentification déléguée à Keycloak avec tokens JWT
 - ✅ Gestion des droits selon les rôles Keycloak
 - ✅ Utilisateurs et contacts comme entités indépendantes
 
 #### Gestion des événements
+
 - ✅ Création d'événements par les administrateurs
 - ✅ Inscription limitée aux utilisateurs authentifiés via Keycloak
 - ✅ Respect des limites de places et dates
 - ✅ Affichage public avec masquage des données sensibles
 
 #### Administration
+
 - ✅ Accès complet aux données pour les administrateurs
 - ✅ Gestion des listes de référence
 - ✅ Consultation des historiques et audits
@@ -1012,12 +1123,14 @@ graph TD
 ### 10.3 Critères de sécurité
 
 #### Protection des données
+
 - ✅ Chiffrement des mots de passe
 - ✅ Masquage partiel des numéros de téléphone
 - ✅ Traçabilité complète des actions
 - ✅ Conformité RGPD
 
 #### Sécurité applicative
+
 - ✅ Protection contre les attaques courantes (XSS, CSRF, injection SQL)
 - ✅ Validation et échappement des entrées utilisateur
 - ✅ Gestion sécurisée des sessions
@@ -1027,9 +1140,11 @@ graph TD
 
 ## Conclusion
 
-Cette analyse fonctionnelle détaillée fournit les spécifications complètes pour le développement de l'application ASHS Alumni. Elle couvre tous les aspects fonctionnels, techniques et sécuritaires nécessaires à la réalisation du projet.
+Cette analyse fonctionnelle détaillée fournit les spécifications complètes pour le développement de l'application ASHS
+Alumni. Elle couvre tous les aspects fonctionnels, techniques et sécuritaires nécessaires à la réalisation du projet.
 
 Les prochaines étapes recommandées sont :
+
 1. Validation de cette analyse par les parties prenantes
 2. Conception technique détaillée
 3. Planification du développement par itérations

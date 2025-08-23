@@ -4,7 +4,7 @@ import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;
 import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
 import fr.hoenheimsports.formerteammate.domain.models.Role;
-import fr.hoenheimsports.formerteammate.domain.spi.stub.FormerTeammateRepositoryStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stubs.FormerTeammateRepositoryStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,10 +40,10 @@ class FormerTeammateRemoverTest {
                 .roles(List.of(Role.PLAYER))
                 .status(ContactStatus.VALIDATED)
                 .build();
-        
+
         // Save entity first to simulate existing data
         repository.save(existingFormerTeammate);
-        
+
         // Verify entity exists before deletion
         assertTrue(repository.findById(existingId).isPresent(), "Entity should exist before deletion");
 
@@ -53,7 +53,7 @@ class FormerTeammateRemoverTest {
         // Then
         // Verify that the entity was deleted
         assertFalse(repository.findById(existingId).isPresent(), "Entity should be deleted after execute");
-        
+
         // Verify deleteById was called on repository (entity should be removed from the list)
         assertFalse(repository.findById(existingId).isPresent(), "Entity should be removed from repository after deletion");
     }
@@ -69,9 +69,9 @@ class FormerTeammateRemoverTest {
         // Then
         // Verify deleteById was called - even for non-existent entities, the method should execute without error
         // We can't verify the exact call was made with stub, but we can verify no exception was thrown
-        assertDoesNotThrow(() -> formerTeammateRemover.execute(testId), 
+        assertDoesNotThrow(() -> formerTeammateRemover.execute(testId),
                 "Should not throw exception when calling deleteById");
-        
+
         // Verify the entity is not present after deletion attempt
         assertFalse(repository.findById(testId).isPresent(), "Entity should not exist after deletion attempt");
     }
@@ -80,17 +80,17 @@ class FormerTeammateRemoverTest {
     void execute_shouldHandleNonExistentId() {
         // Given
         UUID nonExistentId = UUID.randomUUID();
-        
+
         // Verify entity does not exist
         assertFalse(repository.findById(nonExistentId).isPresent(), "Entity should not exist initially");
 
         // When & Then
         // The method should not throw an exception even if ID doesn't exist
-        assertDoesNotThrow(() -> formerTeammateRemover.execute(nonExistentId), 
+        assertDoesNotThrow(() -> formerTeammateRemover.execute(nonExistentId),
                 "Should not throw exception when deleting non-existent ID");
-        
+
         // Verify the entity still doesn't exist after deletion attempt
-        assertFalse(repository.findById(nonExistentId).isPresent(), 
+        assertFalse(repository.findById(nonExistentId).isPresent(),
                 "Entity should still not exist after deletion attempt");
     }
 
@@ -99,7 +99,7 @@ class FormerTeammateRemoverTest {
         // Given
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        
+
         FormerTeammate teammate1 = FormerTeammate.builder()
                 .id(id1)
                 .firstName("Alice")
@@ -110,7 +110,7 @@ class FormerTeammateRemoverTest {
                 .roles(List.of(Role.COACH))
                 .status(ContactStatus.SUBMITTED)
                 .build();
-                
+
         FormerTeammate teammate2 = FormerTeammate.builder()
                 .id(id2)
                 .firstName("Bob")
@@ -121,10 +121,10 @@ class FormerTeammateRemoverTest {
                 .roles(List.of(Role.PRESIDENT))
                 .status(ContactStatus.VALIDATED)
                 .build();
-                
+
         repository.save(teammate1);
         repository.save(teammate2);
-        
+
         // Verify both entities exist
         assertTrue(repository.findById(id1).isPresent(), "First entity should exist before deletion");
         assertTrue(repository.findById(id2).isPresent(), "Second entity should exist before deletion");
@@ -137,7 +137,7 @@ class FormerTeammateRemoverTest {
         // Verify both entities were deleted
         assertFalse(repository.findById(id1).isPresent(), "First entity should be deleted");
         assertFalse(repository.findById(id2).isPresent(), "Second entity should be deleted");
-        
+
         // Verify both deletion operations completed successfully
         assertFalse(repository.findById(id1).isPresent(), "First entity should be removed from repository");
         assertFalse(repository.findById(id2).isPresent(), "Second entity should be removed from repository");
@@ -160,7 +160,7 @@ class FormerTeammateRemoverTest {
         assertDoesNotThrow(() -> formerTeammateRemover.execute(uuid1), "First UUID should be processed without error");
         assertDoesNotThrow(() -> formerTeammateRemover.execute(uuid2), "Second UUID should be processed without error");
         assertDoesNotThrow(() -> formerTeammateRemover.execute(uuid3), "Third UUID should be processed without error");
-        
+
         // Verify none of the entities exist after deletion attempts
         assertFalse(repository.findById(uuid1).isPresent(), "First entity should not exist after deletion");
         assertFalse(repository.findById(uuid2).isPresent(), "Second entity should not exist after deletion");

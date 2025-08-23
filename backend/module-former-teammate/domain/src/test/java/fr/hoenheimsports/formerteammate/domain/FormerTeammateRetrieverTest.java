@@ -4,7 +4,7 @@ import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;
 import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
 import fr.hoenheimsports.formerteammate.domain.models.Role;
-import fr.hoenheimsports.formerteammate.domain.spi.stub.FormerTeammateRepositoryStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stubs.FormerTeammateRepositoryStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package fr.hoenheimsports.formerteammate.domain.spi.stub;
+package fr.hoenheimsports.formerteammate.domain.spi.stubs;
 
 import fr.hoenheimsports.formerteammate.domain.annotations.Stub;
 import fr.hoenheimsports.formerteammate.domain.models.ContactStatus;

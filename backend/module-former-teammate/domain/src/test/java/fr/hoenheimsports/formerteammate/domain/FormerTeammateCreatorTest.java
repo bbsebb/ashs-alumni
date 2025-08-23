@@ -6,8 +6,8 @@ import fr.hoenheimsports.formerteammate.domain.models.FormerTeammate;
 import fr.hoenheimsports.formerteammate.domain.models.Gender;
 import fr.hoenheimsports.formerteammate.domain.models.Role;
 import fr.hoenheimsports.formerteammate.domain.spi.GenerateId;
-import fr.hoenheimsports.formerteammate.domain.spi.stub.FormerTeammateRepositoryStub;
-import fr.hoenheimsports.formerteammate.domain.spi.stub.UUIDGeneratorStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stubs.FormerTeammateRepositoryStub;
+import fr.hoenheimsports.formerteammate.domain.spi.stubs.UUIDGeneratorStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +39,9 @@ class FormerTeammateCreatorTest {
                 "Doe",
                 "0123456789",
                 LocalDate.of(1990, 1, 15),
-                List.of(Role.PLAYER, Role.COACH)
+                List.of(Role.PLAYER, Role.COACH),
+                false,
+                false
         );
 
         // When
@@ -78,7 +80,9 @@ class FormerTeammateCreatorTest {
                 "Smith",
                 "0987654321",
                 LocalDate.of(1985, 5, 20),
-                List.of(Role.PRESIDENT)
+                List.of(Role.PRESIDENT),
+                false,
+                false
         );
 
         CreateFormerTeammateCommand command2 = new CreateFormerTeammateCommand(
@@ -87,7 +91,9 @@ class FormerTeammateCreatorTest {
                 "Johnson",
                 "0555666777",
                 LocalDate.of(1992, 12, 3),
-                List.of(Role.ASSISTANT)
+                List.of(Role.ASSISTANT),
+                false,
+                false
         );
 
         // When

@@ -6,7 +6,12 @@ plugins {
 
 dependencies {
 
-    implementation(project(":module-former-teammate:domain"))
+    implementation(project(":former-teammate-domain"))
+
+    implementation(project(":user-domain"))
+
 
 }
+
+
 
