@@ -1,0 +1,47 @@
+<h2>{{ titleInputSignal() }}</h2>
+<form (ngSubmit)="onSubmit()" [formGroup]="formerForm">
+  <h3>Informations</h3>
+
+  <mat-button-toggle-group aria-label="Gender" formControlName="gender" name="gender">
+    <mat-button-toggle value="M">Masculin</mat-button-toggle>
+    <mat-button-toggle value="F">Féminin</mat-button-toggle>
+  </mat-button-toggle-group>
+  <mat-form-field>
+    <mat-label>Prénom</mat-label>
+    <input formControlName="firstName" matInput required>
+    <mat-error>Le prénom est requis</mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Nom</mat-label>
+    <input formControlName="lastName" matInput required>
+    <mat-error>Le nom est requis</mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Téléphone</mat-label>
+    <input formControlName="phone" matInput type="tel">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Date de naissance</mat-label>
+    <input [matDatepicker]="picker" formControlName="birthDate" matInput>
+    <mat-hint>DD/MM/YYYY</mat-hint>
+    <mat-datepicker-toggle [for]="picker" matIconSuffix></mat-datepicker-toggle>
+    <mat-datepicker #picker [startAt]="startAt" startView="multi-year"></mat-datepicker>
+  </mat-form-field>
+  <h3>Fonction à Hoenheim</h3>
+  <mat-button-toggle-group [multiple]="true" aria-label="Roles" formControlName="roles" name="roles">
+    @for (role of roles; track role) {
+      <mat-button-toggle [value]="role">{{ role | role }}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else {
+    <mat-divider/>
+  }
+  <div id="action">
+    <app-back-button link='/former-teammates'/>
+    <button mat-button type="submit" [disabled]="isLoading()">
+      {{ actionInputSignal() }}
+    </button>
+  </div>
+</form>

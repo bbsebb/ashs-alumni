@@ -1,0 +1,15 @@
+<mat-card class="load-error-card">
+  <mat-card-content class="content">
+    <mat-icon aria-hidden="false" aria-label="Erreur">error</mat-icon>
+    <div class="text">
+      <div class="title">Erreur de chargement</div>
+      <div class="message">{{ messageSignal() }}</div>
+    </div>
+  </mat-card-content>
+  @let backLink = backLinkSignal();
+  @if (backLink) {
+    <mat-card-actions>
+      <app-back-button [link]="backLink"/>
+    </mat-card-actions>
+  }
+</mat-card>

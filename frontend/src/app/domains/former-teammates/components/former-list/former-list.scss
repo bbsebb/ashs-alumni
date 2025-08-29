@@ -1,0 +1,18 @@
+mat-spinner {
+  margin: 30px auto;
+}
+
+
+menu {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  button.floating-button{
+    position: fixed;
+    right: calc(10vw + env(safe-area-inset-right, 0px));
+    bottom: calc(35vw + env(safe-area-inset-bottom, 0px));
+    z-index: 1000; /* au-dessus du contenu */
+  }
+}

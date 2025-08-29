@@ -1,0 +1,102 @@
+@if (isLoading()) {
+  <app-loading message="Chargement du contact"></app-loading>
+} @else if (hasError()) {
+  <app-load-error backLink="/former-teammates"></app-load-error>
+} @else {
+
+  @let formerTeammate = formerTeammateSignal();
+  @if (formerTeammate) {
+    <mat-card>
+      <!-- Header with name and status -->
+      <mat-card-header>
+        <mat-card-title>
+          <app-gender-icon [gender]="formerTeammate.gender"/>
+          <span id="left-mat-card-title">
+          {{ formerTeammate.firstName }} {{ formerTeammate.lastName }}
+        </span>
+          <div id="right-mat-card-title">
+            <app-contact-status-chip [status]="formerTeammate.status"/>
+            @if (formerTeammate.phone) {
+              <span>
+              <mat-icon>phone</mat-icon>
+                {{ formerTeammate.phone }}
+            </span>
+            } @else {
+              <span class="unknown">
+              <mat-icon>phone_disabled</mat-icon>
+              Aucun contact
+            </span>
+            }
+          </div>
+        </mat-card-title>
+        <mat-card-subtitle>
+          <span
+            [class.unknown]="!formerTeammate.birthDate">Génération : {{ (formerTeammate.birthDate | date:'yyyy') ?? 'non renseignée' }}</span>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <!-- Roles Section -->
+
+        <section>
+          <h3>Rôles</h3>
+          <mat-chip-set>
+            @for (role of formerTeammate.roles; track role) {
+              <mat-chip>{{ role | role }}</mat-chip>
+            } @empty {
+              <p class="unknown">Aucun role renseigné</p>
+            }
+          </mat-chip-set>
+        </section>
+
+
+        <!-- History Section -->
+        @if (historiesIsLoading()) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        } @else if (historiesHasError()) {
+          <app-load-error message="L'historique n'a pas pu être récupéré"></app-load-error>
+        } @else {
+          <mat-divider></mat-divider>
+          <section>
+            <mat-expansion-panel [expanded]="true">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>history</mat-icon>
+                  Historique des modifications
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="history-list">
+                @for (formerTeammateHistory of formerTeammateHistoriesSignal(); track formerTeammateHistory.id) {
+                  <article class="history-item">
+                    <p><strong>Action:</strong> {{ formerTeammateHistory.action | actionFormerTeammateHistory }}</p>
+                    <p><strong>Date:</strong> {{ formerTeammateHistory.changedAt | date:'EEEE d MMMM y, HH:mm' }}</p>
+                    <p><strong>Par:</strong> {{ formerTeammateHistory.changedByUserName ?? 'utilisateur non inscrit' }}
+                    </p>
+                  </article>
+                  <mat-divider></mat-divider>
+                } @empty {
+                  <p>Aucun historique</p>
+                }
+              </div>
+            </mat-expansion-panel>
+          </section>
+        }
+      </mat-card-content>
+      @if (isDeleting()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      } @else {
+        <mat-divider></mat-divider>
+      }
+      <mat-card-actions>
+        <app-back-button link='/former-teammates'/>
+        <a mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true"
+           [routerLink]="['/former-teammates/edit',formerTeammate.id]" [disabled]="isDeleting()">Modifier</a>
+        <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="delete()" [disabled]="isDeleting()">
+          Supprimer
+        </button>
+        <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" [disabled]="isDeleting()">Renvoyer SMS</button>
+      </mat-card-actions>
+    </mat-card>
+  }
+}

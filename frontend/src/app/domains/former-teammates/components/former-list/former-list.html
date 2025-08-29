@@ -1,0 +1,23 @@
+<!-- Section de filtrage des anciens coéquipiers -->
+
+
+
+@if (formerTeammatesResource.isLoading()) {
+  <app-loading message="Chargement des données"/>
+} @else if (formerTeammatesResource.error()) {
+  <app-load-error></app-load-error>
+} @else if (formerTeammatesResource.hasValue()) {
+  <menu>
+    <app-former-filter (filterChange)="filterChange($event)"/>
+    <button
+      [class.floating-button]="breakpointObserver()?.matches"
+      matFab
+      extended
+      [routerLink]="['/former-teammates/create']"
+    >
+      <mat-icon>add</mat-icon>
+      Ajouter
+    </button>
+  </menu>
+  <app-former-table [filterFormerTeammates]="filteredFormerTeammates()"/>
+}

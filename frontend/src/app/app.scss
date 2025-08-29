@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto; /* Prend toute la hauteur dispo entre header et footer */
+  padding: 12px clamp(6px, 2vw, 80px);
+;
+}
+
+footer {
+  flex-shrink: 0; /* Ne se réduit jamais */
+}

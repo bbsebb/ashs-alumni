@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ashs-alumni.iml" filepath="$PROJECT_DIR$/ashs-alumni.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/backend.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/backend.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/backend.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/backend.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/backend.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/backend.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/backend.domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/backend.domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/backend.domain.main.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/backend.domain.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/backend.domain.test.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/backend.domain.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.test.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/frontend/frontend.iml" filepath="$PROJECT_DIR$/frontend/frontend.iml" />
+    </modules>
+  </component>
+</project>

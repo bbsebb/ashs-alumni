@@ -1,0 +1,32 @@
+.load-error-card {
+  background-color: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  max-width: 400px;
+  margin: 7vh auto;
+
+  .content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 8px;
+  }
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title {
+    font-weight: 600;
+  }
+
+  .message {
+    opacity: 0.85;
+  }
+}

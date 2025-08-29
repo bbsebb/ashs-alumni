@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpaBuddyIdeaProjectConfig" newRepositoryParent="org.springframework.data.repository.Repository" />
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="backend.app.main" name="entityManagerFactory" framework="JPA" ormUnit="backend.app.main:entityManagerFactory" defaultDataSourceId="d7c677c5-b6ea-48ff-a8d2-c649a70a0219" />
+    </persistence-units>
+  </component>
+</project>

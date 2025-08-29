@@ -1,0 +1,26 @@
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title> Filtres </mat-panel-title>
+  </mat-expansion-panel-header>
+
+<form [formGroup]="formFilter" class="filters" >
+  <!-- Filtre par genre -->
+  <mat-button-toggle-group name="gender" aria-label="Gender" [multiple]="true"  formControlName="gender">
+    <mat-button-toggle value="M">Masc.</mat-button-toggle>
+    <mat-button-toggle value="F">Fem.</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <!-- Filtre par statut de contact -->
+  <mat-button-toggle-group name="contactStatus" aria-label="Contact Status" [multiple]="true" formControlName="contactStatus">
+    @for(contactStatus of statusFilter; track contactStatus) {
+      <mat-button-toggle [value]="contactStatus">{{contactStatus | contactStatus}}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+
+  <!-- Champ de recherche par nom -->
+  <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Rechercher par nom</mat-label>
+    <input matInput  type="text" placeholder="Rechercher par nom" formControlName="searchByName"/>
+  </mat-form-field>
+</form>
+</mat-expansion-panel>

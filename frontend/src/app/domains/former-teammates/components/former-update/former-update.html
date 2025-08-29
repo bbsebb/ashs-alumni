@@ -1,0 +1,14 @@
+@if (isLoading()) {
+  <app-loading message="Chargement du contact"></app-loading>
+} @else if (hasError()) {
+  <app-load-error backLink="/former-teammates"></app-load-error>
+} @else {
+
+  <app-former-form (formerTeammateFormValueSubmitted)="onSubmit($event)"
+                   [prefillFormerTeammate]="prefillFormerTeammateFormSignal()" action="Modifier"
+                   title="Modification du contact"
+                   [isLoading]="isSubmitting()"
+  >
+  </app-former-form>
+
+}

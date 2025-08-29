@@ -1,0 +1,25 @@
+<div class="not-found-container">
+  <mat-card class="not-found-card">
+    <mat-card-content>
+      <mat-card-title>
+        <mat-icon class="error-icon">sentiment_very_dissatisfied</mat-icon>
+        Oups ! Page non trouvée
+      </mat-card-title>
+
+      <p class="error-message">
+        Désolé, l'adresse que vous avez saisie est incorrecte ou la page que vous recherchez n'existe plus.
+        <br>
+        Mais ne vous inquiétez pas, nous allons vous ramener en sécurité !
+      </p>
+
+      <div class="error-code">Erreur 404</div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="goHome()">
+        <mat-icon>home</mat-icon>
+        Retour à l'accueil
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

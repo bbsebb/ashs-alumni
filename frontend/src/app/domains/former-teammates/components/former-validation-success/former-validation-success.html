@@ -1,0 +1,63 @@
+<div class="validation-success-container">
+  <mat-card class="success-card" role="main" aria-labelledby="success-title">
+
+    <mat-card-header class="success-header">
+      <div mat-card-avatar class="success-avatar" aria-hidden="true">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+      </div>
+      <mat-card-title id="success-title" class="success-title">
+        Validation réussie !
+      </mat-card-title>
+      <mat-card-subtitle class="success-subtitle">
+        Votre contact a bien été ajouté à l'annuaire
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="success-content">
+      <section class="confirmation-message">
+        <p class="message-text">
+          Merci pour votre contribution ! Votre validation nous aide à maintenir
+          l'annuaire des anciens joueurs à jour et accessible à tous.
+        </p>
+
+        <div class="benefits-section">
+          <h3 class="benefits-title">Continuez votre expérience en créant un compte :</h3>
+          <ul class="benefits-list">
+            <li>Ajoutez des anciens</li>
+            <li>Inscrivez-vous à la soirée des anciens</li>
+            <li>Explorez l'annuaire complet</li>
+          </ul>
+        </div>
+      </section>
+    </mat-card-content>
+
+    <mat-card-actions class="success-actions">
+      <div class="primary-actions">
+        <button mat-raised-button
+
+                (click)="register()"
+                class="primary-action">
+          <mat-icon>person_add</mat-icon>
+          <span>Créer mon compte</span>
+        </button>
+      </div>
+
+      <div class="secondary-actions">
+        <button mat-stroked-button
+                routerLink="/event-registration"
+                class="secondary-action">
+          <mat-icon>event</mat-icon>
+          <span>Événements</span>
+        </button>
+
+        <button mat-stroked-button
+                routerLink="/former-teammates"
+                class="secondary-action">
+          <mat-icon>contacts</mat-icon>
+          <span>Annuaire</span>
+        </button>
+      </div>
+    </mat-card-actions>
+
+  </mat-card>
+</div>

@@ -1,0 +1,53 @@
+
+@use '@angular/material' as mat;
+
+mat-toolbar {
+  @include mat.toolbar-overrides((
+    container-background-color: var(--mat-sys-primary-container),
+    container-text-color: var(--mat-sys-on-primary-container),
+  ));
+
+}
+.spacer {
+  flex: 1 1 auto;
+}
+
+nav {
+  a {
+    position: relative;
+    transition: all 0.3s ease;
+    margin: 0 8px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background-color: var(--mat-sys-primary);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+      opacity: 0;
+    }
+
+    &:hover::before {
+      width: 40%;
+      opacity: 0.6;
+    }
+
+    &.active {
+      color: var(--mat-sys-primary);
+      font-weight: 500;
+
+      &::before {
+        width: 80%;
+        opacity: 1;
+        background-color: var(--mat-sys-primary);
+      }
+    }
+  }
+}
+
+
+

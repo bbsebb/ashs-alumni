@@ -1,0 +1,28 @@
+@use '@angular/material' as mat;
+
+:host {
+  @include mat.form-field-density(-3);
+  display: block;
+  max-width: 800px;
+}
+
+
+// Main filters container
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+
+mat-form-field {
+  height: 45px;
+}
+
+
+
+
+
+

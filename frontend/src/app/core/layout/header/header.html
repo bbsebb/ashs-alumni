@@ -1,0 +1,30 @@
+<mat-toolbar>
+  @if (!breakpointObserver()?.matches) {
+    <span>Soirée des anciens</span>
+  }
+  <span class="spacer"></span>
+  <nav>
+
+    <a mat-button routerLinkActive="active"
+       routerLink="/former-teammates">Listes des anciens</a>
+
+    <a routerLinkActive="active"
+       routerLink="/event-registration"
+       mat-button>Soirée des anciens</a>
+    @if (!authService.isAuthenticatedSignal()) {
+      <a (click)="authService.login()" mat-button>
+        <mat-icon>login</mat-icon>
+        @if (!breakpointObserver()?.matches) {
+          Se connecter
+        }
+      </a>
+    } @else {
+      <a (click)="authService.logout()" mat-button>
+        <mat-icon>logout</mat-icon>
+        @if (!breakpointObserver()?.matches) {
+          Se déconnecter
+        }
+      </a>
+    }
+  </nav>
+</mat-toolbar>
