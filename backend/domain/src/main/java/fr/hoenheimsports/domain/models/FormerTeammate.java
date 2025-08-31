@@ -29,7 +29,7 @@ public record FormerTeammate(
         String firstName,
         String lastName,
         Gender gender,
-        Optional<String> phone,
+        Optional<Phone> phone,
         Optional<String> email,
         Optional<LocalDate> birthDate,
         List<Role> roles,
@@ -47,6 +47,9 @@ public record FormerTeammate(
         validateRequiredStringField(firstName, "firstName");
         validateRequiredStringField(lastName, "lastName");
         validateRequiredField(gender, "gender");
+        validateRequiredField(phone, "phone");
+        validateRequiredField(email, "email");
+        validateRequiredField(birthDate, "birthDate");
         validateRequiredField(status, "status");
 
         // Ensure that the roles list is never null
@@ -101,7 +104,7 @@ public record FormerTeammate(
         private String firstName;
         private String lastName;
         private Gender gender;
-        private String phone;
+        private Phone phone;
         private String email;
         private LocalDate birthDate;
         private List<Role> roles = new ArrayList<>();
@@ -161,7 +164,10 @@ public record FormerTeammate(
          * @return this builder instance for method chaining
          */
         public Builder phone(String phone) {
-            this.phone = phone;
+            if(phone == null) {
+                return this;
+            }
+            this.phone = Phone.of(phone);
             return this;
         }
 

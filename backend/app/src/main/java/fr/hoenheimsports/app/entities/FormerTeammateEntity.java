@@ -33,4 +33,8 @@ public class FormerTeammateEntity {
     @Enumerated(EnumType.ORDINAL)
     List<Role> roles;
     ContactStatus status;
+
+    @OneToMany(mappedBy = "formerTeammate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SMSHistoryEntity> smsHistory;
+
 }

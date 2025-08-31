@@ -5,6 +5,7 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.entities.FormerTeammateEntity;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
 import fr.hoenheimsports.domain.models.FormerTeammate;
+import fr.hoenheimsports.domain.models.Phone;
 import org.mapstruct.Mapper;
 
 import java.time.LocalDate;
@@ -48,9 +49,19 @@ public interface FormerTeammateMapper {
         return Optional.ofNullable(date);
     }
 
-    // Nouvelle méthode pour mapper Optional<LocalDate> vers LocalDate
     default LocalDate optionalDateToDate(Optional<LocalDate> optionalDate) {
         return optionalDate.orElse(null);
+    }
+
+    default Optional<Phone> phoneToOptional(String phone) {
+        if( phone == null) {
+            return Optional.empty();
+        }
+        return Optional.of(Phone.of(phone));
+    }
+
+    default String optionalPhoneToPhone(Optional<Phone> optionalPhone) {
+        return optionalPhone.map(Phone::toString).orElse(null);
     }
 
 

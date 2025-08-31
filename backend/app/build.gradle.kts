@@ -40,6 +40,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     testImplementation("org.springframework.security:spring-security-test")
+
+    // https://mvnrepository.com/artifact/com.twilio.sdk/twilio
+    implementation("com.twilio.sdk:twilio:10.9.2")
 }
 
 tasks.test {

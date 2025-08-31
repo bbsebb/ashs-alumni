@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - FormerTeammateTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>FormerTeammateTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/fr.hoenheimsports.domain.models.html">fr.hoenheimsports.domain.models</a> &gt; FormerTeammateTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">20</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.075s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">[1] Missing ID, null, John, Doe, MALE, PENDING, id</td>
+<td class="success">testBuilderMissingRequiredFields(String, UUID, String, String, Gender, ContactStatus, String)[1]</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] Missing firstName, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, null, Doe, MALE, PENDING, firstName</td>
+<td class="success">testBuilderMissingRequiredFields(String, UUID, String, String, Gender, ContactStatus, String)[2]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] Empty firstName, 3dc2fc78-c306-42f2-92dc-f342c0e50aab,    , Doe, MALE, PENDING, firstName</td>
+<td class="success">testBuilderMissingRequiredFields(String, UUID, String, String, Gender, ContactStatus, String)[3]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[4] Missing lastName, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, John, null, MALE, PENDING, lastName</td>
+<td class="success">testBuilderMissingRequiredFields(String, UUID, String, String, Gender, ContactStatus, String)[4]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[5] Missing gender, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, John, Doe, null, PENDING, gender</td>
+<td class="success">testBuilderMissingRequiredFields(String, UUID, String, String, Gender, ContactStatus, String)[5]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[6] Missing status, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, John, Doe, MALE, null, status</td>
+<td class="success">testBuilderMissingRequiredFields(String, UUID, String, String, Gender, ContactStatus, String)[6]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testBuilderRolesDefaultsToEmptyList()</td>
+<td class="success">testBuilderRolesDefaultsToEmptyList()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] Required fields only, d47d3d2e-0370-44b3-bd1c-ffd43a76485b, John, Doe, MALE, null, null, null, null, PENDING</td>
+<td class="success">testBuilderWithValidData(String, UUID, String, String, Gender, String, String, LocalDate, List, ContactStatus)[1]</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] With all optional fields, 430beef3-19b8-4297-8198-b5b00f0c32ee, Jane, Smith, FEMALE, +33123456789, jane.smith@example.com, 1990-01-01, [ASSISTANT], PENDING</td>
+<td class="success">testBuilderWithValidData(String, UUID, String, String, Gender, String, String, LocalDate, List, ContactStatus)[2]</td>
+<td class="success">0.013s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] Mixed optional fields, a0f14cb5-fdfb-4b16-8b37-ee0cb05aeb68, Bob, Wilson, MALE, +33987654321, null, 1985-05-15, [PLAYER, COACH], VALIDATED</td>
+<td class="success">testBuilderWithValidData(String, UUID, String, String, Gender, String, String, LocalDate, List, ContactStatus)[3]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testConstructorSetsDefaultRolesIfNull()</td>
+<td class="success">testConstructorSetsDefaultRolesIfNull()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] Null phone Optional, null, Optional.empty, Optional.empty, phone</td>
+<td class="success">testConstructorThrowsWhenOptionalFieldIsNull(String, Optional, Optional, Optional, String)[1]</td>
+<td class="success">0.016s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] Null email Optional, Optional.empty, null, Optional.empty, email</td>
+<td class="success">testConstructorThrowsWhenOptionalFieldIsNull(String, Optional, Optional, Optional, String)[2]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] Null birthDate Optional, Optional.empty, Optional.empty, null, birthDate</td>
+<td class="success">testConstructorThrowsWhenOptionalFieldIsNull(String, Optional, Optional, Optional, String)[3]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] Null ID, null, John, Doe, MALE, PENDING, id</td>
+<td class="success">testConstructorThrowsWhenRequiredFieldIsNull(String, UUID, String, String, Gender, ContactStatus, String)[1]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] Null firstName, cb28517f-9d22-4b17-a850-b9e341215a1e, null, Doe, MALE, PENDING, firstName</td>
+<td class="success">testConstructorThrowsWhenRequiredFieldIsNull(String, UUID, String, String, Gender, ContactStatus, String)[2]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] Null lastName, cb28517f-9d22-4b17-a850-b9e341215a1e, John, null, MALE, PENDING, lastName</td>
+<td class="success">testConstructorThrowsWhenRequiredFieldIsNull(String, UUID, String, String, Gender, ContactStatus, String)[3]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[4] Null gender, cb28517f-9d22-4b17-a850-b9e341215a1e, John, Doe, null, PENDING, gender</td>
+<td class="success">testConstructorThrowsWhenRequiredFieldIsNull(String, UUID, String, String, Gender, ContactStatus, String)[4]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[5] Null status, cb28517f-9d22-4b17-a850-b9e341215a1e, John, Doe, MALE, null, status</td>
+<td class="success">testConstructorThrowsWhenRequiredFieldIsNull(String, UUID, String, String, Gender, ContactStatus, String)[5]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testConstructorValidatesRequiredFields()</td>
+<td class="success">testConstructorValidatesRequiredFields()</td>
+<td class="success">0.018s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.14</a> at 31 août 2025, 19:02:03</p>
+</div>
+</div>
+</body>
+</html>

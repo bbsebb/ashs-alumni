@@ -2,192 +2,121 @@ package fr.hoenheimsports.domain.models;
 
 import fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class FormerTeammateTest {
 
-    @Test
-    void testBuilderWithAllRequiredFields() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
-
-        FormerTeammate teammate = FormerTeammate.builder()
+    @ParameterizedTest
+    @MethodSource("validBuilderScenariosData")
+    void testBuilderWithValidData(String testCase, UUID id, String firstName, String lastName, Gender gender, 
+                                String phone, String email, LocalDate birthDate, List<Role> roles, ContactStatus status) {
+        FormerTeammate.Builder builder = FormerTeammate.builder()
                 .id(id)
                 .firstName(firstName)
                 .lastName(lastName)
                 .gender(gender)
-                .status(status)
-                .build();
+                .status(status);
+
+        if (phone != null) builder.phone(phone);
+        if (email != null) builder.email(email);
+        if (birthDate != null) builder.birthDate(birthDate);
+        if (roles != null) builder.roles(roles);
+
+        FormerTeammate teammate = builder.build();
 
         assertEquals(id, teammate.id());
         assertEquals(firstName, teammate.firstName());
         assertEquals(lastName, teammate.lastName());
         assertEquals(gender, teammate.gender());
         assertEquals(status, teammate.status());
-        assertTrue(teammate.roles().isEmpty());
-        assertTrue(teammate.phone().isEmpty());
-        assertTrue(teammate.email().isEmpty());
-        assertTrue(teammate.birthDate().isEmpty());
+
+        if (phone != null) {
+            assertEquals(Optional.of(Phone.of(phone)), teammate.phone());
+        } else {
+            assertTrue(teammate.phone().isEmpty());
+        }
+
+        if (email != null) {
+            assertEquals(Optional.of(email), teammate.email());
+        } else {
+            assertTrue(teammate.email().isEmpty());
+        }
+
+        if (birthDate != null) {
+            assertEquals(Optional.of(birthDate), teammate.birthDate());
+        } else {
+            assertTrue(teammate.birthDate().isEmpty());
+        }
+
+        if (roles != null) {
+            assertEquals(roles, teammate.roles());
+        } else {
+            assertTrue(teammate.roles().isEmpty());
+        }
     }
 
-    @Test
-    void testBuilderWithOptionalFields() {
-        UUID id = UUID.randomUUID();
-        String firstName = "Jane";
-        String lastName = "Smith";
-        Gender gender = Gender.FEMALE;
-        String phone = "123-456-7890";
-        String email = "jane.smith@example.com";
-        LocalDate birthDate = LocalDate.of(1990, 1, 1);
-        List<Role> roles = List.of(Role.ASSISTANT);
-        ContactStatus status = ContactStatus.PENDING;
+    static Stream<Arguments> validBuilderScenariosData() {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        UUID id3 = UUID.randomUUID();
 
-        FormerTeammate teammate = FormerTeammate.builder()
-                .id(id)
-                .firstName(firstName)
-                .lastName(lastName)
-                .gender(gender)
-                .phone(phone)
-                .email(email)
-                .birthDate(birthDate)
-                .roles(roles)
-                .status(status)
-                .build();
-
-        assertEquals(id, teammate.id());
-        assertEquals(firstName, teammate.firstName());
-        assertEquals(lastName, teammate.lastName());
-        assertEquals(gender, teammate.gender());
-        assertEquals(Optional.of(phone), teammate.phone());
-        assertEquals(Optional.of(email), teammate.email());
-        assertEquals(Optional.of(birthDate), teammate.birthDate());
-        assertEquals(roles, teammate.roles());
-        assertEquals(status, teammate.status());
-    }
-
-    @Test
-    void testBuilderMissingRequiredFieldId() {
-        String firstName = "John";
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
-
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                FormerTeammate.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .gender(gender)
-                        .status(status)
-                        .build()
+        return Stream.of(
+                arguments("Required fields only", id1, "John", "Doe", Gender.MALE, 
+                         null, null, null, null, ContactStatus.PENDING),
+                arguments("With all optional fields", id2, "Jane", "Smith", Gender.FEMALE, 
+                         "+33123456789", "jane.smith@example.com", LocalDate.of(1990, 1, 1), 
+                         List.of(Role.ASSISTANT), ContactStatus.PENDING),
+                arguments("Mixed optional fields", id3, "Bob", "Wilson", Gender.MALE, 
+                         "+33987654321", null, LocalDate.of(1985, 5, 15), 
+                         List.of(Role.PLAYER, Role.COACH), ContactStatus.VALIDATED)
         );
-
-        assertEquals("id", exception.getMessage());
     }
 
-    @Test
-    void testBuilderMissingRequiredFieldFirstName() {
-        UUID id = UUID.randomUUID();
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
+    @ParameterizedTest
+    @MethodSource("builderMissingRequiredFieldsData")
+    void testBuilderMissingRequiredFields(String testCase, UUID id, String firstName, String lastName, 
+                                        Gender gender, ContactStatus status, String expectedField) {
+        Exception exception = assertThrows(MissingRequiredFieldException.class, () -> {
+            FormerTeammate.Builder builder = FormerTeammate.builder();
+            if (id != null) builder.id(id);
+            if (firstName != null) builder.firstName(firstName);
+            if (lastName != null) builder.lastName(lastName);
+            if (gender != null) builder.gender(gender);
+            if (status != null) builder.status(status);
+            builder.build();
+        });
 
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                FormerTeammate.builder()
-                        .id(id)
-                        .lastName(lastName)
-                        .gender(gender)
-                        .status(status)
-                        .build()
-        );
-
-        assertEquals("firstName", exception.getMessage());
+        assertEquals(expectedField, exception.getMessage());
     }
 
-    @Test
-    void testBuilderWithEmptyFirstNameField() {
-        UUID id = UUID.randomUUID();
-        String firstName = "   ";
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
+    static Stream<Arguments> builderMissingRequiredFieldsData() {
+        UUID validId = UUID.randomUUID();
+        String validFirstName = "John";
+        String validLastName = "Doe";
+        Gender validGender = Gender.MALE;
+        ContactStatus validStatus = ContactStatus.PENDING;
 
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                FormerTeammate.builder()
-                        .id(id)
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .gender(gender)
-                        .status(status)
-                        .build()
+        return Stream.of(
+                arguments("Missing ID", null, validFirstName, validLastName, validGender, validStatus, "id"),
+                arguments("Missing firstName", validId, null, validLastName, validGender, validStatus, "firstName"),
+                arguments("Empty firstName", validId, "   ", validLastName, validGender, validStatus, "firstName"),
+                arguments("Missing lastName", validId, validFirstName, null, validGender, validStatus, "lastName"),
+                arguments("Missing gender", validId, validFirstName, validLastName, null, validStatus, "gender"),
+                arguments("Missing status", validId, validFirstName, validLastName, validGender, null, "status")
         );
-
-        assertEquals("firstName", exception.getMessage());
-    }
-
-    @Test
-    void testBuilderMissingRequiredFieldLastName() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
-
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                FormerTeammate.builder()
-                        .id(id)
-                        .firstName(firstName)
-                        .gender(gender)
-                        .status(status)
-                        .build()
-        );
-
-        assertEquals("lastName", exception.getMessage());
-    }
-
-    @Test
-    void testBuilderMissingRequiredFieldGender() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        String lastName = "Doe";
-        ContactStatus status = ContactStatus.PENDING;
-
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                FormerTeammate.builder()
-                        .id(id)
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .status(status)
-                        .build()
-        );
-
-        assertEquals("gender", exception.getMessage());
-    }
-
-    @Test
-    void testBuilderMissingRequiredFieldStatus() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                FormerTeammate.builder()
-                        .id(id)
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .gender(gender)
-                        .build()
-        );
-
-        assertEquals("status", exception.getMessage());
     }
 
     @Test
@@ -219,7 +148,7 @@ class FormerTeammateTest {
         ContactStatus status = ContactStatus.PENDING;
 
         FormerTeammate teammate = new FormerTeammate(
-                id, firstName, lastName, gender, null, null, null, null, status
+                id, firstName, lastName, gender, Optional.empty(), Optional.empty(), Optional.empty(), List.of(), status
         );
 
         assertEquals(id, teammate.id());
@@ -228,79 +157,61 @@ class FormerTeammateTest {
         assertEquals(gender, teammate.gender());
         assertEquals(status, teammate.status());
         assertTrue(teammate.roles().isEmpty());
-        assertNull(teammate.phone());
-        assertNull(teammate.email());
-        assertNull(teammate.birthDate());
+        assertTrue(teammate.phone().isEmpty());
+        assertTrue(teammate.email().isEmpty());
+        assertTrue(teammate.birthDate().isEmpty());
     }
 
-    @Test
-    void testConstructorThrowsWhenIdIsNull() {
-        String firstName = "John";
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
-
+    @ParameterizedTest
+    @MethodSource("constructorNullValidationData")
+    void testConstructorThrowsWhenRequiredFieldIsNull(String testCase, UUID id, String firstName, String lastName, 
+                                                    Gender gender, ContactStatus status, String expectedField) {
         Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                new FormerTeammate(null, firstName, lastName, gender, null, null, null, null, status)
+                new FormerTeammate(id, firstName, lastName, gender, Optional.empty(), Optional.empty(), Optional.empty(), List.of(), status)
         );
 
-        assertEquals("id", exception.getMessage());
+        assertEquals(expectedField, exception.getMessage());
     }
 
-    @Test
-    void testConstructorThrowsWhenFirstNameIsNull() {
-        UUID id = UUID.randomUUID();
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
+    static Stream<Arguments> constructorNullValidationData() {
+        UUID validId = UUID.randomUUID();
+        String validFirstName = "John";
+        String validLastName = "Doe";
+        Gender validGender = Gender.MALE;
+        ContactStatus validStatus = ContactStatus.PENDING;
 
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                new FormerTeammate(id, null, lastName, gender, null, null, null, null, status)
+        return Stream.of(
+                arguments("Null ID", null, validFirstName, validLastName, validGender, validStatus, "id"),
+                arguments("Null firstName", validId, null, validLastName, validGender, validStatus, "firstName"),
+                arguments("Null lastName", validId, validFirstName, null, validGender, validStatus, "lastName"),
+                arguments("Null gender", validId, validFirstName, validLastName, null, validStatus, "gender"),
+                arguments("Null status", validId, validFirstName, validLastName, validGender, null, "status")
         );
-
-        assertEquals("firstName", exception.getMessage());
     }
 
-    @Test
-    void testConstructorThrowsWhenLastNameIsNull() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        Gender gender = Gender.MALE;
-        ContactStatus status = ContactStatus.PENDING;
+    @ParameterizedTest
+    @MethodSource("constructorNullOptionalValidationData")
+    void testConstructorThrowsWhenOptionalFieldIsNull(String testCase, Optional<Phone> phone, Optional<String> email, 
+                                                     Optional<LocalDate> birthDate, String expectedField) {
+        UUID validId = UUID.randomUUID();
+        String validFirstName = "John";
+        String validLastName = "Doe";
+        Gender validGender = Gender.MALE;
+        ContactStatus validStatus = ContactStatus.PENDING;
 
         Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                new FormerTeammate(id, firstName, null, gender, null, null, null, null, status)
+                new FormerTeammate(validId, validFirstName, validLastName, validGender, phone, email, birthDate, List.of(), validStatus)
         );
 
-        assertEquals("lastName", exception.getMessage());
+        assertEquals(expectedField, exception.getMessage());
     }
 
-    @Test
-    void testConstructorThrowsWhenGenderIsNull() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        String lastName = "Doe";
-        ContactStatus status = ContactStatus.PENDING;
-
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                new FormerTeammate(id, firstName, lastName, null, null, null, null, null, status)
+    static Stream<Arguments> constructorNullOptionalValidationData() {
+        return Stream.of(
+                arguments("Null phone Optional", null, Optional.empty(), Optional.empty(), "phone"),
+                arguments("Null email Optional", Optional.empty(), null, Optional.empty(), "email"),
+                arguments("Null birthDate Optional", Optional.empty(), Optional.empty(), null, "birthDate")
         );
-
-        assertEquals("gender", exception.getMessage());
-    }
-
-    @Test
-    void testConstructorThrowsWhenStatusIsNull() {
-        UUID id = UUID.randomUUID();
-        String firstName = "John";
-        String lastName = "Doe";
-        Gender gender = Gender.MALE;
-
-        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
-                new FormerTeammate(id, firstName, lastName, gender, null, null, null, null, null)
-        );
-
-        assertEquals("status", exception.getMessage());
     }
 
     @Test
@@ -312,7 +223,7 @@ class FormerTeammateTest {
         ContactStatus status = ContactStatus.PENDING;
 
         FormerTeammate teammate = new FormerTeammate(
-                id, firstName, lastName, gender, null, null, null, null, status
+                id, firstName, lastName, gender, Optional.empty(), Optional.empty(), Optional.empty(), null, status
         );
 
         assertNotNull(teammate.roles());

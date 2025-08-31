@@ -4,6 +4,7 @@ import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.annotations.Stub;
 import fr.hoenheimsports.domain.spi.stubs.FormerTeammateRepositoryStub;
 import fr.hoenheimsports.domain.spi.stubs.GenerateIdStub;
+import fr.hoenheimsports.domain.spi.stubs.SMSSenderStub;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;

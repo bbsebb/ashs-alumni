@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-26T23:27:28+0200",
+    date = "2025-08-31T21:46:59+0200",
     comments = "version: 1.6.3, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.14.jar, environment: Java 24.0.1 (Eclipse Adoptium)"
 )
 @Component
@@ -73,7 +73,7 @@ public class FormerTeammateMapperImpl implements FormerTeammateMapper {
         firstName = formerTeammate.firstName();
         lastName = formerTeammate.lastName();
         gender = formerTeammate.gender();
-        phone = optionalToString( formerTeammate.phone() );
+        phone = optionalPhoneToPhone( formerTeammate.phone() );
         email = optionalToString( formerTeammate.email() );
         birthDate = optionalDateToDate( formerTeammate.birthDate() );
         List<Role> list = formerTeammate.roles();
@@ -113,7 +113,7 @@ public class FormerTeammateMapperImpl implements FormerTeammateMapper {
         formerTeammateEntity.firstName( formerTeammate.firstName() );
         formerTeammateEntity.lastName( formerTeammate.lastName() );
         formerTeammateEntity.gender( formerTeammate.gender() );
-        formerTeammateEntity.phone( optionalToString( formerTeammate.phone() ) );
+        formerTeammateEntity.phone( optionalPhoneToPhone( formerTeammate.phone() ) );
         formerTeammateEntity.email( optionalToString( formerTeammate.email() ) );
         formerTeammateEntity.birthDate( optionalDateToDate( formerTeammate.birthDate() ) );
         List<Role> list = formerTeammate.roles();

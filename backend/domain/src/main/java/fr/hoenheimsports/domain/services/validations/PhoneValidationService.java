@@ -1,5 +1,6 @@
 package fr.hoenheimsports.domain.services.validations;
 
+import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 
 import java.util.regex.Pattern;
@@ -8,6 +9,7 @@ import java.util.regex.Pattern;
  * Service de validation et normalisation des numéros de téléphone.
  * Assure la conformité au format E.164 international.
  */
+@DomainService
 public class PhoneValidationService {
 
     // Pattern pour valider le format international E.164

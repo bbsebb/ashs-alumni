@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.hoenheimsports.domain.models.FormerTeammateTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2025-08-31T17:02:02.863Z" hostname="PC-SALON" time="0.123">
+  <properties/>
+  <testcase name="testConstructorValidatesRequiredFields()" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.018"/>
+  <testcase name="testConstructorSetsDefaultRolesIfNull()" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.002"/>
+  <testcase name="[1] Null phone Optional, null, Optional.empty, Optional.empty, phone" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.016"/>
+  <testcase name="[2] Null email Optional, Optional.empty, null, Optional.empty, email" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[3] Null birthDate Optional, Optional.empty, Optional.empty, null, birthDate" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[1] Required fields only, d47d3d2e-0370-44b3-bd1c-ffd43a76485b, John, Doe, MALE, null, null, null, null, PENDING" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.007"/>
+  <testcase name="[2] With all optional fields, 430beef3-19b8-4297-8198-b5b00f0c32ee, Jane, Smith, FEMALE, +33123456789, jane.smith@example.com, 1990-01-01, [ASSISTANT], PENDING" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.013"/>
+  <testcase name="[3] Mixed optional fields, a0f14cb5-fdfb-4b16-8b37-ee0cb05aeb68, Bob, Wilson, MALE, +33987654321, null, 1985-05-15, [PLAYER, COACH], VALIDATED" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[1] Missing ID, null, John, Doe, MALE, PENDING, id" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.005"/>
+  <testcase name="[2] Missing firstName, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, null, Doe, MALE, PENDING, firstName" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[3] Empty firstName, 3dc2fc78-c306-42f2-92dc-f342c0e50aab,    , Doe, MALE, PENDING, firstName" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[4] Missing lastName, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, John, null, MALE, PENDING, lastName" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[5] Missing gender, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, John, Doe, null, PENDING, gender" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[6] Missing status, 3dc2fc78-c306-42f2-92dc-f342c0e50aab, John, Doe, MALE, null, status" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[1] Null ID, null, John, Doe, MALE, PENDING, id" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[2] Null firstName, cb28517f-9d22-4b17-a850-b9e341215a1e, null, Doe, MALE, PENDING, firstName" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[3] Null lastName, cb28517f-9d22-4b17-a850-b9e341215a1e, John, null, MALE, PENDING, lastName" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[4] Null gender, cb28517f-9d22-4b17-a850-b9e341215a1e, John, Doe, null, PENDING, gender" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="[5] Null status, cb28517f-9d22-4b17-a850-b9e341215a1e, John, Doe, MALE, null, status" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <testcase name="testBuilderRolesDefaultsToEmptyList()" classname="fr.hoenheimsports.domain.models.FormerTeammateTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
