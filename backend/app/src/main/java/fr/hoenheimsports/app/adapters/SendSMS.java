@@ -6,7 +6,6 @@ import com.twilio.type.PhoneNumber;
 import fr.hoenheimsports.app.mappers.TwilioMessageMapper;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.spi.SMSSender;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 

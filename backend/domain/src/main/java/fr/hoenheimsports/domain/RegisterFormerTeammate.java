@@ -5,15 +5,11 @@ import fr.hoenheimsports.domain.api.FormerTeammateRegistrar;
 import fr.hoenheimsports.domain.api.SendSMSToValidateFormerTeammate;
 import fr.hoenheimsports.domain.api.commands.ContextCommand;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
-import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
-import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.services.validations.PhoneValidationService;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.domain.spi.IdGenerator;
-
-import java.util.UUID;
 
 @DomainService
 public class RegisterFormerTeammate implements FormerTeammateRegistrar {

@@ -35,12 +35,5 @@ public interface SMSHistoryMapper {
      */
     List<SMSHistory> toModelList(List<SMSHistoryEntity> smsHistoryEntities);
 
-    /**
-     * Convertit une liste de modèles domain en liste d'entités
-     *
-     * @param smsHistories la liste de modèles domain à convertir
-     * @return la liste d'entités JPA
-     */
-    @Mapping(target = "formerTeammate", ignore = true) // Relation gérée séparément
-    List<SMSHistoryEntity> toEntityList(List<SMSHistory> smsHistories);
+
 }
