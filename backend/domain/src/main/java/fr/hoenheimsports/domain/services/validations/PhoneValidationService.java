@@ -54,7 +54,7 @@ public class PhoneValidationService {
      *
      * @param phoneNumber le numéro à traiter
      * @return le numéro normalisé et validé
-     * @throws IllegalArgumentException si le format est invalide
+     * @throws InvalidPhoneNumberException si le format est invalide
      */
     public String validateAndNormalize(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {

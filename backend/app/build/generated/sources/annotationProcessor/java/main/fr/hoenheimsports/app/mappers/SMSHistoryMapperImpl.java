@@ -2,17 +2,14 @@ package fr.hoenheimsports.app.mappers;
 
 import fr.hoenheimsports.app.entities.SMSHistoryEntity;
 import fr.hoenheimsports.domain.models.SMSHistory;
-import fr.hoenheimsports.domain.models.SMSStatus;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T21:50:23+0200",
+    date = "2025-09-09T19:20:05+0200",
     comments = "version: 1.6.3, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.14.jar, environment: Java 24.0.1 (Eclipse Adoptium)"
 )
 @Component
@@ -28,13 +25,14 @@ public class SMSHistoryMapperImpl implements SMSHistoryMapper {
 
         sMSHistoryEntity.id( smsHistory.id() );
         sMSHistoryEntity.formerTeammateId( smsHistory.formerTeammateId() );
-        sMSHistoryEntity.phoneNumber( smsHistory.phoneNumber() );
         sMSHistoryEntity.message( smsHistory.message() );
         sMSHistoryEntity.status( smsHistory.status() );
         sMSHistoryEntity.sentAt( smsHistory.sentAt() );
         sMSHistoryEntity.updatedAt( smsHistory.updatedAt() );
         sMSHistoryEntity.externalId( smsHistory.externalId() );
         sMSHistoryEntity.errorMessage( smsHistory.errorMessage() );
+
+        sMSHistoryEntity.phoneNumber( phoneToString(smsHistory.phoneNumber()) );
 
         return sMSHistoryEntity.build();
     }
@@ -45,29 +43,20 @@ public class SMSHistoryMapperImpl implements SMSHistoryMapper {
             return null;
         }
 
-        UUID id = null;
-        UUID formerTeammateId = null;
-        String phoneNumber = null;
-        String message = null;
-        SMSStatus status = null;
-        Instant sentAt = null;
-        Instant updatedAt = null;
-        String externalId = null;
-        String errorMessage = null;
+        SMSHistory.Builder sMSHistory = SMSHistory.builder();
 
-        id = smsHistoryEntity.getId();
-        formerTeammateId = smsHistoryEntity.getFormerTeammateId();
-        phoneNumber = smsHistoryEntity.getPhoneNumber();
-        message = smsHistoryEntity.getMessage();
-        status = smsHistoryEntity.getStatus();
-        sentAt = smsHistoryEntity.getSentAt();
-        updatedAt = smsHistoryEntity.getUpdatedAt();
-        externalId = smsHistoryEntity.getExternalId();
-        errorMessage = smsHistoryEntity.getErrorMessage();
+        sMSHistory.id( smsHistoryEntity.getId() );
+        sMSHistory.formerTeammateId( smsHistoryEntity.getFormerTeammateId() );
+        sMSHistory.message( smsHistoryEntity.getMessage() );
+        sMSHistory.status( smsHistoryEntity.getStatus() );
+        sMSHistory.sentAt( smsHistoryEntity.getSentAt() );
+        sMSHistory.updatedAt( smsHistoryEntity.getUpdatedAt() );
+        sMSHistory.externalId( smsHistoryEntity.getExternalId() );
+        sMSHistory.errorMessage( smsHistoryEntity.getErrorMessage() );
 
-        SMSHistory sMSHistory = new SMSHistory( id, formerTeammateId, phoneNumber, message, status, sentAt, updatedAt, externalId, errorMessage );
+        sMSHistory.phoneNumber( stringToPhone(smsHistoryEntity.getPhoneNumber()) );
 
-        return sMSHistory;
+        return sMSHistory.build();
     }
 
     @Override
@@ -79,20 +68,6 @@ public class SMSHistoryMapperImpl implements SMSHistoryMapper {
         List<SMSHistory> list = new ArrayList<SMSHistory>( smsHistoryEntities.size() );
         for ( SMSHistoryEntity sMSHistoryEntity : smsHistoryEntities ) {
             list.add( toModel( sMSHistoryEntity ) );
-        }
-
-        return list;
-    }
-
-    @Override
-    public List<SMSHistoryEntity> toEntityList(List<SMSHistory> smsHistories) {
-        if ( smsHistories == null ) {
-            return null;
-        }
-
-        List<SMSHistoryEntity> list = new ArrayList<SMSHistoryEntity>( smsHistories.size() );
-        for ( SMSHistory sMSHistory : smsHistories ) {
-            list.add( toEntity( sMSHistory ) );
         }
 
         return list;

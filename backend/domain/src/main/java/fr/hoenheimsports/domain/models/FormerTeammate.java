@@ -1,7 +1,9 @@
 package fr.hoenheimsports.domain.models;
 
 
+import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException;
+import fr.hoenheimsports.domain.services.validations.FieldValidationService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,55 +38,41 @@ public record FormerTeammate(
         ContactStatus status
 ) {
 
+    private static final FieldValidationService validationService = new FieldValidationService();
+
     /**
      * Compact constructor that validates all required fields and ensures data integrity.
      * Performs null checks and business rule validations.
-     *
+     * @throws InvalidPhoneNumberException if the phone number format is invalid (not E.164 format)
      * @throws MissingRequiredFieldException if any required field is null or empty
      */
     public FormerTeammate {
-        validateRequiredField(id, "id");
-        validateRequiredStringField(firstName, "firstName");
-        validateRequiredStringField(lastName, "lastName");
-        validateRequiredField(gender, "gender");
-        validateRequiredField(phone, "phone");
-        validateRequiredField(email, "email");
-        validateRequiredField(birthDate, "birthDate");
-        validateRequiredField(status, "status");
+        validationService.validateRequiredField(id, "id");
+        validationService.validateRequiredStringField(firstName, "firstName");
+        validationService.validateRequiredStringField(lastName, "lastName");
+        validationService.validateRequiredField(gender, "gender");
+        validationService.validateRequiredField(phone, "phone");
+        validationService.validateRequiredField(email, "email");
+        validationService.validateRequiredField(birthDate, "birthDate");
+        validationService.validateRequiredField(status, "status");
 
         // Ensure that the roles list is never null
-        if (roles == null) {
-            roles = List.of();
-        }
-
+        roles = validationService.validateListField(roles);
     }
 
     /**
-     * Validates that a required field is not null.
+     * Creates a new FormerTeammate instance with a changed contact status.
+     * All other fields remain the same.
      *
-     * @param field     the field to validate
-     * @param fieldName the name of the field for error messaging
-     * @throws MissingRequiredFieldException if the field is null
+     * @param newStatus the new contact status
+     * @return a new FormerTeammate instance with the updated status
+     * @throws InvalidPhoneNumberException if the phone number format is invalid (not E.164 format)
+     * @throws MissingRequiredFieldException if any required field is null or empty
      */
-    private static void validateRequiredField(Object field, String fieldName) {
-        if (field == null) {
-            throw new MissingRequiredFieldException(fieldName);
-        }
+    public FormerTeammate withContactStatus(ContactStatus newStatus) {
+        validationService.validateRequiredField(newStatus, "newStatus");
+        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus);
     }
-
-    /**
-     * Validates that a required string field is not null or empty.
-     *
-     * @param field     the string field to validate
-     * @param fieldName the name of the field for error messaging
-     * @throws MissingRequiredFieldException if the field is null or empty after trimming
-     */
-    private static void validateRequiredStringField(String field, String fieldName) {
-        if (field == null || field.trim().isEmpty()) {
-            throw new MissingRequiredFieldException(fieldName);
-        }
-    }
-
 
     /**
      * Creates a new builder instance for constructing FormerTeammate objects.
@@ -162,6 +150,7 @@ public record FormerTeammate(
          *
          * @param phone the phone number (optional)
          * @return this builder instance for method chaining
+         * @throws InvalidPhoneNumberException if the phone number format is invalid (not E.164 format)
          */
         public Builder phone(String phone) {
             if(phone == null) {
@@ -204,10 +193,6 @@ public record FormerTeammate(
             return this;
         }
 
-/*        public Builder addRole(Role role) {
-            this.roles.add(role);
-            return this;
-        }*/
 
         /**
          * Sets the contact status of the former teammate.
@@ -226,13 +211,14 @@ public record FormerTeammate(
          *
          * @return a new FormerTeammate instance
          * @throws IllegalStateException if any required field is missing or invalid
+         * @throws InvalidPhoneNumberException if the phone number format is invalid (propagated from Phone creation)
          */
         public FormerTeammate build() {
-            validateRequiredField(id, "id");
-            validateRequiredStringField(firstName, "firstName");
-            validateRequiredStringField(lastName, "lastName");
-            validateRequiredField(gender, "gender");
-            validateRequiredField(status, "status");
+            validationService.validateRequiredField(id, "id");
+            validationService.validateRequiredStringField(firstName, "firstName");
+            validationService.validateRequiredStringField(lastName, "lastName");
+            validationService.validateRequiredField(gender, "gender");
+            validationService.validateRequiredField(status, "status");
 
             return new FormerTeammate(id, firstName, lastName, gender, 
                     Optional.ofNullable(phone), Optional.ofNullable(email), Optional.ofNullable(birthDate),

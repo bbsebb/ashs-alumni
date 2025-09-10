@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FormerTeammateRepository {
-    void save(FormerTeammate formerTeammate);
+    FormerTeammate save(FormerTeammate formerTeammate);
 
     List<FormerTeammate> findAll();
 
@@ -15,4 +15,8 @@ public interface FormerTeammateRepository {
     Optional<FormerTeammate> findById(UUID id);
 
     void deleteById(UUID id);
+
+    Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName);
+
+    Optional<FormerTeammate> findByPhone(String phone);
 }

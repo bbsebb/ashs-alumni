@@ -1,6 +1,7 @@
 package fr.hoenheimsports.domain.spi.stubs;
 
 import fr.hoenheimsports.domain.models.FormerTeammate;
+import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
 import java.util.*;
@@ -10,8 +11,9 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
     private final Map<UUID, FormerTeammate> storage = new HashMap<>();
     
     @Override
-    public void save(FormerTeammate formerTeammate) {
+    public FormerTeammate save(FormerTeammate formerTeammate) {
         storage.put(formerTeammate.id(), formerTeammate);
+        return formerTeammate;
     }
 
     @Override
@@ -33,4 +35,26 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
     public void deleteById(UUID id) {
         storage.remove(id);
     }
+
+    @Override
+    public Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName) {
+        return storage.values().stream().filter(formerTeammate -> formerTeammate.firstName().equals(firstName) && formerTeammate.lastName().equals(lastName)).findFirst();
+    }
+
+    @Override
+    public Optional<FormerTeammate> findByPhone(String phoneString) {
+        var phone = new Phone(phoneString);
+        return storage.values().stream()
+                .filter(formerTeammate -> hasMatchingPhone(formerTeammate, phone))
+                .findFirst();
+    }
+
+    private boolean hasMatchingPhone(FormerTeammate formerTeammate, Phone targetPhone) {
+        return formerTeammate.phone()
+                .map(phone -> phone.equals(targetPhone))
+                .orElse(false);
+    }
+
+
+
 }

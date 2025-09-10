@@ -20,17 +20,17 @@ public class SMSSenderStub implements SMSSender {
     
     @Override
     public SMSHistory sendSMS(String message, String phoneNumber, UUID formerTeammateId) {
-        var smsHistory = new SMSHistory(
-                UUID.randomUUID(),
-                formerTeammateId,
-                phoneNumber,
-                message,
-                simulateFailure ? SMSStatus.FAILED : defaultStatus,
-                Instant.now(),
-                Instant.now(),
-                "stub-external-id-" + UUID.randomUUID(),
-                simulateFailure ? "Erreur simulée dans le stub" : null
-        );
+        var smsHistory = SMSHistory.builder()
+                .id(UUID.randomUUID())
+                .formerTeammateId(formerTeammateId)
+                .phoneNumber(phoneNumber)
+                .message(message)
+                .status(simulateFailure ? SMSStatus.FAILED : defaultStatus)
+                .sentAt(Instant.now())
+                .updatedAt(Instant.now())
+                .externalId("stub-external-id-" + UUID.randomUUID())
+                .errorMessage(simulateFailure ? "Erreur simulée dans le stub" : null)
+                .build();
         
         sentSMSHistory.add(smsHistory);
         return smsHistory;
@@ -59,7 +59,7 @@ public class SMSSenderStub implements SMSSender {
     
     public boolean hasSentSMSTo(String phoneNumber) {
         return sentSMSHistory.stream()
-                .anyMatch(sms -> sms.phoneNumber().equals(phoneNumber));
+                .anyMatch(sms -> sms.phoneNumber().value().equals(phoneNumber));
     }
     
     public boolean hasSentSMSWith(String message) {

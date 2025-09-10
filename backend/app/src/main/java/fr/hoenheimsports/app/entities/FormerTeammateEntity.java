@@ -18,23 +18,44 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FormerTeammateEntity {
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false)
     String firstName;
-    @Column(nullable = false)
+
+    @Column(name = "last_name", nullable = false)
     String lastName;
+
+    @Column(name = "gender")
+    @Enumerated(EnumType.ORDINAL)
     Gender gender;
+
+    @Column(name = "phone")
     String phone;
+
+    @Column(name = "email")
     String email;
+
+    @Column(name = "birth_date")
     LocalDate birthDate;
+
     @ElementCollection
+    @CollectionTable(name = "former_teammate_entity_roles", joinColumns = @JoinColumn(name = "former_teammate_entity_id"))
+    @Column(name = "roles")
     @Enumerated(EnumType.ORDINAL)
     List<Role> roles;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.ORDINAL)
     ContactStatus status;
+
 
     @OneToMany(mappedBy = "formerTeammate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SMSHistoryEntity> smsHistory;
+
+    @OneToMany(mappedBy = "formerTeammate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<FormerTeammateHistoryEntity> formerTeammateHistory;
+
 
 }

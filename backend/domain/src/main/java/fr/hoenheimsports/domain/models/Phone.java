@@ -1,5 +1,6 @@
 package fr.hoenheimsports.domain.models;
 
+import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.services.validations.PhoneValidationService;
 
 /**
@@ -16,7 +17,7 @@ public record Phone(String value) {
     /**
      * Compact constructor that validates and normalizes the phone number.
      *
-     * @throws IllegalArgumentException if the phone number is null, empty, or doesn't match international format
+     * @throws InvalidPhoneNumberException if the phone number is null, empty, or doesn't match international format
      */
     public Phone {
         value = validationService.validateAndNormalize(value);
@@ -86,7 +87,7 @@ public record Phone(String value) {
      *
      * @param phoneNumber the phone number string in international format
      * @return a new Phone instance
-     * @throws IllegalArgumentException if the phone number is null, empty, or invalid format
+     * @throws InvalidPhoneNumberException if the phone number is null, empty, or invalid format
      */
     public static Phone of(String phoneNumber) {
         return new Phone(phoneNumber);

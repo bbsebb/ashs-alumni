@@ -227,4 +227,90 @@ class FormerTeammateTest {
         assertNotNull(teammate.roles());
         assertTrue(teammate.roles().isEmpty());
     }
+
+    @Test
+    void testWithContactStatusReturnsNewInstanceWithChangedStatus() {
+        UUID id = UUID.randomUUID();
+        String firstName = "John";
+        String lastName = "Doe";
+        Gender gender = Gender.MALE;
+        ContactStatus originalStatus = ContactStatus.PENDING;
+        ContactStatus newStatus = ContactStatus.VALIDATED;
+
+        FormerTeammate originalTeammate = FormerTeammate.builder()
+                .id(id)
+                .firstName(firstName)
+                .lastName(lastName)
+                .gender(gender)
+                .status(originalStatus)
+                .build();
+
+        FormerTeammate updatedTeammate = originalTeammate.withContactStatus(newStatus);
+
+        // Verify the new instance has the updated status
+        assertEquals(newStatus, updatedTeammate.status());
+        
+        // Verify all other fields remain the same
+        assertEquals(originalTeammate.id(), updatedTeammate.id());
+        assertEquals(originalTeammate.firstName(), updatedTeammate.firstName());
+        assertEquals(originalTeammate.lastName(), updatedTeammate.lastName());
+        assertEquals(originalTeammate.gender(), updatedTeammate.gender());
+        assertEquals(originalTeammate.phone(), updatedTeammate.phone());
+        assertEquals(originalTeammate.email(), updatedTeammate.email());
+        assertEquals(originalTeammate.birthDate(), updatedTeammate.birthDate());
+        assertEquals(originalTeammate.roles(), updatedTeammate.roles());
+        
+        // Verify original instance is unchanged (immutability)
+        assertEquals(originalStatus, originalTeammate.status());
+        
+        // Verify they are different instances
+        assertNotSame(originalTeammate, updatedTeammate);
+    }
+
+    @Test
+    void testWithContactStatusThrowsExceptionForNullStatus() {
+        UUID id = UUID.randomUUID();
+        FormerTeammate teammate = FormerTeammate.builder()
+                .id(id)
+                .firstName("John")
+                .lastName("Doe")
+                .gender(Gender.MALE)
+                .status(ContactStatus.PENDING)
+                .build();
+
+        Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
+                teammate.withContactStatus(null)
+        );
+
+        assertEquals("newStatus", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("contactStatusTransitionData")
+    void testWithContactStatusWorksForAllStatusValues(String testCase, ContactStatus fromStatus, ContactStatus toStatus) {
+        UUID id = UUID.randomUUID();
+        FormerTeammate teammate = FormerTeammate.builder()
+                .id(id)
+                .firstName("Jane")
+                .lastName("Smith")
+                .gender(Gender.FEMALE)
+                .status(fromStatus)
+                .build();
+
+        FormerTeammate updatedTeammate = teammate.withContactStatus(toStatus);
+
+        assertEquals(toStatus, updatedTeammate.status());
+        assertEquals(fromStatus, teammate.status()); // Original unchanged
+    }
+
+    static Stream<Arguments> contactStatusTransitionData() {
+        return Stream.of(
+                arguments("SUBMITTED to PENDING", ContactStatus.SUBMITTED, ContactStatus.PENDING),
+                arguments("PENDING to VALIDATED", ContactStatus.PENDING, ContactStatus.VALIDATED),
+                arguments("PENDING to UNREACHABLE", ContactStatus.PENDING, ContactStatus.UNREACHABLE),
+                arguments("VALIDATED to NOT_REQUESTED", ContactStatus.VALIDATED, ContactStatus.NOT_REQUESTED),
+                arguments("NOT_REQUESTED to SUBMITTED", ContactStatus.NOT_REQUESTED, ContactStatus.SUBMITTED),
+                arguments("Same status transition", ContactStatus.PENDING, ContactStatus.PENDING)
+        );
+    }
 }

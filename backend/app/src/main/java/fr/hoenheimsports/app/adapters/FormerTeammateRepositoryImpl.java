@@ -20,9 +20,9 @@ private final FormerTeammateMapper formerTeammateMapper;
     }
 
     @Override
-    public void save(FormerTeammate formerTeammate) {
+    public FormerTeammate save(FormerTeammate formerTeammate) {
         var formerTeammateEntity = formerTeammateMapper.toEntity(formerTeammate);
-        formerTeammateEntityRepository.save(formerTeammateEntity);
+        return formerTeammateMapper.toModel(formerTeammateEntityRepository.save(formerTeammateEntity));
     }
 
     @Override
@@ -45,5 +45,15 @@ private final FormerTeammateMapper formerTeammateMapper;
     @Override
     public void deleteById(UUID id) {
         formerTeammateEntityRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName) {
+        return formerTeammateEntityRepository.findByFirstNameIgnoreCaseAndLastNameIgnoreCaseAllIgnoreCase(firstName,lastName).map(formerTeammateMapper::toModel);
+    }
+
+    @Override
+    public Optional<FormerTeammate> findByPhone(String phone) {
+        return formerTeammateEntityRepository.findByPhone(phone).map(formerTeammateMapper::toModel);
     }
 }

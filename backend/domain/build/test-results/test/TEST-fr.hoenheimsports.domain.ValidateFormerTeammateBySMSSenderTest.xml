@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ValidateFormerTeammateBySMSSender Tests" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-09-09T18:06:03.037Z" hostname="PC-SALON" time="0.065">
+  <properties/>
+  <testcase name="Should handle valid phone number but failed SMS sending" classname="fr.hoenheimsports.domain.ValidateFormerTeammateBySMSSenderTest" time="0.055"/>
+  <testcase name="Should throw InvalidPhoneNumberException for invalid phone number" classname="fr.hoenheimsports.domain.ValidateFormerTeammateBySMSSenderTest" time="0.004"/>
+  <testcase name="Should handle valid phone number and successful SMS sending" classname="fr.hoenheimsports.domain.ValidateFormerTeammateBySMSSenderTest" time="0.001"/>
+  <testcase name="Should validate and normalize phone number before sending SMS" classname="fr.hoenheimsports.domain.ValidateFormerTeammateBySMSSenderTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

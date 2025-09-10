@@ -1,6 +1,7 @@
 package fr.hoenheimsports.app.mappers;
 
 import fr.hoenheimsports.app.entities.SMSHistoryEntity;
+import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +18,7 @@ public interface SMSHistoryMapper {
      * @return l'entité JPA
      */
     @Mapping(target = "formerTeammate", ignore = true) // Relation gérée séparément
+    @Mapping(target = "phoneNumber", expression = "java(phoneToString(smsHistory.phoneNumber()))")
     SMSHistoryEntity toEntity(SMSHistory smsHistory);
 
     /**
@@ -25,6 +27,7 @@ public interface SMSHistoryMapper {
      * @param smsHistoryEntity l'entité JPA à convertir
      * @return le modèle domain
      */
+    @Mapping(target = "phoneNumber", expression = "java(stringToPhone(smsHistoryEntity.getPhoneNumber()))")
     SMSHistory toModel(SMSHistoryEntity smsHistoryEntity);
 
     /**
@@ -35,5 +38,23 @@ public interface SMSHistoryMapper {
      */
     List<SMSHistory> toModelList(List<SMSHistoryEntity> smsHistoryEntities);
 
+    /**
+     * Convertit un objet Phone en String pour l'entité
+     *
+     * @param phone l'objet Phone
+     * @return la valeur string du téléphone
+     */
+    default String phoneToString(Phone phone) {
+        return phone != null ? phone.value() : null;
+    }
 
+    /**
+     * Convertit un String en objet Phone pour le modèle domain
+     *
+     * @param phoneNumber le numéro de téléphone en string
+     * @return l'objet Phone
+     */
+    default Phone stringToPhone(String phoneNumber) {
+        return phoneNumber != null ? Phone.of(phoneNumber) : null;
+    }
 }

@@ -5,11 +5,10 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.mappers.FormerTeammateMapper;
 import fr.hoenheimsports.app.services.SecurityContextService;
 import fr.hoenheimsports.domain.FormerTeammateRetriever;
-import fr.hoenheimsports.domain.api.FormerTeammateRegistrar;
-import fr.hoenheimsports.domain.api.commands.ContextCommand;
-import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
+import fr.hoenheimsports.domain.api.RegisterFormerTeammate;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,22 +17,23 @@ import java.util.List;
 @RequestMapping("/api/former-teammates")
 public class FormerTeammateController {
 
-    private final FormerTeammateRegistrar formerTeammateRegistrar;
+    private final RegisterFormerTeammate registerFormerTeammate;
     private final FormerTeammateRetriever formerTeammateRetriever;
     private final FormerTeammateMapper formerTeammateMapper;
     private final SecurityContextService securityContextService;
 
-    public FormerTeammateController(FormerTeammateRegistrar formerTeammateRegistrar, FormerTeammateRetriever formerTeammateRetriever, FormerTeammateMapper formerTeammateMapper, SecurityContextService securityContextService) {
-        this.formerTeammateRegistrar = formerTeammateRegistrar;
+    public FormerTeammateController(RegisterFormerTeammate registerFormerTeammate, FormerTeammateRetriever formerTeammateRetriever, FormerTeammateMapper formerTeammateMapper, SecurityContextService securityContextService) {
+        this.registerFormerTeammate = registerFormerTeammate;
         this.formerTeammateRetriever = formerTeammateRetriever;
         this.formerTeammateMapper = formerTeammateMapper;
         this.securityContextService = securityContextService;
     }
 
     @PostMapping()
+    @Transactional
     public ResponseEntity<FormerTeammateResponse> registerFormerTeammate(@RequestBody @Valid FormerTeammateRequest formerTeammateRequest) {
         var formerTeammateRegistrationCommand = formerTeammateMapper.toCommand(formerTeammateRequest);
-        var formerTeammate = formerTeammateRegistrar.registerFormerTeammate(formerTeammateRegistrationCommand, securityContextService.getCurrentContext());
+        var formerTeammate = registerFormerTeammate.registerFormerTeammate(formerTeammateRegistrationCommand, securityContextService.getCurrentContext());
         return ResponseEntity.ok(formerTeammateMapper.toResponse(formerTeammate));
     }
 
