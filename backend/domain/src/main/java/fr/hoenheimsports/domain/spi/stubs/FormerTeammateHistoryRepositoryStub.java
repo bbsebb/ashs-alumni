@@ -6,6 +6,7 @@ import fr.hoenheimsports.domain.spi.FormerTeammateHistoryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Stub
 public class FormerTeammateHistoryRepositoryStub implements FormerTeammateHistoryRepository {
@@ -17,6 +18,11 @@ public class FormerTeammateHistoryRepositoryStub implements FormerTeammateHistor
             savedHistories.add(formerTeammateHistory);
         }
         return formerTeammateHistory;
+    }
+
+    @Override
+    public List<FormerTeammateHistory> findAllFormerTeammateHistoryByFormerTeammateId(UUID formerTeammateId) {
+        return savedHistories.stream().filter(history -> history.formerTeammateId().equals(formerTeammateId)).toList();
     }
 
     // Utility method for testing purposes

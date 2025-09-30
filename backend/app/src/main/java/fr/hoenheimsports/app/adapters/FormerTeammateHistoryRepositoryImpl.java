@@ -6,6 +6,9 @@ import fr.hoenheimsports.domain.models.FormerTeammateHistory;
 import fr.hoenheimsports.domain.spi.FormerTeammateHistoryRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.UUID;
+
 @Repository
 public class FormerTeammateHistoryRepositoryImpl implements FormerTeammateHistoryRepository {
     private final FormerTeammateHistoryEntityRepository formerTeammateHistoryEntityRepository;
@@ -19,5 +22,10 @@ public class FormerTeammateHistoryRepositoryImpl implements FormerTeammateHistor
     @Override
     public FormerTeammateHistory save(FormerTeammateHistory formerTeammateHistory) {
         return formerTeammateHistoryMapper.toModel(formerTeammateHistoryEntityRepository.save(formerTeammateHistoryMapper.toEntity(formerTeammateHistory)));
+    }
+
+    @Override
+    public List<FormerTeammateHistory> findAllFormerTeammateHistoryByFormerTeammateId(UUID formerTeammateId) {
+        return formerTeammateHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(formerTeammateHistoryMapper::toModel).toList();
     }
 }

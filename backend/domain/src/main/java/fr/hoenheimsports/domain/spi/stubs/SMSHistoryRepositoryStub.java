@@ -3,10 +3,7 @@ package fr.hoenheimsports.domain.spi.stubs;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SMSHistoryRepositoryStub implements SMSHistoryRepository {
     
@@ -20,5 +17,10 @@ public class SMSHistoryRepositoryStub implements SMSHistoryRepository {
     @Override
     public Optional<SMSHistory> findByExternalID(String externalId) {
         return storage.values().stream().filter(smsHistory -> smsHistory.externalId().equals(externalId)).findFirst();
+    }
+
+    @Override
+    public List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId) {
+        return storage.values().stream().filter(smsHistory -> smsHistory.formerTeammateId().equals(formerTeammateId)).toList();
     }
 }

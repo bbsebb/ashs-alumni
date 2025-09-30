@@ -1,15 +1,19 @@
 package fr.hoenheimsports.app.mappers;
 
+import fr.hoenheimsports.app.controllers.dtos.SMSHistoryResponse;
 import fr.hoenheimsports.app.entities.SMSHistoryEntity;
 import fr.hoenheimsports.domain.models.SMSHistory;
+import fr.hoenheimsports.domain.models.SMSStatus;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-09T19:20:05+0200",
+    date = "2025-09-30T19:47:35+0200",
     comments = "version: 1.6.3, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.14.jar, environment: Java 24.0.1 (Eclipse Adoptium)"
 )
 @Component
@@ -60,14 +64,45 @@ public class SMSHistoryMapperImpl implements SMSHistoryMapper {
     }
 
     @Override
-    public List<SMSHistory> toModelList(List<SMSHistoryEntity> smsHistoryEntities) {
-        if ( smsHistoryEntities == null ) {
+    public SMSHistoryResponse toResponse(SMSHistory smsHistory) {
+        if ( smsHistory == null ) {
             return null;
         }
 
-        List<SMSHistory> list = new ArrayList<SMSHistory>( smsHistoryEntities.size() );
-        for ( SMSHistoryEntity sMSHistoryEntity : smsHistoryEntities ) {
-            list.add( toModel( sMSHistoryEntity ) );
+        UUID id = null;
+        UUID formerTeammateId = null;
+        String message = null;
+        SMSStatus status = null;
+        Instant sentAt = null;
+        Instant updatedAt = null;
+        String externalId = null;
+        String errorMessage = null;
+
+        id = smsHistory.id();
+        formerTeammateId = smsHistory.formerTeammateId();
+        message = smsHistory.message();
+        status = smsHistory.status();
+        sentAt = smsHistory.sentAt();
+        updatedAt = smsHistory.updatedAt();
+        externalId = smsHistory.externalId();
+        errorMessage = smsHistory.errorMessage();
+
+        String phoneNumber = phoneToMaskedString(smsHistory.phoneNumber());
+
+        SMSHistoryResponse sMSHistoryResponse = new SMSHistoryResponse( id, formerTeammateId, phoneNumber, message, status, sentAt, updatedAt, externalId, errorMessage );
+
+        return sMSHistoryResponse;
+    }
+
+    @Override
+    public List<SMSHistoryResponse> toResponseList(List<SMSHistory> smsHistories) {
+        if ( smsHistories == null ) {
+            return null;
+        }
+
+        List<SMSHistoryResponse> list = new ArrayList<SMSHistoryResponse>( smsHistories.size() );
+        for ( SMSHistory sMSHistory : smsHistories ) {
+            list.add( toResponse( sMSHistory ) );
         }
 
         return list;

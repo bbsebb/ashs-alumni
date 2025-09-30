@@ -7,7 +7,9 @@ import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
@@ -58,5 +60,10 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
     @Override
     public Optional<SMSHistory> findByExternalID(String externalId) {
         return smsHistoryEntityRepository.findByExternalId(externalId).map(smsHistoryMapper::toModel);
+    }
+
+    @Override
+    public List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId) {
+       return smsHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(smsHistoryMapper::toModel).toList();
     }
 }

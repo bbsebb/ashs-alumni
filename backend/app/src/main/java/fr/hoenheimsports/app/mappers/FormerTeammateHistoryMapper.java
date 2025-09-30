@@ -1,11 +1,14 @@
 package fr.hoenheimsports.app.mappers;
 
+import fr.hoenheimsports.app.controllers.dtos.FormerTeammateHistoryResponse;
 import fr.hoenheimsports.app.entities.FormerTeammateHistoryEntity;
 import fr.hoenheimsports.domain.models.FormerTeammateHistory;
 import fr.hoenheimsports.domain.models.Phone;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")
@@ -17,6 +20,8 @@ public interface FormerTeammateHistoryMapper {
      * @param formerTeammateHistory le modèle domain à convertir
      * @return l'entité JPA
      */
+    @Mapping(target = "formerTeammate", ignore = true)
+    @Mapping(target = "phoneAtTime", expression = "java(optionalPhoneToString(formerTeammateHistory.phoneAtTime()))")
     FormerTeammateHistoryEntity toEntity(FormerTeammateHistory formerTeammateHistory);
 
     /**
@@ -27,46 +32,33 @@ public interface FormerTeammateHistoryMapper {
      */
     FormerTeammateHistory toModel(FormerTeammateHistoryEntity formerTeammateHistoryEntity);
 
-    // Conversions personnalisées pour les types Optional
-    default Optional<String> stringToOptional(String value) {
-        return Optional.ofNullable(value);
-    }
+    /**
+     * Convertit un modèle domain FormerTeammateHistory en réponse FormerTeammateHistoryResponse
+     *
+     * @param formerTeammateHistory le modèle domain à convertir
+     * @return la réponse DTO
+     */
+    @Mapping(target = "phoneAtTime", expression = "java(optionalPhoneToMaskedString(formerTeammateHistory.phoneAtTime()))")
+    FormerTeammateHistoryResponse toResponse(FormerTeammateHistory formerTeammateHistory);
 
-    default String optionalToString(Optional<String> optional) {
+
+
+
+    default <T> T map(Optional<T> optional) {
         return optional.orElse(null);
     }
 
-    default Optional<LocalDate> dateToOptional(LocalDate date) {
-        return Optional.ofNullable(date);
-    }
-
-    default LocalDate optionalDateToDate(Optional<LocalDate> optionalDate) {
-        return optionalDate.orElse(null);
-    }
-
-    default Optional<Phone> phoneToOptional(String phone) {
-        if (phone == null) {
-            return Optional.empty();
-        }
-        return Optional.of(Phone.of(phone));
-    }
-
-    default String optionalPhoneToPhone(Optional<Phone> optionalPhone) {
-        return optionalPhone.map(Phone::toString).orElse(null);
-    }
-
-    // Direct mapping methods for MapStruct
     default Phone map(String value) {
-        if (value == null) {
-            return null;
-        }
         return Phone.of(value);
     }
 
-    default String map(Phone phone) {
-        if (phone == null) {
-            return null;
-        }
-        return phone.toString();
+
+    default String optionalPhoneToString(Optional<Phone> optionalPhone) {
+        return optionalPhone.map(Phone::getRawValue).orElse(null);
     }
+    default String optionalPhoneToMaskedString(Optional<Phone> optionalPhone) {
+        return optionalPhone.map(Phone::toString).orElse(null);
+    }
+
+
 }

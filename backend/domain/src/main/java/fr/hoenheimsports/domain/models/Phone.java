@@ -30,7 +30,8 @@ public record Phone(String value) {
      */
     @Override
     public String toString() {
-        return value;
+        return toMaskedFormat();
+
     }
 
     /**
@@ -61,6 +62,18 @@ public record Phone(String value) {
 
         return visiblePrefix + maskedPart + lastThree;
     }
+
+    /**
+     * Returns the raw phone number value for internal system use.
+     * This method should only be used when the complete phone number is required
+     * for operations like SMS sending or database storage.
+     *
+     * @return the complete phone number value
+     */
+    public String getRawValue() {
+        return value;
+    }
+
 
 
     /**

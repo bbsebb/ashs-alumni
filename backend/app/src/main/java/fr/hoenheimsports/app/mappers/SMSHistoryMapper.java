@@ -1,5 +1,6 @@
 package fr.hoenheimsports.app.mappers;
 
+import fr.hoenheimsports.app.controllers.dtos.SMSHistoryResponse;
 import fr.hoenheimsports.app.entities.SMSHistoryEntity;
 import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.models.SMSHistory;
@@ -12,7 +13,7 @@ import java.util.List;
 public interface SMSHistoryMapper {
 
     /**
-     * Convertit un modèle domain SMSHistory en entité SMSHistoryEntity
+     * Convertit un modèle domain SMSHistoryResponse en entité SMSHistoryEntity
      *
      * @param smsHistory le modèle domain à convertir
      * @return l'entité JPA
@@ -22,7 +23,7 @@ public interface SMSHistoryMapper {
     SMSHistoryEntity toEntity(SMSHistory smsHistory);
 
     /**
-     * Convertit une entité SMSHistoryEntity en modèle domain SMSHistory
+     * Convertit une entité SMSHistoryEntity en modèle domain SMSHistoryResponse
      *
      * @param smsHistoryEntity l'entité JPA à convertir
      * @return le modèle domain
@@ -30,13 +31,25 @@ public interface SMSHistoryMapper {
     @Mapping(target = "phoneNumber", expression = "java(stringToPhone(smsHistoryEntity.getPhoneNumber()))")
     SMSHistory toModel(SMSHistoryEntity smsHistoryEntity);
 
+
+
     /**
-     * Convertit une liste d'entités en liste de modèles domain
+     * Convertit un modèle domain SMSHistory en réponse SMSHistoryResponse
      *
-     * @param smsHistoryEntities la liste d'entités à convertir
-     * @return la liste de modèles domain
+     * @param smsHistory le modèle domain à convertir
+     * @return la réponse DTO
      */
-    List<SMSHistory> toModelList(List<SMSHistoryEntity> smsHistoryEntities);
+    @Mapping(target = "phoneNumber", expression = "java(phoneToMaskedString(smsHistory.phoneNumber()))")
+    SMSHistoryResponse toResponse(SMSHistory smsHistory);
+
+    /**
+     * Convertit une liste de modèles domain en liste de réponses DTO
+     *
+     * @param smsHistories la liste de modèles domain à convertir
+     * @return la liste de réponses DTO
+     */
+    List<SMSHistoryResponse> toResponseList(List<SMSHistory> smsHistories);
+
 
     /**
      * Convertit un objet Phone en String pour l'entité
@@ -45,7 +58,17 @@ public interface SMSHistoryMapper {
      * @return la valeur string du téléphone
      */
     default String phoneToString(Phone phone) {
-        return phone != null ? phone.value() : null;
+        return phone != null ? phone.getRawValue() : null;
+    }
+
+    /**
+     * Convertit un objet Phone en String masqué pour l'utilisateur
+     *
+     * @param phone l'objet Phone
+     * @return la valeur string masqué du téléphone
+     */
+    default String phoneToMaskedString(Phone phone) {
+        return phone != null ? phone.toString() : null;
     }
 
     /**

@@ -1,10 +1,12 @@
 package fr.hoenheimsports.domain;
 
-import fr.hoenheimsports.domain.api.commands.ContextCommand;
+import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.api.commands.CurrentUser;
-import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
+import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.models.*;
+import fr.hoenheimsports.domain.services.*;
+import fr.hoenheimsports.domain.services.validations.FormerTeammateUniquenessValidationService;
 import fr.hoenheimsports.domain.services.validations.PhoneValidationService;
 import fr.hoenheimsports.domain.spi.stubs.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,32 +27,30 @@ class FormerTeammateRegistrarIntegrationTest {
     private FormerTeammateRegistrar formerTeammateRegistrar;
     private FormerTeammateRepositoryStub formerTeammateRepository;
     private FormerTeammateHistoryRepositoryStub historyRepository;
-    private SMSHistoryRepositoryStub smsHistoryRepository;
     private SMSSenderStub smsSender;
-    private GenerateIdStub idGenerator;
 
     @BeforeEach
     void setUp() {
         // Initialize stubs
         formerTeammateRepository = new FormerTeammateRepositoryStub();
         historyRepository = new FormerTeammateHistoryRepositoryStub();
-        smsHistoryRepository = new SMSHistoryRepositoryStub();
+        SMSHistoryRepositoryStub smsHistoryRepository = new SMSHistoryRepositoryStub();
         smsSender = new SMSSenderStub();
-        idGenerator = new GenerateIdStub();
+        GenerateIdStub idGenerator = new GenerateIdStub();
 
         // Initialize domain services
-        var formerTeammateCreator = new FormerTeammateCreator(idGenerator, formerTeammateRepository);
+        var uniquenessValidationService = new FormerTeammateUniquenessValidationService(formerTeammateRepository);
+        var formerTeammateCreator = new FormerTeammateCreator(idGenerator, formerTeammateRepository, uniquenessValidationService);
         var formerTeammateHistoryCreator = new FormerTeammateHistoryCreator(idGenerator, historyRepository);
         var formerTeammateUpdater = new FormerTeammateUpdater(formerTeammateRepository);
         var phoneValidationService = new PhoneValidationService();
         var smsService = new ValidateFormerTeammateBySMSSender(smsSender, smsHistoryRepository, phoneValidationService);
-
+        var handleSMSValidation = new SMSValidationHandler(formerTeammateUpdater, smsService,formerTeammateHistoryCreator);
         // Initialize the registrar under test
         formerTeammateRegistrar = new FormerTeammateRegistrar(
             formerTeammateCreator,
             formerTeammateHistoryCreator,
-            formerTeammateUpdater,
-            smsService
+                handleSMSValidation
         );
     }
 
@@ -129,7 +129,7 @@ class FormerTeammateRegistrarIntegrationTest {
             .filter(h -> h.description().contains("Modification du status"))
             .findFirst().orElse(null);
         assertThat(statusHistory).isNotNull();
-        assertThat(statusHistory.updatedBy()).isEqualTo("système ASHS");
+        assertThat(statusHistory.updatedBy()).isEqualTo("admin");
         assertThat(statusHistory.description()).contains("SUBMITTED à PENDING");
 
         // Verify SMS was sent
@@ -236,8 +236,8 @@ class FormerTeammateRegistrarIntegrationTest {
         assertThat(smsSender.getSentSMSCount()).isEqualTo(2);
     }
 
-    private FormerTeammateRegistrationCommand createRegistrationCommand(String firstName, String lastName, String phone, String email) {
-        return new FormerTeammateRegistrationCommand(
+    private FormerTeammateRegistrationRequest createRegistrationCommand(String firstName, String lastName, String phone, String email) {
+        return new FormerTeammateRegistrationRequest(
             Gender.MALE,
             firstName,
             lastName,
@@ -248,12 +248,12 @@ class FormerTeammateRegistrarIntegrationTest {
         );
     }
 
-    private ContextCommand createContextWithUser() {
+    private ContextDetails createContextWithUser() {
         var user = new CurrentUser("user-id-" + "admin", "admin", Set.of());
-        return new ContextCommand(Optional.of(user));
+        return new ContextDetails(Optional.of(user));
     }
 
-    private ContextCommand createContextWithoutUser() {
-        return new ContextCommand(Optional.empty());
+    private ContextDetails createContextWithoutUser() {
+        return new ContextDetails(Optional.empty());
     }
 }

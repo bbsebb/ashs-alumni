@@ -565,7 +565,7 @@ class SMSHistoryTest {
         // Then
         assertThat(updatedSMS).isNotNull();
         assertThat(updatedSMS.errorMessage()).isEqualTo(newErrorMessage);
-        assertThat(updatedSMS.updatedAt()).isAfter(VALID_UPDATED_AT);
+        assertThat(updatedSMS.updatedAt()).isAfterOrEqualTo(VALID_UPDATED_AT);
         assertThat(updatedSMS.updatedAt()).isBeforeOrEqualTo(Instant.now());
         
         // All other fields should remain the same

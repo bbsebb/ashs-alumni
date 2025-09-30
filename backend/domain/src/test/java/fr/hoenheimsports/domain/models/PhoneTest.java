@@ -82,7 +82,7 @@ class PhoneTest {
     }
 
     @Test
-    void should_return_phone_value_when_toString_called() {
+    void should_return_masked_format_when_toString_called() {
         // Given
         String phoneNumber = "+33123456789";
         Phone phone = new Phone(phoneNumber);
@@ -91,7 +91,90 @@ class PhoneTest {
         String result = phone.toString();
         
         // Then
-        assertThat(result).isEqualTo(phoneNumber);
+        assertThat(result).isEqualTo("+33******789");
+    }
+
+    @Test
+    void should_return_raw_value_when_getRawValue_called() {
+        // Given
+        String phoneNumber = "+33123456789";
+        Phone phone = new Phone(phoneNumber);
+        
+        // When
+        String rawValue = phone.getRawValue();
+        
+        // Then
+        assertThat(rawValue).isEqualTo(phoneNumber);
+    }
+
+    @Test
+    void should_return_normalized_raw_value_for_phone_with_spaces() {
+        // Given
+        String phoneWithSpaces = "+33 1 23 45 67 89";
+        String expectedNormalized = "+33123456789";
+        Phone phone = new Phone(phoneWithSpaces);
+        
+        // When
+        String rawValue = phone.getRawValue();
+        
+        // Then
+        assertThat(rawValue).isEqualTo(expectedNormalized);
+    }
+
+    @Test
+    void should_return_normalized_raw_value_for_phone_with_dashes() {
+        // Given
+        String phoneWithDashes = "+33-1-23-45-67-89";
+        String expectedNormalized = "+33123456789";
+        Phone phone = new Phone(phoneWithDashes);
+        
+        // When
+        String rawValue = phone.getRawValue();
+        
+        // Then
+        assertThat(rawValue).isEqualTo(expectedNormalized);
+    }
+
+    @Test
+    void should_return_raw_value_for_us_phone_number() {
+        // Given
+        String usPhone = "+12345678900";
+        Phone phone = new Phone(usPhone);
+        
+        // When
+        String rawValue = phone.getRawValue();
+        
+        // Then
+        assertThat(rawValue).isEqualTo(usPhone);
+    }
+
+    @Test
+    void should_return_raw_value_for_german_phone_number() {
+        // Given
+        String germanPhone = "+49123456789";
+        Phone phone = new Phone(germanPhone);
+        
+        // When
+        String rawValue = phone.getRawValue();
+        
+        // Then
+        assertThat(rawValue).isEqualTo(germanPhone);
+    }
+
+    @Test
+    void should_return_different_values_for_toString_and_getRawValue() {
+        // Given
+        String phoneNumber = "+33638123456";
+        Phone phone = new Phone(phoneNumber);
+        
+        // When
+        String toStringResult = phone.toString();
+        String rawValueResult = phone.getRawValue();
+        
+        // Then
+        assertThat(toStringResult).isEqualTo("+33******456"); // masked format
+        assertThat(rawValueResult).isEqualTo("+33638123456"); // raw value
+        assertThat(toStringResult).isNotEqualTo(rawValueResult);
     }
 
     @Test

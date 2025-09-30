@@ -17,7 +17,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.UUID;
 
-@Component
+//@Component
 @Slf4j
 public class SendSMS implements SMSSender {
     private final TwilioMessageMapper twilioMessageMapper;

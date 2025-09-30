@@ -10,6 +10,8 @@ public interface FormerTeammateRepository {
 
     List<FormerTeammate> findAll();
 
+    List<FormerTeammate> findAllNotDeleted();
+
     void deleteAll();
 
     Optional<FormerTeammate> findById(UUID id);

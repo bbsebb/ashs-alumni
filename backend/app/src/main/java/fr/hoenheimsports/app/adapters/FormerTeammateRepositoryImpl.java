@@ -32,6 +32,11 @@ private final FormerTeammateMapper formerTeammateMapper;
     }
 
     @Override
+    public List<FormerTeammate> findAllNotDeleted() {
+        return formerTeammateEntityRepository.findAllNotDeleted().stream().map(formerTeammateMapper::toModel).toList();
+    }
+
+    @Override
     public void deleteAll() {
         formerTeammateEntityRepository.deleteAll();
     }
@@ -49,7 +54,7 @@ private final FormerTeammateMapper formerTeammateMapper;
 
     @Override
     public Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName) {
-        return formerTeammateEntityRepository.findByFirstNameIgnoreCaseAndLastNameIgnoreCaseAllIgnoreCase(firstName,lastName).map(formerTeammateMapper::toModel);
+        return formerTeammateEntityRepository.findByFirstNameAndLastName(firstName,lastName).map(formerTeammateMapper::toModel);
     }
 
     @Override

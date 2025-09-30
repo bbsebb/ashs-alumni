@@ -1,9 +1,10 @@
 package fr.hoenheimsports.domain;
 
-import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusCommand;
+import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateRepositoryException;
 import fr.hoenheimsports.domain.exceptions.SMSHistoryRepositoryException;
 import fr.hoenheimsports.domain.models.*;
+import fr.hoenheimsports.domain.services.SMSUpdatedStatusHandler;
 import fr.hoenheimsports.domain.spi.stubs.FormerTeammateRepositoryStub;
 import fr.hoenheimsports.domain.spi.stubs.SMSHistoryRepositoryStub;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,7 +79,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommand(SMSStatus.QUEUED, null, null);
         
         // When
-        handler.execute(command);
+        handler.handleSMSStatusUpdated(command);
         
         // Then
         var savedSMSHistory = smsHistoryRepository.findByExternalID(testExternalSmsId).orElseThrow();
@@ -95,7 +96,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommand(SMSStatus.DELIVERED, null, null);
         
         // When
-        handler.execute(command);
+        handler.handleSMSStatusUpdated(command);
         
         // Then
         var savedSMSHistory = smsHistoryRepository.findByExternalID(testExternalSmsId).orElseThrow();
@@ -112,7 +113,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommand(SMSStatus.FAILED, "30008", "Unknown destination handset");
         
         // When
-        handler.execute(command);
+        handler.handleSMSStatusUpdated(command);
         
         // Then
         var savedSMSHistory = smsHistoryRepository.findByExternalID(testExternalSmsId).orElseThrow();
@@ -131,7 +132,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommand(smsStatus, null, null);
         
         // When
-        handler.execute(command);
+        handler.handleSMSStatusUpdated(command);
         
         // Then
         var savedSMSHistory = smsHistoryRepository.findByExternalID(testExternalSmsId).orElseThrow();
@@ -148,7 +149,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommandWithExternalId("non-existent-id", SMSStatus.DELIVERED, null, null);
         
         // When & Then
-        assertThatThrownBy(() -> handler.execute(command))
+        assertThatThrownBy(() -> handler.handleSMSStatusUpdated(command))
                 .isInstanceOf(SMSHistoryRepositoryException.class)
                 .hasMessageContaining("L'historique des sms n'a pas été trouvé avec l'id : non-existent-id");
     }
@@ -161,7 +162,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommandWithFormerTeammateId(nonExistentId.toString());
         
         // When & Then
-        assertThatThrownBy(() -> handler.execute(command))
+        assertThatThrownBy(() -> handler.handleSMSStatusUpdated(command))
                 .isInstanceOf(FormerTeammateRepositoryException.class)
                 .hasMessageContaining("Le contact n'a pas été trouvé avec l'id " + nonExistentId);
     }
@@ -173,7 +174,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommandWithFormerTeammateId("invalid-uuid");
         
         // When & Then
-        assertThatThrownBy(() -> handler.execute(command))
+        assertThatThrownBy(() -> handler.handleSMSStatusUpdated(command))
                 .isInstanceOf(IllegalArgumentException.class);
     }
     
@@ -186,7 +187,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommand(SMSStatus.FAILED, errorCode, errorMessage);
         
         // When
-        handler.execute(command);
+        handler.handleSMSStatusUpdated(command);
         
         // Then
         var savedSMSHistory = smsHistoryRepository.findByExternalID(testExternalSmsId).orElseThrow();
@@ -202,7 +203,7 @@ class SMSUpdatedStatusHandlerTest {
         var command = createCommand(SMSStatus.DELIVERED, null, null);
         
         // When
-        handler.execute(command);
+        handler.handleSMSStatusUpdated(command);
         
         // Then
         var savedSMSHistory = smsHistoryRepository.findByExternalID(testExternalSmsId);
@@ -216,22 +217,22 @@ class SMSUpdatedStatusHandlerTest {
     
     // Helper methods
     
-    private SMSUpdatedStatusCommand createCommand(SMSStatus smsStatus, String errorCode, String errorMessage) {
+    private SMSUpdatedStatusDetails createCommand(SMSStatus smsStatus, String errorCode, String errorMessage) {
         return createCommandWithExternalId(testExternalSmsId, smsStatus, errorCode, errorMessage);
     }
     
-    private SMSUpdatedStatusCommand createCommandWithExternalId(String externalSmsId, SMSStatus smsStatus, String errorCode, String errorMessage) {
+    private SMSUpdatedStatusDetails createCommandWithExternalId(String externalSmsId, SMSStatus smsStatus, String errorCode, String errorMessage) {
         return createCommandWithFormerTeammateId(testFormerTeammateId.toString(), externalSmsId, smsStatus, errorCode, errorMessage);
     }
     
-    private SMSUpdatedStatusCommand createCommandWithFormerTeammateId(String formerTeammateId) {
+    private SMSUpdatedStatusDetails createCommandWithFormerTeammateId(String formerTeammateId) {
         return createCommandWithFormerTeammateId(formerTeammateId, testExternalSmsId, SMSStatus.DELIVERED, null, null);
     }
     
-    private SMSUpdatedStatusCommand createCommandWithFormerTeammateId(String formerTeammateId, String externalSmsId, SMSStatus smsStatus, String errorCode, String errorMessage) {
-        var smsStatusUpdate = new SMSUpdatedStatusCommand.SMSStatusUpdate(externalSmsId, smsStatus, errorMessage, errorCode);
-        var formerTeammateReference = new SMSUpdatedStatusCommand.FormerTeammateReference(formerTeammateId);
-        return new SMSUpdatedStatusCommand(smsStatusUpdate, formerTeammateReference);
+    private SMSUpdatedStatusDetails createCommandWithFormerTeammateId(String formerTeammateId, String externalSmsId, SMSStatus smsStatus, String errorCode, String errorMessage) {
+        var smsStatusUpdate = new SMSUpdatedStatusDetails.SMSStatusUpdate(externalSmsId, smsStatus, errorMessage, errorCode);
+        var formerTeammateReference = new SMSUpdatedStatusDetails.FormerTeammateReference(formerTeammateId);
+        return new SMSUpdatedStatusDetails(smsStatusUpdate, formerTeammateReference);
     }
     
     // Data providers

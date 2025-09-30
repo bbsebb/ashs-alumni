@@ -1,12 +1,10 @@
 package fr.hoenheimsports.domain;
 
-import fr.hoenheimsports.domain.annotations.DomainService;
-import fr.hoenheimsports.domain.api.CreateFormerTeammate;
-import fr.hoenheimsports.domain.api.CreateFormerTeammateHistory;
-import fr.hoenheimsports.domain.api.SendSMSToValidateFormerTeammate;
-import fr.hoenheimsports.domain.api.UpdateFormerTeammate;
-import fr.hoenheimsports.domain.api.commands.ContextCommand;
-import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
+import fr.hoenheimsports.domain.annotations.UseCase;
+import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
+import fr.hoenheimsports.domain.services.*;
+import fr.hoenheimsports.domain.api.EditFormerTeammate;
+import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.models.*;
 
@@ -19,7 +17,7 @@ import fr.hoenheimsports.domain.models.*;
  *   <li><strong>Création initiale :</strong> Délègue la création à {@link CreateFormerTeammate}
  *       et l'historique initial à {@link CreateFormerTeammateHistory}</li>
  *   <li><strong>Validation SMS :</strong> Si un utilisateur est authentifié, envoie un SMS
- *       puis délègue la mise à jour à {@link UpdateFormerTeammate} et l'historique
+ *       puis délègue la mise à jour à {@link EditFormerTeammate} et l'historique
  *       à {@link CreateFormerTeammateHistory}</li>
  * </ol>
  * 
@@ -37,14 +35,14 @@ import fr.hoenheimsports.domain.models.*;
  * @since 1.0
  * @see CreateFormerTeammate
  * @see CreateFormerTeammateHistory
- * @see UpdateFormerTeammate
+ * @see EditFormerTeammate
  */
-@DomainService
+@UseCase
 public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.RegisterFormerTeammate {
     private final CreateFormerTeammate createFormerTeammate;
     private final CreateFormerTeammateHistory createFormerTeammateHistory;
-    private final UpdateFormerTeammate updateFormerTeammate;
-    private final SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate;
+    private final HandleSMSValidation handleSMSValidation;
+
 
 
     /**
@@ -52,15 +50,13 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
      * 
      * @param createFormerTeammate API pour la création des anciens coéquipiers
      * @param createFormerTeammateHistory API pour la création d'entrées d'historique
-     * @param updateFormerTeammate API pour la mise à jour des anciens coéquipiers
-     * @param sendSMSToValidateFormerTeammate service d'envoi de SMS de validation
      * @throws IllegalArgumentException si l'un des paramètres est null
      */
-    public FormerTeammateRegistrar(CreateFormerTeammate createFormerTeammate, CreateFormerTeammateHistory createFormerTeammateHistory, UpdateFormerTeammate updateFormerTeammate, SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate) {
+    public FormerTeammateRegistrar(CreateFormerTeammate createFormerTeammate, CreateFormerTeammateHistory createFormerTeammateHistory, HandleSMSValidation handleSMSValidation) {
         this.createFormerTeammate = createFormerTeammate;
         this.createFormerTeammateHistory = createFormerTeammateHistory;
-        this.updateFormerTeammate = updateFormerTeammate;
-        this.sendSMSToValidateFormerTeammate = sendSMSToValidateFormerTeammate;
+
+        this.handleSMSValidation = handleSMSValidation;
     }
 
     /**
@@ -72,26 +68,26 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
      *   <li><strong>Phase 1 :</strong> Création via {@link CreateFormerTeammate} et historique
      *       via {@link CreateFormerTeammateHistory} avec le statut SUBMITTED</li>
      *   <li><strong>Phase 2 :</strong> Si un utilisateur est authentifié, tentative d'envoi de SMS
-     *       puis mise à jour via {@link UpdateFormerTeammate} (PENDING si succès, UNREACHABLE si échec)</li>
+     *       puis mise à jour via {@link EditFormerTeammate} (PENDING si succès, UNREACHABLE si échec)</li>
      * </ol>
      * 
      * <p>Le contexte utilisateur détermine si la validation par SMS est nécessaire.
      * Sans utilisateur authentifié, l'ancien coéquipier reste au statut SUBMITTED.</p>
      * 
-     * @param command les données de l'ancien coéquipier à enregistrer (nom, prénom, téléphone, etc.)
+     * @param formerTeammateRegistrationRequest les données de l'ancien coéquipier à enregistrer (nom, prénom, téléphone, etc.)
      * @param context le contexte d'exécution contenant l'utilisateur courant (peut être vide)
      * @return l'ancien coéquipier enregistré avec son statut final
      * @throws InvalidPhoneNumberException si le numéro de téléphone est invalide
      */
     @Override
-    public FormerTeammate registerFormerTeammate(FormerTeammateRegistrationCommand command, ContextCommand context) {
+    public FormerTeammate registerFormerTeammate(FormerTeammateRegistrationRequest formerTeammateRegistrationRequest, ContextDetails context) {
 
         // Sauvegarde initiale
-        var savedFormerTeammate = createInitialeFormerTeammate(command,context);
+        var savedFormerTeammate = createInitialeFormerTeammate(formerTeammateRegistrationRequest,context);
 
         // Gestion SMS et mise à jour du statut
         if (context.currentUser().isPresent()) {
-            savedFormerTeammate = handleSMSValidation(savedFormerTeammate, command.phone());
+            savedFormerTeammate = handleSMSValidation.handleSMSValidation(savedFormerTeammate, context.currentUser().get().username());
         }
 
         return savedFormerTeammate;
@@ -108,7 +104,7 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
      * @param context le contexte d'exécution contenant l'utilisateur courant
      * @return l'ancien coéquipier créé et sauvegardé
      */
-    private FormerTeammate createInitialeFormerTeammate(FormerTeammateRegistrationCommand command, ContextCommand context) {
+    private FormerTeammate createInitialeFormerTeammate(FormerTeammateRegistrationRequest command, ContextDetails context) {
         // Création de l'ancien coéquipier via l'API dédiée
         var formerTeammate = createFormerTeammate.createFormerTeammate(command, context);
         
@@ -121,37 +117,5 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
     }
 
 
-    /**
-     * Gère la validation par SMS et met à jour le statut de l'ancien coéquipier.
-     *
-     * <p>Cette méthode orchestre la seconde phase du processus d'enregistrement
-     * en utilisant les APIs spécialisées. Elle normalise le numéro de téléphone,
-     * envoie un SMS de validation, puis délègue la mise à jour du statut et
-     * la création de l'historique aux APIs appropriées :</p>
-     * <ul>
-     *   <li><strong>PENDING :</strong> si l'envoi du SMS a réussi</li>
-     *   <li><strong>UNREACHABLE :</strong> si l'envoi du SMS a échoué</li>
-     * </ul>
-     *
-     * @param formerTeammate l'ancien coéquipier à mettre à jour
-     * @param rawPhone       le numéro de téléphone brut à valider et normaliser
-     * @return l'ancien coéquipier avec son statut mis à jour
-     * @throws InvalidPhoneNumberException si le numéro de téléphone est invalide
-     */
-    private FormerTeammate handleSMSValidation(FormerTeammate formerTeammate, String rawPhone) {
-        var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(rawPhone, "message test du sms", formerTeammate.id());
 
-        var newStatus = smsHistory.hasFailed() ? ContactStatus.UNREACHABLE : ContactStatus.PENDING;
-        var oldFormerTeammateStatus = formerTeammate.status();
-        
-        // Mise à jour du statut via l'API dédiée
-        var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, newStatus);
-        
-        // Création de l'entrée d'historique pour la mise à jour
-        var description = "Modification du status de %s à %s".formatted(oldFormerTeammateStatus, newStatus);
-        createFormerTeammateHistory.createHistoryForUpdate(updatedFormerTeammate, "système ASHS", description);
-
-
-        return updatedFormerTeammate;
-    }
 }

@@ -1,9 +1,11 @@
 package fr.hoenheimsports.app.mappers;
 
+import fr.hoenheimsports.app.controllers.dtos.FormerTeammateHistoryResponse;
 import fr.hoenheimsports.app.controllers.dtos.FormerTeammateRequest;
 import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
+import fr.hoenheimsports.app.controllers.dtos.SMSHistoryResponse;
 import fr.hoenheimsports.app.entities.FormerTeammateEntity;
-import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
+import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.Gender;
@@ -17,14 +19,14 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-09T19:20:05+0200",
+    date = "2025-09-30T19:47:35+0200",
     comments = "version: 1.6.3, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.14.jar, environment: Java 24.0.1 (Eclipse Adoptium)"
 )
 @Component
 public class FormerTeammateMapperImpl implements FormerTeammateMapper {
 
     @Override
-    public FormerTeammateRegistrationCommand toCommand(FormerTeammateRequest request) {
+    public FormerTeammateRegistrationRequest toRegistrationRequest(FormerTeammateRequest request) {
         if ( request == null ) {
             return null;
         }
@@ -48,9 +50,9 @@ public class FormerTeammateMapperImpl implements FormerTeammateMapper {
             roles = new ArrayList<Role>( list );
         }
 
-        FormerTeammateRegistrationCommand formerTeammateRegistrationCommand = new FormerTeammateRegistrationCommand( gender, firstName, lastName, email, phone, birthDate, roles );
+        FormerTeammateRegistrationRequest formerTeammateRegistrationRequest = new FormerTeammateRegistrationRequest( gender, firstName, lastName, email, phone, birthDate, roles );
 
-        return formerTeammateRegistrationCommand;
+        return formerTeammateRegistrationRequest;
     }
 
     @Override
@@ -63,7 +65,6 @@ public class FormerTeammateMapperImpl implements FormerTeammateMapper {
         String firstName = null;
         String lastName = null;
         Gender gender = null;
-        String phone = null;
         String email = null;
         LocalDate birthDate = null;
         List<Role> roles = null;
@@ -73,32 +74,21 @@ public class FormerTeammateMapperImpl implements FormerTeammateMapper {
         firstName = formerTeammate.firstName();
         lastName = formerTeammate.lastName();
         gender = formerTeammate.gender();
-        phone = optionalPhoneToPhone( formerTeammate.phone() );
-        email = optionalToString( formerTeammate.email() );
-        birthDate = optionalDateToDate( formerTeammate.birthDate() );
+        email = map( formerTeammate.email() );
+        birthDate = map( formerTeammate.birthDate() );
         List<Role> list = formerTeammate.roles();
         if ( list != null ) {
             roles = new ArrayList<Role>( list );
         }
         status = formerTeammate.status();
 
-        FormerTeammateResponse formerTeammateResponse = new FormerTeammateResponse( id, firstName, lastName, gender, phone, email, birthDate, roles, status );
+        List<FormerTeammateHistoryResponse> formerTeammateHistories = null;
+        List<SMSHistoryResponse> sMSHistories = null;
+        String phone = optionalPhoneToMaskedString(formerTeammate.phone());
+
+        FormerTeammateResponse formerTeammateResponse = new FormerTeammateResponse( id, firstName, lastName, gender, phone, email, birthDate, roles, status, formerTeammateHistories, sMSHistories );
 
         return formerTeammateResponse;
-    }
-
-    @Override
-    public List<FormerTeammateResponse> toResponseList(List<FormerTeammate> formerTeammates) {
-        if ( formerTeammates == null ) {
-            return null;
-        }
-
-        List<FormerTeammateResponse> list = new ArrayList<FormerTeammateResponse>( formerTeammates.size() );
-        for ( FormerTeammate formerTeammate : formerTeammates ) {
-            list.add( toResponse( formerTeammate ) );
-        }
-
-        return list;
     }
 
     @Override
@@ -113,14 +103,15 @@ public class FormerTeammateMapperImpl implements FormerTeammateMapper {
         formerTeammateEntity.firstName( formerTeammate.firstName() );
         formerTeammateEntity.lastName( formerTeammate.lastName() );
         formerTeammateEntity.gender( formerTeammate.gender() );
-        formerTeammateEntity.phone( optionalPhoneToPhone( formerTeammate.phone() ) );
-        formerTeammateEntity.email( optionalToString( formerTeammate.email() ) );
-        formerTeammateEntity.birthDate( optionalDateToDate( formerTeammate.birthDate() ) );
+        formerTeammateEntity.email( map( formerTeammate.email() ) );
+        formerTeammateEntity.birthDate( map( formerTeammate.birthDate() ) );
         List<Role> list = formerTeammate.roles();
         if ( list != null ) {
             formerTeammateEntity.roles( new ArrayList<Role>( list ) );
         }
         formerTeammateEntity.status( formerTeammate.status() );
+
+        formerTeammateEntity.phone( optionalPhoneToString(formerTeammate.phone()) );
 
         return formerTeammateEntity.build();
     }

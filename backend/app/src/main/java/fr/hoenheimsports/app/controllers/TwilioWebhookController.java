@@ -2,8 +2,8 @@ package fr.hoenheimsports.app.controllers;
 
 import fr.hoenheimsports.app.controllers.dtos.TwilioWebhookRequest;
 import fr.hoenheimsports.app.mappers.TwilioMessageMapper;
-import fr.hoenheimsports.domain.api.HandleSMSUpdatedStatus;
-import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusCommand;
+import fr.hoenheimsports.domain.services.HandleSMSUpdatedStatus;
+import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,8 +38,8 @@ public class TwilioWebhookController {
     @Transactional
     public ResponseEntity<Void> handleStatusCallback(
             @ModelAttribute TwilioWebhookRequest request, @RequestParam String formerTeammateId) {
-        SMSUpdatedStatusCommand command = twilioMessageMapper.toSMSUpdatedStatusCommand(request, formerTeammateId);
-        handleSMSUpdatedStatus.execute(command);
+        SMSUpdatedStatusDetails command = twilioMessageMapper.toSMSUpdatedStatusCommand(request, formerTeammateId);
+        handleSMSUpdatedStatus.handleSMSStatusUpdated(command);
         return ResponseEntity.ok().build();
     }
 

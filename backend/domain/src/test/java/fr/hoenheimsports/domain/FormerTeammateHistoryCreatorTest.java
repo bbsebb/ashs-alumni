@@ -1,6 +1,7 @@
 package fr.hoenheimsports.domain;
 
 import fr.hoenheimsports.domain.models.*;
+import fr.hoenheimsports.domain.services.FormerTeammateHistoryCreator;
 import fr.hoenheimsports.domain.spi.stubs.FormerTeammateHistoryRepositoryStub;
 import fr.hoenheimsports.domain.spi.stubs.GenerateIdStub;
 import org.junit.jupiter.api.BeforeEach;

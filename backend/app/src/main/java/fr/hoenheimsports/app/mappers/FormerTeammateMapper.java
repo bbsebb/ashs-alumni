@@ -3,24 +3,23 @@ package fr.hoenheimsports.app.mappers;
 import fr.hoenheimsports.app.controllers.dtos.FormerTeammateRequest;
 import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.entities.FormerTeammateEntity;
-import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
+import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.Phone;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public interface FormerTeammateMapper {
     /**
-     * Convertit une requête FormerTeammateRequest en commande FormerTeammateRegistrationCommand
+     * Convertit une requête FormerTeammateRequest en commande FormerTeammateRegistrationRequest
      *
      * @param request la requête à convertir
      * @return la commande de registration
      */
-    FormerTeammateRegistrationCommand toCommand(FormerTeammateRequest request);
+    FormerTeammateRegistrationRequest toRegistrationRequest(FormerTeammateRequest request);
 
     /**
      * Convertit un modèle domain FormerTeammate en réponse FormerTeammateResponse
@@ -28,42 +27,33 @@ public interface FormerTeammateMapper {
      * @param formerTeammate le modèle domain à convertir
      * @return la réponse DTO
      */
+    @Mapping(target = "formerTeammateHistories", ignore = true)
+    @Mapping(target = "SMSHistories", ignore = true)
+    @Mapping(target = "phone" , expression = "java(optionalPhoneToMaskedString(formerTeammate.phone()))")
     FormerTeammateResponse toResponse(FormerTeammate formerTeammate);
 
-    List<FormerTeammateResponse> toResponseList(List<FormerTeammate> formerTeammates);
 
+    @Mapping(target = "smsHistory", ignore = true)
+    @Mapping(target = "formerTeammateHistory", ignore = true)
+    @Mapping(target = "phone" , expression = "java(optionalPhoneToString(formerTeammate.phone()))")
     FormerTeammateEntity toEntity(FormerTeammate formerTeammate);
+
 
     FormerTeammate toModel(FormerTeammateEntity formerTeammateEntity);
 
-    // Conversions personnalisées si nécessaire
-    default Optional<String> stringToOptional(String value) {
-        return Optional.ofNullable(value);
-    }
 
-    default String optionalToString(Optional<String> optional) {
+    default <T> T map(Optional<T> optional) {
         return optional.orElse(null);
     }
 
-    default Optional<LocalDate> dateToOptional(LocalDate date) {
-        return Optional.ofNullable(date);
+
+    default String optionalPhoneToString(Optional<Phone> optionalPhone) {
+        return optionalPhone.map(Phone::getRawValue).orElse(null);
     }
 
-    default LocalDate optionalDateToDate(Optional<LocalDate> optionalDate) {
-        return optionalDate.orElse(null);
-    }
-
-    default Optional<Phone> phoneToOptional(String phone) {
-        if( phone == null) {
-            return Optional.empty();
-        }
-        return Optional.of(Phone.of(phone));
-    }
-
-    default String optionalPhoneToPhone(Optional<Phone> optionalPhone) {
+    default String optionalPhoneToMaskedString(Optional<Phone> optionalPhone) {
         return optionalPhone.map(Phone::toString).orElse(null);
     }
-
 
 
 }

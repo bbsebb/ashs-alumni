@@ -1,13 +1,12 @@
 package fr.hoenheimsports.app.services;
 
-import fr.hoenheimsports.domain.api.commands.ContextCommand;
+import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.api.commands.CurrentUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,14 +16,14 @@ import java.util.stream.Collectors;
 @Service
 public class SecurityContextService {
 
-    public ContextCommand getCurrentContext() {
+    public ContextDetails getCurrentContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return buildContextFromAuthentication(authentication);
     }
 
-    private ContextCommand buildContextFromAuthentication(Authentication authentication) {
+    private ContextDetails buildContextFromAuthentication(Authentication authentication) {
         if (!(authentication instanceof JwtAuthenticationToken jwtAuth) || !authentication.isAuthenticated()) {
-            return new ContextCommand(Optional.empty());
+            return new ContextDetails(Optional.empty());
         }
 
         Jwt jwt = jwtAuth.getToken();
@@ -37,7 +36,7 @@ public class SecurityContextService {
                 .collect(Collectors.toSet());
 
 
-        return new ContextCommand(
+        return new ContextDetails(
                 Optional.of(
                         new CurrentUser(id,username,roles)
                 )

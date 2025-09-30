@@ -1,0 +1,10 @@
+package fr.hoenheimsports.domain.services;
+
+import fr.hoenheimsports.domain.models.SMSHistory;
+
+import java.util.UUID;
+
+public interface SendSMSToValidateFormerTeammate {
+
+    SMSHistory sendSMS(String phoneNumber, String message, UUID formerTeammateId);
+}

@@ -1,10 +1,12 @@
 package fr.hoenheimsports.domain;
 
-import fr.hoenheimsports.domain.api.commands.ContextCommand;
+import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.api.commands.CurrentUser;
-import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationCommand;
+import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateAlreadyExistsException;
 import fr.hoenheimsports.domain.models.*;
+import fr.hoenheimsports.domain.services.FormerTeammateCreator;
+import fr.hoenheimsports.domain.services.validations.FormerTeammateUniquenessValidationService;
 import fr.hoenheimsports.domain.spi.stubs.FormerTeammateRepositoryStub;
 import fr.hoenheimsports.domain.spi.stubs.GenerateIdStub;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +44,8 @@ class FormerTeammateCreatorTest {
         GenerateIdStub idGenerator = new GenerateIdStub();
         
         // Create service under test
-        formerTeammateCreator = new FormerTeammateCreator(idGenerator, formerTeammateRepository);
+        var uniquenessValidationService = new FormerTeammateUniquenessValidationService(formerTeammateRepository);
+        formerTeammateCreator = new FormerTeammateCreator(idGenerator, formerTeammateRepository, uniquenessValidationService);
 
         // Setup test data
         UUID testId = UUID.randomUUID();
@@ -105,7 +108,7 @@ class FormerTeammateCreatorTest {
     @DisplayName("Should handle different gender values correctly")
     void shouldHandleDifferentGenders(Gender gender, String description) {
         // Given
-        var command = new FormerTeammateRegistrationCommand(
+        var command = new FormerTeammateRegistrationRequest(
                 gender,
                 testFirstName,
                 testLastName,
@@ -193,8 +196,8 @@ class FormerTeammateCreatorTest {
     }
 
     // Helper methods
-    private FormerTeammateRegistrationCommand createCommand(String firstName, String lastName, String phone, String email, LocalDate birthDate, List<Role> roles) {
-        return new FormerTeammateRegistrationCommand(
+    private FormerTeammateRegistrationRequest createCommand(String firstName, String lastName, String phone, String email, LocalDate birthDate, List<Role> roles) {
+        return new FormerTeammateRegistrationRequest(
                 Gender.MALE,
                 firstName,
                 lastName,
@@ -205,13 +208,13 @@ class FormerTeammateCreatorTest {
         );
     }
 
-    private ContextCommand createContextWithUser() {
+    private ContextDetails createContextWithUser() {
         var currentUser = new CurrentUser("user-id-" + "testUser", "testUser", Set.of());
-        return new ContextCommand(Optional.of(currentUser));
+        return new ContextDetails(Optional.of(currentUser));
     }
 
-    private ContextCommand createContextWithoutUser() {
-        return new ContextCommand(Optional.empty());
+    private ContextDetails createContextWithoutUser() {
+        return new ContextDetails(Optional.empty());
     }
 
     private FormerTeammate createTestFormerTeammate(String firstName, String lastName) {

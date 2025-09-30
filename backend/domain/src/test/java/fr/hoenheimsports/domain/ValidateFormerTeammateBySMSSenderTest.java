@@ -3,6 +3,7 @@ package fr.hoenheimsports.domain;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.models.SMSStatus;
+import fr.hoenheimsports.domain.services.ValidateFormerTeammateBySMSSender;
 import fr.hoenheimsports.domain.services.validations.PhoneValidationService;
 import fr.hoenheimsports.domain.spi.stubs.SMSHistoryRepositoryStub;
 import fr.hoenheimsports.domain.spi.stubs.SMSSenderStub;
