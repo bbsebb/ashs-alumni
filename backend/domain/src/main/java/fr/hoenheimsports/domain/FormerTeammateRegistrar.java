@@ -1,6 +1,7 @@
 package fr.hoenheimsports.domain;
 
 import fr.hoenheimsports.domain.annotations.UseCase;
+import fr.hoenheimsports.domain.api.commands.CurrentUser;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.services.*;
 import fr.hoenheimsports.domain.api.EditFormerTeammate;
@@ -86,7 +87,7 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
         var savedFormerTeammate = createInitialeFormerTeammate(formerTeammateRegistrationRequest,context);
 
         // Gestion SMS et mise à jour du statut
-        if (context.currentUser().isPresent()) {
+        if (context.currentUser().isPresent() && savedFormerTeammate.phone().isPresent()) {
             savedFormerTeammate = handleSMSValidation.handleSMSValidation(savedFormerTeammate, context.currentUser().get().username());
         }
 
@@ -109,7 +110,7 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
         var formerTeammate = createFormerTeammate.createFormerTeammate(command, context);
         
         // Création de l'entrée d'historique pour la création
-        var updatedBy = context.currentUser().isPresent() ? context.currentUser().get().username() : "Anonyme";
+        var updatedBy = context.currentUser().map(CurrentUser::username).orElse("Anonyme");
 
         createFormerTeammateHistory.createHistoryForCreation(formerTeammate, updatedBy, "Enregistrement initial");
         

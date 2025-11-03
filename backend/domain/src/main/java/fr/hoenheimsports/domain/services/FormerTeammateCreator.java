@@ -79,7 +79,7 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
         uniquenessValidationService.validatePhoneUniqueness(command.phone());
 
         var uuid = idGenerator.generateId();
-        var initialStatus = ContactStatus.SUBMITTED;
+        var initialStatus = command.phone() != null? ContactStatus.SUBMITTED : ContactStatus.UNREACHABLE;
         
         // Création de l'entité
         var formerTeammate = FormerTeammate.builder()

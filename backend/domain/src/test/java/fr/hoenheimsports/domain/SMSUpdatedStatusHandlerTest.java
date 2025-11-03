@@ -47,7 +47,7 @@ class SMSUpdatedStatusHandlerTest {
                 testFormerTeammateId,
                 "John",
                 "Doe",
-                Gender.MALE,
+                Gender.M,
                 Optional.of(new Phone("+33123456789")),
                 Optional.of("john.doe@test.com"),
                 Optional.of(LocalDate.of(1990, 1, 1)),

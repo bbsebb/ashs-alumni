@@ -4,34 +4,38 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import {provideRouter} from '@angular/router';
 
-import { routes } from './app.routes';
-import {provideHttpClient} from '@angular/common/http';
+import {routes} from './app.routes';
+import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
-import {FormerTeammatesGatewayStub} from '@app/domains/former-teammates/gateways/stub/former-teammates-gateway-stub';
-import {FORMER_TEAMMATE_HISTORY_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammate-history-gateway';
-import {
-  FormerTeammateHistoryGatewayStub
-} from '@app/domains/former-teammates/gateways/stub/former-teammate-history-gateway-stub';
 import {registerLocaleData} from '@angular/common';
 import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import localeFr from '@angular/common/locales/fr';
-import { provideKeycloak } from 'keycloak-angular';
+import {
+  createInterceptorCondition,
+  INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+  IncludeBearerTokenCondition,
+  includeBearerTokenInterceptor,
+  provideKeycloak
+} from 'keycloak-angular';
 import {environment} from '@environments/environment';
+import {FormerTeammatesGatewayImpl} from '@app/domains/former-teammates/gateways/former-teammates-gateway-impl';
 
 registerLocaleData(localeFr);
 
+const urlCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
+  urlPattern: new RegExp(`^${environment.apiUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\/.*)?$`, 'i'),
+  bearerPrefix: 'Bearer'
+});
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideNativeDateAdapter(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideAnimationsAsync(),
     provideKeycloak({
       config: {
         url: environment.keycloak.url,
@@ -43,15 +47,15 @@ export const appConfig: ApplicationConfig = {
         silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
       }
     }),
+    {
+      provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+      useValue: [urlCondition]
+    },
     { provide: LOCALE_ID, useValue: 'fr-FR' },
     { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
     {
       provide: FORMER_TEAMMATES_GATEWAY,
-      useClass: FormerTeammatesGatewayStub,
-    },
-    {
-      provide: FORMER_TEAMMATE_HISTORY_GATEWAY,
-      useClass: FormerTeammateHistoryGatewayStub,
+      useClass: FormerTeammatesGatewayImpl,
     }
   ]
 };

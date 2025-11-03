@@ -17,7 +17,7 @@ import org.springframework.context.annotation.FilterType;
         excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 FormerTeammateRepositoryStub.class,
                 GenerateIdStub.class,
-                //SMSSenderStub.class,
+                SMSSenderStub.class,
                 SMSHistoryRepositoryStub.class,
                 FormerTeammateHistoryRepositoryStub.class
         })}

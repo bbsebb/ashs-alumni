@@ -1,4 +1,4 @@
-import {Component, computed, inject, signal, Signal} from '@angular/core';
+import {Component, computed, effect, inject, signal, Signal} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatIconModule} from '@angular/material/icon';
@@ -10,8 +10,6 @@ import {CommonModule} from '@angular/common';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
-import {FormerTeammateHistoryStore} from '@app/domains/former-teammates/store/former-teammate-history-store';
-import {FormerTeammateHistory} from '@app/domains/former-teammates/models/former-teamate-history';
 import {ContactStatusChip} from '@app/shared/components/contact-status-chip/contact-status-chip';
 import {GenderIcon} from '@app/shared/components/gender-icon/gender-icon';
 import {ActionFormerTeammateHistoryPipe} from '@app/shared/pipes/action-former-teammate-history-pipe';
@@ -73,8 +71,10 @@ export class FormerCard {
   paramsRouteSignal = toSignal(inject(ActivatedRoute).params.pipe(), {requireSync: true});
   /** Signal containing the current former teammate data based on route parameters */
   formerTeammateSignal: Signal<FormerTeammate | undefined>;
-  /** Signal containing the history records for the current former teammate */
-  formerTeammateHistoriesSignal: Signal<FormerTeammateHistory[]>;
+  isRemovedFormerTeammateSignal = computed(
+    () => this.formerTeammateSignal()?.formerTeammateHistories?.some(
+      formerTeammateHistory => formerTeammateHistory.historyAction === 'REMOVED')
+  )
   /** Loading state signal for the former teammates resource */
   isLoading: Signal<boolean>;
   /** Error state signal for the former teammates resource */
@@ -89,20 +89,19 @@ export class FormerCard {
   private readonly router = inject(Router);
   /** Store for managing former teammates data */
   private readonly formerTeammatesStore = inject(FormerTeammatesStore);
-  /** Store for managing former teammate history records */
-  private readonly formerTeammateHistoriesStore = inject(FormerTeammateHistoryStore);
-  readonly historiesIsLoading = this.formerTeammateHistoriesStore.isLoading();
-  readonly historiesHasError = this.formerTeammateHistoriesStore.hasError();
+
 
   // ===== CONSTRUCTOR AND INITIALIZATION =====
 
   constructor() {
     // Initialize computed signals for teammate and their histories
     this.formerTeammateSignal = this.findFormerTeammate();
-    this.formerTeammateHistoriesSignal = computed(this.getFormerTeammateHistories());
 
     this.isLoading = this.formerTeammatesStore.isLoading();
-    this.hasError = this.formerTeammatesStore.hasError()
+    this.hasError = this.formerTeammatesStore.hasError();
+    effect(() => {
+      console.log('isRemovedFormerTeammateSignal', this.isRemovedFormerTeammateSignal());
+    });
 
   }
 
@@ -158,27 +157,6 @@ export class FormerCard {
         this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
       }
     });
-  }
-
-  /**
-   * Creates a computed function to retrieve former teammate histories
-   *
-   * @returns A function that returns the histories for the current teammate
-   *          or an empty array if no teammate ID is available
-   */
-  private getFormerTeammateHistories() {
-    return () => {
-      const formerTeammateId = this.formerTeammateSignal()?.id;
-
-      // Return an empty array if no teammate is selected
-      if (formerTeammateId === undefined) {
-        return [];
-      }
-
-      // Retrieve histories from the store and return the signal value
-      const formerTeammateHistoriesById = this.formerTeammateHistoriesStore.getFormerTeammateHistoriesById(formerTeammateId);
-      return formerTeammateHistoriesById();
-    };
   }
 
   // ===== PUBLIC METHODS - USER ACTIONS =====

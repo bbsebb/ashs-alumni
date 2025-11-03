@@ -34,10 +34,10 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
     }
 
     @Override
-    public List<FormerTeammate> findAllNotDeleted() {
+    public List<FormerTeammate> findAllActiveFormerTeammates() {
         // Get all teammate IDs that have a DELETED history action
         Set<UUID> deletedTeammateIds = historyStub.getAllSavedHistories().stream()
-                .filter(history -> history.historyAction() == HistoryAction.DELETED)
+                .filter(history -> history.historyAction() == HistoryAction.REMOVED)
                 .map(FormerTeammateHistory::formerTeammateId)
                 .collect(Collectors.toSet());
         
@@ -63,8 +63,12 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
     }
 
     @Override
-    public Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName) {
-        return storage.values().stream().filter(formerTeammate -> formerTeammate.firstName().equals(firstName) && formerTeammate.lastName().equals(lastName)).findFirst();
+    public Optional<FormerTeammate> findByFirstNameIgnoreCaseAndLastNameIgnoreCase(String firstName, String lastName) {
+        return storage.values().stream()
+                .filter(formerTeammate ->
+                        formerTeammate.firstName().equalsIgnoreCase(firstName) &&
+                                formerTeammate.lastName().equalsIgnoreCase(lastName))
+                .findFirst();
     }
 
     @Override
@@ -74,6 +78,7 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
                 .filter(formerTeammate -> hasMatchingPhone(formerTeammate, phone))
                 .findFirst();
     }
+
 
     private boolean hasMatchingPhone(FormerTeammate formerTeammate, Phone targetPhone) {
         return formerTeammate.phone()

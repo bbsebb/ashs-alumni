@@ -1,6 +1,6 @@
 import {Component, input} from '@angular/core';
-import {Gender} from '@app/domains/former-teammates/models/former-teammates';
 import {MatIcon} from '@angular/material/icon';
+import {Gender} from '@app/domains/former-teammates/models/gender';
 
 @Component({
   selector: 'app-gender-icon',

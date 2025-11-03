@@ -37,7 +37,7 @@ class FormerTeammateUpdaterTest {
                 .id(sampleId)
                 .firstName("Jean")
                 .lastName("Dupont")
-                .gender(Gender.MALE)
+                .gender(Gender.M)
                 .status(ContactStatus.PENDING)
                 .build();
     }
@@ -172,7 +172,7 @@ class FormerTeammateUpdaterTest {
                 .id(UUID.randomUUID())
                 .firstName("Marie")
                 .lastName("Martin")
-                .gender(Gender.FEMALE)
+                .gender(Gender.F)
                 .status(originalStatus)
                 .build();
 

@@ -30,27 +30,39 @@ public interface CreateFormerTeammateHistory {
     
     /**
      * Crée une entrée d'historique pour une action de création d'un ancien coéquipier.
-     * 
+     *
      * <p>Cette méthode enregistre la création initiale d'un FormerTeammate en
      * capturant son état au moment de la création avec l'action CREATED.</p>
-     * 
+     *
      * @param formerTeammate l'ancien coéquipier créé
-     * @param updatedBy l'identifiant de l'utilisateur ayant effectué l'action
-     * @param description la description de l'action de création
-     * @return l'entrée d'historique créée et sauvegardée
+     * @param updatedBy      l'identifiant de l'utilisateur ayant effectué l'action
+     * @param description    la description de l'action de création
      */
-    FormerTeammateHistory createHistoryForCreation(FormerTeammate formerTeammate, String updatedBy, String description);
+    void createHistoryForCreation(FormerTeammate formerTeammate, String updatedBy, String description);
     
     /**
      * Crée une entrée d'historique pour une action de mise à jour d'un ancien coéquipier.
-     * 
+     *
      * <p>Cette méthode enregistre une modification apportée à un FormerTeammate en
      * capturant son nouvel état avec l'action UPDATED.</p>
-     * 
+     *
      * @param formerTeammate l'ancien coéquipier mis à jour
-     * @param updatedBy l'identifiant de l'utilisateur ayant effectué l'action
-     * @param description la description de l'action de mise à jour
-     * @return l'entrée d'historique créée et sauvegardée
+     * @param updatedBy      l'identifiant de l'utilisateur ayant effectué l'action
+     * @param description    la description de l'action de mise à jour
      */
-    FormerTeammateHistory createHistoryForUpdate(FormerTeammate formerTeammate, String updatedBy, String description);
+    void createHistoryForUpdate(FormerTeammate formerTeammate, String updatedBy, String description);
+
+    /**
+     * Crée une entrée d'historique pour une action de suppression d'un ancien coéquipier.
+     *
+     * <p>Cette méthode enregistre la suppression logique d'un {@link FormerTeammate} en
+     * capturant son dernier état connu avec l'action {@link HistoryAction#REMOVE}.
+     * Elle permet de conserver une trace complète de l'entité et du contexte
+     * de suppression (qui, quand, pourquoi) afin d'assurer la traçabilité.</p>
+     *
+     * @param formerTeammateToRemove l'ancien coéquipier concerné par la suppression
+     * @param updatedBy              l'identifiant de l'utilisateur ayant effectué l'action
+     * @param description            la description de la raison ou du contexte de la suppression
+     */
+    void createHistoryForRemove(FormerTeammate formerTeammateToRemove, String updatedBy, String description);
 }

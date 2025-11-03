@@ -10,7 +10,7 @@ public interface FormerTeammateRepository {
 
     List<FormerTeammate> findAll();
 
-    List<FormerTeammate> findAllNotDeleted();
+    List<FormerTeammate> findAllActiveFormerTeammates();
 
     void deleteAll();
 
@@ -18,7 +18,9 @@ public interface FormerTeammateRepository {
 
     void deleteById(UUID id);
 
-    Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName);
+    Optional<FormerTeammate> findByFirstNameIgnoreCaseAndLastNameIgnoreCase(String firstName, String lastName);
 
     Optional<FormerTeammate> findByPhone(String phone);
+
+
 }

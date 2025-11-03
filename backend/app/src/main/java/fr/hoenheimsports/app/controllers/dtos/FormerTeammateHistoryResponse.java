@@ -5,6 +5,7 @@ import fr.hoenheimsports.domain.models.HistoryAction;
 import fr.hoenheimsports.domain.models.Role;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public record FormerTeammateHistoryResponse(
         LocalDate birthDateAtTime,
         List<Role> rolesAtTime,
         ContactStatus statusAtTime,
-        LocalDate updatedAt,
+        LocalDateTime updatedAt,
         HistoryAction historyAction,
         String updatedBy,
         String description

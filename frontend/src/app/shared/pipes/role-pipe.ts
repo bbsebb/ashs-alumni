@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {Role} from '@app/domains/former-teammates/models/former-teammates';
+import {Role} from '@app/domains/former-teammates/models/role';
+
 
 @Pipe({
   name: 'role'

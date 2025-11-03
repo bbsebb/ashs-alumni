@@ -9,5 +9,5 @@ public interface EditFormerTeammate {
     
 
 
-    FormerTeammate editFormerTeammate(FormerTeammate oldFormerTeammate, UpdateFormerTeammateRequest updateFormerTeammateRequest,ContextDetails context);
+    FormerTeammate editFormerTeammate(UpdateFormerTeammateRequest updateFormerTeammateRequest, ContextDetails context);
 }

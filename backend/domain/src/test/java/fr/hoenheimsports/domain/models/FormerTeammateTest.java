@@ -72,12 +72,12 @@ class FormerTeammateTest {
         UUID id3 = UUID.randomUUID();
 
         return Stream.of(
-                arguments("Required fields only", id1, "John", "Doe", Gender.MALE, 
+                arguments("Required fields only", id1, "John", "Doe", Gender.M,
                          null, null, null, null, ContactStatus.PENDING),
-                arguments("With all optional fields", id2, "Jane", "Smith", Gender.FEMALE, 
+                arguments("With all optional fields", id2, "Jane", "Smith", Gender.F,
                          "+33123456789", "jane.smith@example.com", LocalDate.of(1990, 1, 1), 
                          List.of(Role.ASSISTANT), ContactStatus.PENDING),
-                arguments("Mixed optional fields", id3, "Bob", "Wilson", Gender.MALE, 
+                arguments("Mixed optional fields", id3, "Bob", "Wilson", Gender.M,
                          "+33987654321", null, LocalDate.of(1985, 5, 15), 
                          List.of(Role.PLAYER, Role.COACH), ContactStatus.VALIDATED)
         );
@@ -104,7 +104,7 @@ class FormerTeammateTest {
         UUID validId = UUID.randomUUID();
         String validFirstName = "John";
         String validLastName = "Doe";
-        Gender validGender = Gender.MALE;
+        Gender validGender = Gender.M;
         ContactStatus validStatus = ContactStatus.PENDING;
 
         return Stream.of(
@@ -122,7 +122,7 @@ class FormerTeammateTest {
         UUID id = UUID.randomUUID();
         String firstName = "John";
         String lastName = "Doe";
-        Gender gender = Gender.MALE;
+        Gender gender = Gender.M;
         ContactStatus status = ContactStatus.PENDING;
 
         FormerTeammate teammate = FormerTeammate.builder()
@@ -142,7 +142,7 @@ class FormerTeammateTest {
         UUID id = UUID.randomUUID();
         String firstName = "John";
         String lastName = "Doe";
-        Gender gender = Gender.MALE;
+        Gender gender = Gender.M;
         ContactStatus status = ContactStatus.PENDING;
 
         FormerTeammate teammate = new FormerTeammate(
@@ -175,7 +175,7 @@ class FormerTeammateTest {
         UUID validId = UUID.randomUUID();
         String validFirstName = "John";
         String validLastName = "Doe";
-        Gender validGender = Gender.MALE;
+        Gender validGender = Gender.M;
         ContactStatus validStatus = ContactStatus.PENDING;
 
         return Stream.of(
@@ -194,7 +194,7 @@ class FormerTeammateTest {
         UUID validId = UUID.randomUUID();
         String validFirstName = "John";
         String validLastName = "Doe";
-        Gender validGender = Gender.MALE;
+        Gender validGender = Gender.M;
         ContactStatus validStatus = ContactStatus.PENDING;
 
         Exception exception = assertThrows(MissingRequiredFieldException.class, () ->
@@ -217,7 +217,7 @@ class FormerTeammateTest {
         UUID id = UUID.randomUUID();
         String firstName = "John";
         String lastName = "Doe";
-        Gender gender = Gender.MALE;
+        Gender gender = Gender.M;
         ContactStatus status = ContactStatus.PENDING;
 
         FormerTeammate teammate = new FormerTeammate(
@@ -233,7 +233,7 @@ class FormerTeammateTest {
         UUID id = UUID.randomUUID();
         String firstName = "John";
         String lastName = "Doe";
-        Gender gender = Gender.MALE;
+        Gender gender = Gender.M;
         ContactStatus originalStatus = ContactStatus.PENDING;
         ContactStatus newStatus = ContactStatus.VALIDATED;
 
@@ -274,7 +274,7 @@ class FormerTeammateTest {
                 .id(id)
                 .firstName("John")
                 .lastName("Doe")
-                .gender(Gender.MALE)
+                .gender(Gender.M)
                 .status(ContactStatus.PENDING)
                 .build();
 
@@ -293,7 +293,7 @@ class FormerTeammateTest {
                 .id(id)
                 .firstName("Jane")
                 .lastName("Smith")
-                .gender(Gender.FEMALE)
+                .gender(Gender.F)
                 .status(fromStatus)
                 .build();
 

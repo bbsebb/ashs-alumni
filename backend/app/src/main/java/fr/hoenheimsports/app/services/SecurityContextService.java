@@ -29,7 +29,7 @@ public class SecurityContextService {
         Jwt jwt = jwtAuth.getToken();
 
         String id = jwt.getSubject();
-        String username = jwt.getClaimAsString("preferred_username");
+        String username = jwt.getClaimAsString("name");
         Set<String> roles = jwtAuth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .map(role -> role.replace("ROLE_", ""))

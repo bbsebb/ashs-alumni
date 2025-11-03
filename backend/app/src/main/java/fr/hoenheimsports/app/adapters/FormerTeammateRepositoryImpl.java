@@ -32,8 +32,8 @@ private final FormerTeammateMapper formerTeammateMapper;
     }
 
     @Override
-    public List<FormerTeammate> findAllNotDeleted() {
-        return formerTeammateEntityRepository.findAllNotDeleted().stream().map(formerTeammateMapper::toModel).toList();
+    public List<FormerTeammate> findAllActiveFormerTeammates() {
+        return formerTeammateEntityRepository.findAllActiveFormerTeammate().stream().map(formerTeammateMapper::toModel).toList();
     }
 
     @Override
@@ -53,12 +53,14 @@ private final FormerTeammateMapper formerTeammateMapper;
     }
 
     @Override
-    public Optional<FormerTeammate> findByFirstNameAndLastName(String firstName, String lastName) {
-        return formerTeammateEntityRepository.findByFirstNameAndLastName(firstName,lastName).map(formerTeammateMapper::toModel);
+    public Optional<FormerTeammate> findByFirstNameIgnoreCaseAndLastNameIgnoreCase(String firstName, String lastName) {
+        return formerTeammateEntityRepository.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName,lastName).map(formerTeammateMapper::toModel);
     }
 
     @Override
     public Optional<FormerTeammate> findByPhone(String phone) {
         return formerTeammateEntityRepository.findByPhone(phone).map(formerTeammateMapper::toModel);
     }
+
+
 }

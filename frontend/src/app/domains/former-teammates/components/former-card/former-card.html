@@ -52,36 +52,31 @@
 
 
         <!-- History Section -->
-        @if (historiesIsLoading()) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        } @else if (historiesHasError()) {
-          <app-load-error message="L'historique n'a pas pu être récupéré"></app-load-error>
-        } @else {
-          <mat-divider></mat-divider>
-          <section>
-            <mat-expansion-panel [expanded]="true">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <mat-icon>history</mat-icon>
-                  Historique des modifications
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <div class="history-list">
-                @for (formerTeammateHistory of formerTeammateHistoriesSignal(); track formerTeammateHistory.id) {
-                  <article class="history-item">
-                    <p><strong>Action:</strong> {{ formerTeammateHistory.action | actionFormerTeammateHistory }}</p>
-                    <p><strong>Date:</strong> {{ formerTeammateHistory.changedAt | date:'EEEE d MMMM y, HH:mm' }}</p>
-                    <p><strong>Par:</strong> {{ formerTeammateHistory.changedByUserName ?? 'utilisateur non inscrit' }}
-                    </p>
-                  </article>
-                  <mat-divider></mat-divider>
-                } @empty {
-                  <p>Aucun historique</p>
-                }
-              </div>
-            </mat-expansion-panel>
-          </section>
-        }
+        <mat-divider></mat-divider>
+        <section>
+          <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>history</mat-icon>
+                Historique des modifications
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="history-list">
+              @for (formerTeammateHistory of formerTeammateSignal()?.formerTeammateHistories; track formerTeammateHistory.id) {
+                <article class="history-item">
+                  <p><strong>Action:</strong> {{ formerTeammateHistory.historyAction | actionFormerTeammateHistory | uppercase}}</p>
+                  <p><strong>Date:</strong> {{ formerTeammateHistory.updatedAt | date:'EEEE d MMMM y, HH:mm' }}</p>
+                  <p><strong>Description:</strong> {{ formerTeammateHistory.description}}</p>
+                  <p><strong>Par:</strong> {{ formerTeammateHistory.updatedBy}}</p>
+                </article>
+
+                <mat-divider></mat-divider>
+              } @empty {
+                <p>Aucun historique</p>
+              }
+            </div>
+          </mat-expansion-panel>
+        </section>
       </mat-card-content>
       @if (isDeleting()) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -90,12 +85,14 @@
       }
       <mat-card-actions>
         <app-back-button link='/former-teammates'/>
-        <a mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true"
-           [routerLink]="['/former-teammates/edit',formerTeammate.id]" [disabled]="isDeleting()">Modifier</a>
-        <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="delete()" [disabled]="isDeleting()">
-          Supprimer
-        </button>
-        <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" [disabled]="isDeleting()">Renvoyer SMS</button>
+        @if(!isRemovedFormerTeammateSignal()) {
+          <a mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true"
+             [routerLink]="['/former-teammates/edit',formerTeammate.id]" [disabled]="isDeleting()">Modifier</a>
+          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="delete()" [disabled]="isDeleting()">
+            Supprimer
+          </button>
+          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" [disabled]="isDeleting()">Renvoyer SMS</button>
+        }
       </mat-card-actions>
     </mat-card>
   }

@@ -4,6 +4,7 @@ import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
+import fr.hoenheimsports.domain.models.SMSHistory;
 
 /**
  * Service de gestion de la validation par SMS des anciens coéquipiers.
@@ -39,6 +40,8 @@ import fr.hoenheimsports.domain.models.FormerTeammate;
  */
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
+    private static final String SMS_VALIDATION_MESSAGE = "message test du sms"; // TODO: Finaliser le message de validation
+
     private final UpdateFormerTeammate updateFormerTeammate;
     private final SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate;
     private final CreateFormerTeammateHistory createFormerTeammateHistory;
@@ -87,20 +90,61 @@ public class SMSValidationHandler implements HandleSMSValidation{
      * @throws NullPointerException si formerTeammate ou updatedBy est null
      */
     @Override
-    public FormerTeammate handleSMSValidation(FormerTeammate formerTeammate,String updatedBy) {
-        var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(formerTeammate.phone().orElseThrow().toString(), "message test du sms", formerTeammate.id());
+    public FormerTeammate handleSMSValidation(FormerTeammate formerTeammate, String updatedBy) {
+        var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(
+                formerTeammate.phone().orElseThrow().getRawValue(),
+                SMS_VALIDATION_MESSAGE,
+                formerTeammate.id()
+        );
 
-        var newStatus = smsHistory.hasFailed() ? ContactStatus.UNREACHABLE : ContactStatus.PENDING;
-        var oldFormerTeammateStatus = formerTeammate.status();
-
-        // Mise à jour du statut via l'API dédiée
+        var newStatus = determineNewStatus(smsHistory);
+        var previousStatus = formerTeammate.status();
         var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, newStatus);
 
-        // Création de l'entrée d'historique pour la mise à jour
-        var description = "Modification du status de %s à %s".formatted(oldFormerTeammateStatus, newStatus);
-        createFormerTeammateHistory.createHistoryForUpdate(updatedFormerTeammate, updatedBy, description);
-
+        recordStatusChangeHistory(updatedFormerTeammate, updatedBy, previousStatus, newStatus);
 
         return updatedFormerTeammate;
+    }
+
+    /**
+     * Détermine le nouveau statut de contact basé sur le résultat de l'envoi du SMS.
+     *
+     * @param smsHistory l'historique du SMS envoyé
+     * @return UNREACHABLE si l'envoi a échoué, PENDING sinon
+     */
+    private ContactStatus determineNewStatus(SMSHistory smsHistory) {
+        return smsHistory.hasFailed() ? ContactStatus.UNREACHABLE : ContactStatus.PENDING;
+    }
+
+    /**
+     * Enregistre l'historique du changement de statut si celui-ci a été modifié.
+     *
+     * @param formerTeammate l'ancien coéquipier mis à jour
+     * @param updatedBy l'utilisateur ayant effectué la modification
+     * @param previousStatus le statut précédent
+     * @param newStatus le nouveau statut
+     */
+    private void recordStatusChangeHistory(FormerTeammate formerTeammate, String updatedBy,
+                                           ContactStatus previousStatus, ContactStatus newStatus) {
+        if (!previousStatus.equals(newStatus)) {
+            String description = createHistoryDescription(newStatus);
+            createFormerTeammateHistory.createHistoryForUpdate(formerTeammate, updatedBy, description);
+        }
+    }
+
+    /**
+     * Crée la description de l'historique en fonction du nouveau statut.
+     *
+     * @param newStatus le nouveau statut de contact
+     * @return la description formatée pour l'historique
+     */
+    private String createHistoryDescription(ContactStatus newStatus) {
+        return switch (newStatus) {
+            case PENDING -> "Transition du status vers → EN ATTENTE : SMS de validation envoyé avec succès. " +
+                    "En attente de la confirmation du contact.";
+            case UNREACHABLE -> "Transition du status vers → INJOIGNABLE : Échec de l'envoi du SMS. " +
+                    "Le numéro de téléphone fourni est invalide ou absent.";
+            default -> "Changement de statut vers " + newStatus;
+        };
     }
 }

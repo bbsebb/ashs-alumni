@@ -68,7 +68,7 @@ class FormerTeammateHistoryTest {
                 arguments("Only required fields", id, formerTeammateId, null, null, null, 
                          List.of(), ContactStatus.PENDING, now, HistoryAction.UPDATED, "admin", "Status update"),
                 arguments("With empty roles list", id, formerTeammateId, null, null, null,
-                         List.of(), ContactStatus.SUBMITTED, now, HistoryAction.DELETED, "system", "Cleanup operation")
+                         List.of(), ContactStatus.SUBMITTED, now, HistoryAction.REMOVE, "system", "Cleanup operation")
         );
     }
 
@@ -300,7 +300,7 @@ class FormerTeammateHistoryTest {
         return Stream.of(
                 arguments("CREATED", HistoryAction.CREATED),
                 arguments("UPDATED", HistoryAction.UPDATED),
-                arguments("DELETED", HistoryAction.DELETED)
+                arguments("DELETED", HistoryAction.REMOVE)
         );
     }
 }

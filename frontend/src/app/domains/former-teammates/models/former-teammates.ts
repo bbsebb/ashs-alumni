@@ -1,16 +1,24 @@
 import {UUID} from '@app/shared/types/uuid';
+import {FormerTeammateHistory} from '@app/domains/former-teammates/models/former-teamate-history';
+import {Gender} from '@app/domains/former-teammates/models/gender';
+import {Role} from '@app/domains/former-teammates/models/role';
+import {ContactStatus} from '@app/domains/former-teammates/models/contact-status';
+import {SMSHistory} from '@app/domains/former-teammates/models/sms-history';
 
-export type ContactStatus = 'SUBMITTED' | 'PENDING' | 'VALIDATED' | 'NOT_REQUESTED' | 'UNREACHABLE';
-export type Role = 'PLAYER' | 'COACH' | 'PRESIDENT' | 'ASSISTANT';
-export type Gender = "M" | "F";
+
+
+
 
 export interface FormerTeammate {
-  id: Readonly<UUID>;                    // UUID
+  id: Readonly<UUID>;
   firstName: string;
   lastName: string;
   gender: Gender;
   phone?: string;
-  birthDate?: Date;            // format ISO (YYYY-MM-DD)
+  email?: string;
+  birthDate?: Date;          // format ISO (YYYY-MM-DD)
   roles: Role[];
   status: ContactStatus;
+  formerTeammateHistories?: FormerTeammateHistory[];
+  SMSHistories?: SMSHistory[];
 }

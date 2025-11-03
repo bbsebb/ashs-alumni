@@ -4,12 +4,14 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateRequest;
 import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.entities.FormerTeammateEntity;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
+import fr.hoenheimsports.domain.api.commands.UpdateFormerTeammateRequest;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.Phone;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public interface FormerTeammateMapper {
@@ -56,4 +58,18 @@ public interface FormerTeammateMapper {
     }
 
 
+    default UpdateFormerTeammateRequest toUpdateRequest(String id, FormerTeammateRequest formerTeammateRequest) {
+        var formerTeammateRegistrationRequest = toRegistrationRequest(formerTeammateRequest);
+        var uuid = UUID.fromString(id);
+        return new UpdateFormerTeammateRequest(
+                uuid,
+                formerTeammateRegistrationRequest.firstName(),
+                formerTeammateRegistrationRequest.lastName(),
+                formerTeammateRegistrationRequest.gender(),
+                formerTeammateRegistrationRequest.phone(),
+                formerTeammateRegistrationRequest.email(),
+                formerTeammateRegistrationRequest.birthDate(),
+                formerTeammateRegistrationRequest.roles()
+        );
+    }
 }

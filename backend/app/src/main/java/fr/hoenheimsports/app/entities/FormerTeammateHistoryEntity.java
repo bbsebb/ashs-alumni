@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class FormerTeammateHistoryEntity {
     ContactStatus statusAtTime;
 
     @Column(name = "updated_at", nullable = false)
-    LocalDate updatedAt;
+    LocalDateTime updatedAt;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "history_action", nullable = false)

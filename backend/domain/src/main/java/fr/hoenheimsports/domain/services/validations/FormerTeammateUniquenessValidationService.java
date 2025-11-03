@@ -32,9 +32,9 @@ public class FormerTeammateUniquenessValidationService {
      * @throws FormerTeammateAlreadyExistsException si un contact existe déjà avec ces nom et prénom
      */
     public void validateNameUniqueness(String firstName, String lastName) {
-        formerTeammateRepository.findByFirstNameAndLastName(firstName, lastName).ifPresent(formerTeammate -> {
+        formerTeammateRepository.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName).ifPresent(formerTeammate -> {
             throw new FormerTeammateAlreadyExistsException(
-                    "Le contact existe déjà; id: %s".formatted(formerTeammate.id())
+                    "Le contact existe déjà; id: %s".formatted(formerTeammate.firstName() + " " + formerTeammate.lastName())
             );
         });
     }

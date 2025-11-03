@@ -238,7 +238,7 @@ class FormerTeammateRegistrarIntegrationTest {
 
     private FormerTeammateRegistrationRequest createRegistrationCommand(String firstName, String lastName, String phone, String email) {
         return new FormerTeammateRegistrationRequest(
-            Gender.MALE,
+            Gender.M,
             firstName,
             lastName,
             email,

@@ -5,8 +5,10 @@ import fr.hoenheimsports.domain.models.Role;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public record UpdateFormerTeammateRequest(
+        UUID formerTeammateId,
         String newFirstName,
         String newLastName,
         Gender newGender,

@@ -1,6 +1,5 @@
 package fr.hoenheimsports.domain.services;
 
-import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException;
 import fr.hoenheimsports.domain.models.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +50,7 @@ class SMSValidationHandlerTest {
                 testFormerTeammateId,
                 "John",
                 "Doe",
-                Gender.MALE,
+                Gender.M,
                 Optional.of(new Phone("+33123456789")),
                 Optional.of("john.doe@test.com"),
                 Optional.of(LocalDate.of(1990, 1, 1)),
@@ -125,7 +124,7 @@ class SMSValidationHandlerTest {
                 testFormerTeammateId,
                 "John",
                 "Doe",
-                Gender.MALE,
+                Gender.M,
                 Optional.of(new Phone("+33123456789")),
                 Optional.of("john.doe@test.com"),
                 Optional.of(LocalDate.of(1990, 1, 1)),
@@ -152,7 +151,7 @@ class SMSValidationHandlerTest {
                 testFormerTeammateId,
                 "John",
                 "Doe",
-                Gender.MALE,
+                Gender.M,
                 Optional.empty(),
                 Optional.of("john.doe@test.com"),
                 Optional.of(LocalDate.of(1990, 1, 1)),
@@ -295,27 +294,44 @@ class SMSValidationHandlerTest {
         private final List<FormerTeammateHistory> createdHistories = new java.util.ArrayList<>();
 
         @Override
-        public FormerTeammateHistory createHistoryForCreation(FormerTeammate formerTeammate, String updatedBy, String description) {
+        public void createHistoryForCreation(FormerTeammate formerTeammate, String updatedBy, String description) {
             throw new UnsupportedOperationException("Not used in SMS validation handler");
         }
 
         @Override
-        public FormerTeammateHistory createHistoryForUpdate(FormerTeammate formerTeammate, String updatedBy, String description) {
-            FormerTeammateHistory history = new FormerTeammateHistory(
-                    UUID.randomUUID(),
-                    formerTeammate.id(),
-                    formerTeammate.phone(),
-                    formerTeammate.email(),
-                    formerTeammate.birthDate(),
-                    formerTeammate.roles(),
-                    formerTeammate.status(),
-                    java.time.LocalDate.now(),
-                    HistoryAction.UPDATED,
-                    updatedBy,
-                    description
-            );
+        public void createHistoryForUpdate(FormerTeammate formerTeammate, String updatedBy, String description) {
+            FormerTeammateHistory history = FormerTeammateHistory.builder()
+                    .id(UUID.randomUUID())
+                    .formerTeammateId(formerTeammate.id())
+                    .phoneAtTime(formerTeammate.phone().orElse(null))
+                    .emailAtTime(formerTeammate.email().orElse(null))
+                    .birthDateAtTime(formerTeammate.birthDate().orElse(null))
+                    .rolesAtTime(formerTeammate.roles())
+                    .statusAtTime(formerTeammate.status())
+                    .updatedAt(java.time.LocalDateTime.now())
+                    .historyAction(HistoryAction.UPDATED)
+                    .updatedBy(updatedBy)
+                    .description(description)
+                    .build();
             createdHistories.add(history);
-            return history;
+        }
+
+        @Override
+        public void createHistoryForRemove(FormerTeammate formerTeammate, String updatedBy, String description) {
+            FormerTeammateHistory history = FormerTeammateHistory.builder()
+                    .id(UUID.randomUUID())
+                    .formerTeammateId(formerTeammate.id())
+                    .phoneAtTime(formerTeammate.phone().orElse(null))
+                    .emailAtTime(formerTeammate.email().orElse(null))
+                    .birthDateAtTime(formerTeammate.birthDate().orElse(null))
+                    .rolesAtTime(formerTeammate.roles())
+                    .statusAtTime(formerTeammate.status())
+                    .updatedAt(java.time.LocalDateTime.now())
+                    .historyAction(HistoryAction.REMOVE)
+                    .updatedBy(updatedBy)
+                    .description(description)
+                    .build();
+            createdHistories.add(history);
         }
 
         public List<FormerTeammateHistory> getCreatedHistories() {

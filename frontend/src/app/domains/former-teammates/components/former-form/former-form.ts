@@ -1,14 +1,16 @@
 import {Component, effect, inject, input, output} from '@angular/core';
 import {FormControl, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatError, MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
+import {MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix, MatSuffix} from '@angular/material/input';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import {Gender, Role} from '@app/domains/former-teammates/models/former-teammates';
 import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {BackButton} from '@app/shared/components/back-button/back-button';
 import {MatButton} from '@angular/material/button';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatDivider} from '@angular/material/divider';
+import {Role} from '@app/domains/former-teammates/models/role';
+import {Gender} from '@app/domains/former-teammates/models/gender';
+import {PhoneUtils} from '@app/shared/utils/phone-utils';
 
 /**
  * Component for creating and editing former teammates.
@@ -33,7 +35,8 @@ import {MatDivider} from '@angular/material/divider';
     BackButton,
     MatButton,
     MatProgressBar,
-    MatDivider
+    MatDivider,
+    MatPrefix
   ],
   templateUrl: './former-form.html',
   styleUrl: './former-form.scss',
@@ -87,22 +90,24 @@ export class FormerForm {
 
   }
 
-  // ===========================
-  // PRIVATE METHODS
-  // ===========================
-
   /**
    * Handles form submission for both create and update operations.
    * Validates form data and call the appropriate store method based on the current mode.
    * Shows success/error notifications and navigates to the teammate detail page on success.
    */
   onSubmit(): void {
-
-
     if (this.formerForm.valid) {
-      this.formerTeammateFormValueSubmitted.emit(this.formerForm.getRawValue());
+      const formValue = this.formerForm.getRawValue();
+      formValue.phone = PhoneUtils.formatPhoneNumberWithPrefix(formValue.phone);
+      this.formerTeammateFormValueSubmitted.emit(formValue);
     }
   }
+
+  // ===========================
+  // PRIVATE METHODS
+  // ===========================
+
+
 
   /**
    * Populates form fields with data from the teammate being edited.
@@ -116,7 +121,7 @@ export class FormerForm {
       gender: formerTeammateFormValue.gender,
       firstName: formerTeammateFormValue.firstName,
       lastName: formerTeammateFormValue.lastName,
-      phone: formerTeammateFormValue.phone,
+      phone: PhoneUtils.removePhoneNumberPrefix(formerTeammateFormValue.phone),
       birthDate: formerTeammateFormValue.birthDate,
       roles: formerTeammateFormValue.roles,
     });

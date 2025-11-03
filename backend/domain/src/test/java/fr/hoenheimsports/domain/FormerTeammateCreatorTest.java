@@ -198,7 +198,7 @@ class FormerTeammateCreatorTest {
     // Helper methods
     private FormerTeammateRegistrationRequest createCommand(String firstName, String lastName, String phone, String email, LocalDate birthDate, List<Role> roles) {
         return new FormerTeammateRegistrationRequest(
-                Gender.MALE,
+                Gender.M,
                 firstName,
                 lastName,
                 email,
@@ -220,7 +220,7 @@ class FormerTeammateCreatorTest {
     private FormerTeammate createTestFormerTeammate(String firstName, String lastName) {
         return FormerTeammate.builder()
                 .id(UUID.randomUUID())
-                .gender(Gender.MALE)
+                .gender(Gender.M)
                 .firstName(firstName)
                 .lastName(lastName)
                 .status(ContactStatus.SUBMITTED)
@@ -230,7 +230,7 @@ class FormerTeammateCreatorTest {
     private FormerTeammate createTestFormerTeammateWithPhone(String phone) {
         return FormerTeammate.builder()
                 .id(UUID.randomUUID())
-                .gender(Gender.MALE)
+                .gender(Gender.M)
                 .firstName("Jane")
                 .lastName("Smith")
                 .phone(phone)
@@ -240,8 +240,8 @@ class FormerTeammateCreatorTest {
 
     static Stream<Arguments> provideGenderScenarios() {
         return Stream.of(
-                Arguments.of(Gender.MALE, "Male gender"),
-                Arguments.of(Gender.FEMALE, "Female gender")
+                Arguments.of(Gender.M, "Male gender"),
+                Arguments.of(Gender.F, "Female gender")
         );
     }
 

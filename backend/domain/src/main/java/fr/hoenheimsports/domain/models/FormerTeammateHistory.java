@@ -5,6 +5,7 @@ import fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException;
 import fr.hoenheimsports.domain.services.validations.FieldValidationService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public record FormerTeammateHistory(
         Optional<LocalDate> birthDateAtTime,
         List<Role> rolesAtTime,
         ContactStatus statusAtTime,
-        LocalDate updatedAt,
+        LocalDateTime updatedAt,
         HistoryAction historyAction,
         String updatedBy,
         String description
@@ -86,7 +87,7 @@ public record FormerTeammateHistory(
         private LocalDate birthDateAtTime;
         private List<Role> rolesAtTime = new ArrayList<>();
         private ContactStatus statusAtTime;
-        private LocalDate updatedAt;
+        private LocalDateTime updatedAt;
         private HistoryAction historyAction;
         private String updatedBy;
         private String description;
@@ -195,7 +196,7 @@ public record FormerTeammateHistory(
          * @param updatedAt the update date
          * @return this builder instance for method chaining
          */
-        public Builder updatedAt(LocalDate updatedAt) {
+        public Builder updatedAt(LocalDateTime updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }

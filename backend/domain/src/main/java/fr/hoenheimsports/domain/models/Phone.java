@@ -24,7 +24,7 @@ public record Phone(String value) {
     }
 
     /**
-     * Returns the phone number value in normalized format.
+     * Returns the phone number value a masked format for privacy protection.
      *
      * @return the phone number as a string without spaces or dashes
      */
@@ -33,6 +33,7 @@ public record Phone(String value) {
         return toMaskedFormat();
 
     }
+
 
     /**
      * Returns the phone number in a masked format for privacy protection.
@@ -50,17 +51,10 @@ public record Phone(String value) {
         // Extraire les 3 derniers chiffres
         String lastThree = value.substring(value.length() - 3);
 
-        // Calculer la partie à masquer (tout sauf les 3 derniers)
-        String prefix = value.substring(0, value.length() - 3);
+        // Garder tout le début sauf les 3 derniers chiffres (moins les 3 étoiles)
+        String visiblePrefix = value.substring(0, value.length() - 6);
 
-        // Déterminer combien de chiffres masquer (minimum 3 étoiles)
-        int digitsToMask = Math.max(3, Math.min(6, prefix.length() - 3));
-
-        // Garder le début (indicatif pays + premiers chiffres) et masquer le milieu
-        String visiblePrefix = prefix.substring(0, prefix.length() - digitsToMask);
-        String maskedPart = "*".repeat(digitsToMask);
-
-        return visiblePrefix + maskedPart + lastThree;
+        return visiblePrefix + "***" + lastThree;
     }
 
     /**
@@ -74,25 +68,6 @@ public record Phone(String value) {
         return value;
     }
 
-
-
-    /**
-     * Returns the phone number in a formatted display version.
-     * This method can be used to display the phone number in a more readable format.
-     *
-     * @return the formatted phone number for display
-     */
-    public String toDisplayFormat() {
-        if (value.startsWith("+33")) {
-            // Format français: +33 1 23 45 67 89
-            return value.replaceFirst("^(\\+33)(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})$", "$1 $2 $3 $4 $5 $6");
-        } else if (value.startsWith("+1")) {
-            // Format américain/canadien: +1 234 567 8900
-            return value.replaceFirst("^(\\+1)(\\d{3})(\\d{3})(\\d{4})$", "$1 $2 $3 $4");
-        }
-        // Format générique : +XX XXX XXX XXX
-        return value.replaceFirst("^(\\+\\d{1,3})(\\d{3})(\\d{3})(\\d+)$", "$1 $2 $3 $4");
-    }
 
     /**
      * Creates a Phone instance from a string value.

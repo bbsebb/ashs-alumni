@@ -1,39 +1,42 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {FormerTeammatesGateway} from './former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
 import {CreateFormerTeammate} from '../dto/payloads/createFormerTeammate';
 import {UpdateFormerTeammate} from '../dto/payloads/updateFormerTeammate';
 import {FormerTeammate} from '../models/former-teammates';
-import {HttpResourceRef} from '@angular/common/http';
+import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {environment} from '@environments/environment.development';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
+  private readonly httpClient = inject(HttpClient);
   getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined> {
-    throw new Error("Method not implemented.");
+    return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/${id}`)
   }
 
   getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined> {
-    throw new Error("Method not implemented.");
+    return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/code/${code}`)
   }
 
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammate> {
-    throw new Error('Method not implemented.');
+    return this.httpClient.post<FormerTeammate>(`${environment.apiUrl}/former-teammates`, createFormerTeammate)
   }
 
   updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {
-    throw new Error('Method not implemented.');
+    return this.httpClient.put<FormerTeammate>(`${environment.apiUrl}/former-teammates/${updateFormerTeammate.id}`, updateFormerTeammate)
   }
 
   deleteFormerTeammate(formerTeammateId: UUID): Observable<void> {
-    throw new Error('Method not implemented.');
+    return this.httpClient.delete<void>(`${environment.apiUrl}/former-teammates/${formerTeammateId}`)
   }
 
   getFormerTeammates(): HttpResourceRef<FormerTeammate[] | undefined> {
-    throw new Error('Method not implemented.');
+    return httpResource<FormerTeammate[] | undefined>(() =>
+      `${environment.apiUrl}/former-teammates?isActive=true`)
   }
 
 }

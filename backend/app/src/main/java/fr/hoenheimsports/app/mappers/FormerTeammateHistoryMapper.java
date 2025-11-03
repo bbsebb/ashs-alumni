@@ -49,6 +49,9 @@ public interface FormerTeammateHistoryMapper {
     }
 
     default Phone map(String value) {
+        if (value == null) {
+            return null;
+        }
         return Phone.of(value);
     }
 

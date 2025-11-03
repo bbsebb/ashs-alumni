@@ -21,7 +21,8 @@ public class FormerTeammateRetriever implements GetFormerTeammates {
     }
 
     @Override
-    public List<FormerTeammate> findAllNotDeletedFormerTeammates() {
-        return this.formerTeammateRepository.findAllNotDeleted();
+    public List<FormerTeammate> findAllActiveFormerTeammates() {
+        return this.formerTeammateRepository.findAllActiveFormerTeammates();
     }
+
 }

@@ -1,10 +1,10 @@
 import {Component, input} from '@angular/core';
 import {MatChip, MatChipSet} from '@angular/material/chips';
 import {ContactStatusPipe} from '@app/shared/pipes/contact-status-pipe';
-import {ContactStatus} from '@app/domains/former-teammates/models/former-teammates';
 import {UpperCasePipe} from '@angular/common';
 import {ContactStatusDetailPipe} from '@app/shared/pipes/contact-status-detail-pipe';
 import {MatTooltip} from '@angular/material/tooltip';
+import {ContactStatus} from '@app/domains/former-teammates/models/contact-status';
 
 @Component({
   selector: 'app-contact-status-chip',
