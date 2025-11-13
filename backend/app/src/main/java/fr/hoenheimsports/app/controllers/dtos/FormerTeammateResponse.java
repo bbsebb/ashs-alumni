@@ -1,10 +1,8 @@
 package fr.hoenheimsports.app.controllers.dtos;
 
 import fr.hoenheimsports.domain.models.ContactStatus;
-import fr.hoenheimsports.domain.models.FormerTeammateHistory;
 import fr.hoenheimsports.domain.models.Gender;
 import fr.hoenheimsports.domain.models.Role;
-import lombok.Builder;
 
 import java.time.LocalDate;
 import java.util.List;

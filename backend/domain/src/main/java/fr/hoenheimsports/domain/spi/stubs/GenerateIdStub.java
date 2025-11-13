@@ -7,7 +7,12 @@ import java.util.UUID;
 public class GenerateIdStub implements IdGenerator {
 
     @Override
-    public UUID generateId() {
+    public UUID generateUUID() {
         return UUID.randomUUID();
+    }
+
+    @Override
+    public String generateCode(int size) {
+        return "AAAAAA";
     }
 }

@@ -1,16 +1,14 @@
 package fr.hoenheimsports.app.controllers.dtos;
 
-import fr.hoenheimsports.app.controllers.validators.ValidPhone;
-import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.Gender;
 import fr.hoenheimsports.domain.models.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 public record FormerTeammateRequest(
         @NotBlank(message = "Le prénom est obligatoire")
@@ -22,6 +20,7 @@ public record FormerTeammateRequest(
         String phone,
         @Email(message = "L'adresse email est invalide")
         String email,
+        @Past
         LocalDate birthDate,
         List<Role> roles
 ) {

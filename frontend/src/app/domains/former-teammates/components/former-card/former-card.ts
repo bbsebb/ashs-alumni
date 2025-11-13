@@ -8,7 +8,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {CommonModule} from '@angular/common';
 
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {ContactStatusChip} from '@app/shared/components/contact-status-chip/contact-status-chip';
 import {GenderIcon} from '@app/shared/components/gender-icon/gender-icon';
@@ -56,7 +56,6 @@ import {MatProgressBar} from '@angular/material/progress-bar';
     BackButton,
     MatButton,
     HasRolesDirective,
-    RouterLink,
     LoadingComponent,
     LoadErrorComponent,
     MatProgressBar
@@ -105,7 +104,7 @@ export class FormerCard {
 
   }
 
-  // ===== PRIVATE METHODS - DATA RETRIEVAL =====
+
 
   /**
    * Handles the deletion of the current former teammate
@@ -117,7 +116,7 @@ export class FormerCard {
    * 4. Shows success/error notifications
    * 5. Navigates back to the teammate's list on success
    */
-  delete() {
+  onDelete() {
     this.isDeleting.set(true);
     const formerTeammate = this.formerTeammateSignal();
 
@@ -159,15 +158,78 @@ export class FormerCard {
     });
   }
 
-  // ===== PUBLIC METHODS - USER ACTIONS =====
+  protected onSendSMS() {
+    const formerTeammate = this.formerTeammateSignal();
 
-  /**
-   * Creates a computed function to find the former teammate based on route parameters
-   *
-   * @returns A function that returns the former teammate matching the route ID,
-   *          or undefined if no ID is provided or teammate is not found
-   */
+    // Defensive check to ensure teammate exists before attempting deletion
+    if (!formerTeammate) {
+      console.warn('the teammate is undefined');
+      return;
+    }
+
+    // Prepare confirmation dialog content
+    const content = `Vous allez renvoyer un SMS à ${formerTeammate.firstName} ${formerTeammate.lastName} au numéro suivant : ${formerTeammate.phone}`;
+    const title = 'Confirmation l\'envoie';
+
+    // Show a confirmation dialog and handle the response
+    this.dialogService.showConfirmation(content, title).pipe(
+      switchMap((confirmation) => {
+        if (confirmation) {
+          // User confirmed deletion - proceed with deletion
+          return this.formerTeammatesStore.handleResendSMS(formerTeammate.id);
+        } else {
+          // User cancelled deletion - return empty observable
+          return EMPTY;
+        }
+      })
+    ).subscribe({
+      next: () => {
+
+        // Deletion successful - show a success message and navigate away
+        this.notificationService.showSuccess('Le sms a été renvoyé');
+        console.log('SMS  sent.');
+      },
+      error: () => {
+        // Deletion failed - show an error message
+        this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+      }
+    });
+
+  }
+
+
   private findFormerTeammate() {
     return this.formerTeammatesStore.getFormerTeammateById(this.paramsRouteSignal()['id'])
+  }
+
+
+  protected onUpdate() {
+    const formerTeammate = this.formerTeammateSignal();
+
+    // Defensive check to ensure teammate exists before attempting deletion
+    if (!formerTeammate) {
+      console.warn('the teammate is undefined');
+      return;
+    }
+
+    if(formerTeammate.status !== "VALIDATED") {
+      void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
+    }
+
+    // Prepare confirmation dialog content
+    const content = `Le contact a déjà été validé par son propriétaire et ne devrait plus être modifié. Êtes-vous sur de modifier le contact ${formerTeammate.firstName} ${formerTeammate.lastName}`;
+    const title = 'Allez à la page de modification';
+
+    // Show a confirmation dialog and handle the response
+    this.dialogService.showConfirmation(content, title).subscribe({
+      next: (response) => {
+        if(response) {
+          void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
+        }
+      },
+      error: () => {
+        this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+      }
+    });
   }
 }

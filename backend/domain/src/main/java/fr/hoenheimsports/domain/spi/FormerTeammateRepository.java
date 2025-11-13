@@ -15,6 +15,7 @@ public interface FormerTeammateRepository {
     void deleteAll();
 
     Optional<FormerTeammate> findById(UUID id);
+    Optional<FormerTeammate> findByCode(String id);
 
     void deleteById(UUID id);
 

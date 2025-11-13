@@ -50,6 +50,9 @@ public class FormerTeammateEntity {
     @Enumerated(EnumType.ORDINAL)
     ContactStatus status;
 
+    @Column(name = "code", nullable = false, unique = true)
+    String code;
+
 
     @OneToMany(mappedBy = "formerTeammate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SMSHistoryEntity> smsHistory;

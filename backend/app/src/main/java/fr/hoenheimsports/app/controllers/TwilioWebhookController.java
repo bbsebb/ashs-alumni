@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/webhooks/twilio")
 @Tag(name = "Twilio Webhooks", description = "API pour gérer les callbacks Twilio")
 @Slf4j
-public class TwilioWebhookController {
+public class
+TwilioWebhookController {
     private final HandleSMSUpdatedStatus handleSMSUpdatedStatus;
     private final TwilioMessageMapper twilioMessageMapper;
 

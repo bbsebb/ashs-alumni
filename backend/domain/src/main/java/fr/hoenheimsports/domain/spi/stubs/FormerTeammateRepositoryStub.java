@@ -58,6 +58,11 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
     }
 
     @Override
+    public Optional<FormerTeammate> findByCode(String id) {
+        return Optional.empty(); //TODO
+    }
+
+    @Override
     public void deleteById(UUID id) {
         storage.remove(id);
     }

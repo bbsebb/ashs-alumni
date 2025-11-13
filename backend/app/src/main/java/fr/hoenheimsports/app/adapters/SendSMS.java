@@ -42,7 +42,7 @@ public class SendSMS implements SMSSender {
             return twilioMessageMapper.toSMSHistory(response, formerTeammateId);
         } catch (Exception e) {
             return SMSHistory.builder()
-                    .id(idGenerator.generateId())
+                    .id(idGenerator.generateUUID())
                     .formerTeammateId(formerTeammateId)
                     .phoneNumber(phoneNumber)
                     .message(message)

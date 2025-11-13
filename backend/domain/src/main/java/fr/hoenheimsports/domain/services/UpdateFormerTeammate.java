@@ -1,5 +1,6 @@
 package fr.hoenheimsports.domain.services;
 
+import fr.hoenheimsports.domain.api.commands.FormerTeammateModificationRequest;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 
@@ -31,4 +32,7 @@ public interface UpdateFormerTeammate {
      * @return l'ancien coéquipier avec le statut mis à jour et sauvegardé
      */
     FormerTeammate updateContactStatus(FormerTeammate formerTeammate, ContactStatus newStatus);
+
+    FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest);
+
 }

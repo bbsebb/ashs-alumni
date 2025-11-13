@@ -86,12 +86,15 @@
       <mat-card-actions>
         <app-back-button link='/former-teammates'/>
         @if(!isRemovedFormerTeammateSignal()) {
-          <a mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true"
-             [routerLink]="['/former-teammates/edit',formerTeammate.id]" [disabled]="isDeleting()">Modifier</a>
-          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="delete()" [disabled]="isDeleting()">
+          <button mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true" (click)="onUpdate()" [disabled]="isDeleting()">
+            Modifier
+          </button>
+          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="onDelete()" [disabled]="isDeleting()">
             Supprimer
           </button>
-          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" [disabled]="isDeleting()">Renvoyer SMS</button>
+          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" [disabled]="isDeleting()" (click)="onSendSMS()">
+            Renvoyer SMS
+          </button>
         }
       </mat-card-actions>
     </mat-card>

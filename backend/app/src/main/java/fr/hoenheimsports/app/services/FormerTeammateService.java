@@ -50,7 +50,7 @@ public class FormerTeammateService {
         var formerTeammateHistoryResponses = formerTeammateHistories.stream().map(formerTeammateHistoryMapper::toResponse).toList();
         var smsHistoryResponses = smsHistoryMapper.toResponseList(smsHistories);
         
-        // Create complete response with histories
+        // Create a complete response with histories
         return new FormerTeammateResponse(
                 formerTeammateResponse.id(),
                 formerTeammateResponse.firstName(),

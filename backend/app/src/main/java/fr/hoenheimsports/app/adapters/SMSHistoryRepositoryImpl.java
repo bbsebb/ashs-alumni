@@ -53,7 +53,7 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
         entity.setUpdatedAt(smsHistory.updatedAt());
         entity.setExternalId(smsHistory.externalId());
         entity.setErrorMessage(smsHistory.errorMessage());
-        // Note: formerTeammate n'est pas modifié, préservant la relation existante
+        // Note : formerTeammate n'est pas modifié, préservant la relation existante
     }
 
 

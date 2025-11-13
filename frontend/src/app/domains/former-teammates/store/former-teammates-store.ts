@@ -6,6 +6,7 @@ import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/c
 import {Observable, tap} from 'rxjs';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
 import {HttpResourceRef} from '@angular/common/http';
+import {Form} from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -41,17 +42,22 @@ export class FormerTeammatesStore {
 
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate) {
     return this.formerTeammatesGateway.createFormerTeammate(createFormerTeammate).pipe(
-      tap(() => this.formerTeammatesResource.reload()));
+      tap(() => this.formerTeammatesResource.reload())); //TODO: reload only if the formerTeammate is the one that was updated
   }
 
   updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate> {
     return this.formerTeammatesGateway.updateFormerTeammate(updateFormerTeammate).pipe(
-      tap(() => this.formerTeammatesResource.reload()));
+      tap(() => this.formerTeammatesResource.reload())); //TODO: reload only if the formerTeammate is the one that was updated
+  }
+
+  validateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate,code:UUID): Observable<FormerTeammate> {
+    return this.formerTeammatesGateway.validateFormerTeammate(updateFormerTeammate,code).pipe(
+      tap(() => this.formerTeammatesResource.reload())); //TODO: reload only if the formerTeammate is the one that was updated
   }
 
   deleteTeammate(id: UUID): Observable<void> {
     return this.formerTeammatesGateway.deleteFormerTeammate(id).pipe(
-      tap(() => this.formerTeammatesResource.reload())
+      tap(() => this.formerTeammatesResource.reload()) //TODO: reload only if the formerTeammate is the one that was updated
     );
   }
 
@@ -60,5 +66,11 @@ export class FormerTeammatesStore {
 
   getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined> {
     return this.formerTeammatesGateway.getFormerTeammateByCode(code);
+  }
+
+  handleResendSMS(id: Readonly<UUID>):Observable<FormerTeammate> {
+    return this.formerTeammatesGateway.resendSMS(id).pipe(
+      tap(() => this.formerTeammatesResource.reload()) //TODO: reload only if the formerTeammate is the one that was updated
+    );
   }
 }

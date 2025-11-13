@@ -30,11 +30,10 @@ public interface CreateFormerTeammate {
      * avec les données fournies et la persiste avec le statut SUBMITTED.</p>
      * 
      * @param command les données de l'ancien coéquipier à créer
-     * @param context le contexte d'exécution contenant l'utilisateur courant
      * @return l'ancien coéquipier créé et sauvegardé
      * @throws fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException si des champs obligatoires sont manquants
      * @throws fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException si le format du téléphone est invalide
      * @throws fr.hoenheimsports.domain.exceptions.FormerTeammateAlreadyExistsException si le contact existe déjà
      */
-    FormerTeammate createFormerTeammate(FormerTeammateRegistrationRequest command, ContextDetails context);
+    FormerTeammate createFormerTeammate(FormerTeammateRegistrationRequest command );
 }

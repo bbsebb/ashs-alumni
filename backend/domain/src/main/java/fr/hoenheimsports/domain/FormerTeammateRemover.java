@@ -6,6 +6,7 @@ import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.api.commands.CurrentUser;
 import fr.hoenheimsports.domain.exceptions.CurrentUserMissingException;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateAlreadyRemoved;
+import fr.hoenheimsports.domain.exceptions.FormerTeammateNotFoundException;
 import fr.hoenheimsports.domain.models.HistoryAction;
 import fr.hoenheimsports.domain.services.FormerTeammateHistoryCreator;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
@@ -28,11 +29,11 @@ public class FormerTeammateRemover implements RemoveFormerTeammate {
     @Override
     public void removeFormerTeammate(UUID formerTeammateId, ContextDetails context) {
         //Cela vérifie aussi la présence d'un currentUser dans le contexte.
-        if (!context.hasRole("USER")) {
+        if (!context.hasRole("USER") && !context.hasRole("ADMIN")) {
             throw new CurrentUserMissingException("Vous n'avez pas les autorisations requises");
         }
 
-        var formerTeammateToRemove = formerTeammateRepository.findById(formerTeammateId).orElseThrow(() -> new IllegalStateException("ERREUR CRITIQUE : currentUser absent malgré la vérification hasRole. Vérifiez que la validation de sécurité n'a pas été supprimée."));
+        var formerTeammateToRemove = formerTeammateRepository.findById(formerTeammateId).orElseThrow(() -> new FormerTeammateNotFoundException("Le contact à supprimer n'existe pas ou plus."));
         boolean isAlreadyRemoved = formerTeammateHistoryRetriever.findAllFormerTeammateHistoryByFormerTeammateId(formerTeammateToRemove.id()).stream().anyMatch(formerTeammateHistory -> formerTeammateHistory.historyAction() == HistoryAction.REMOVED);
         if (isAlreadyRemoved) {
             throw new FormerTeammateAlreadyRemoved("Ce contact a déjà été supprimé.");

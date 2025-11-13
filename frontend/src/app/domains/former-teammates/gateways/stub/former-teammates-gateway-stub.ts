@@ -23,6 +23,14 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
 
   }
 
+  validateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate, code: UUID): Observable<FormerTeammate> {
+        throw new Error("Method not implemented.");
+    }
+
+  resendSMS(id: Readonly<UUID>):Observable<FormerTeammate> {
+        throw new Error("Method not implemented.");
+    }
+
   getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined> {
     return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/${id}`)
   }

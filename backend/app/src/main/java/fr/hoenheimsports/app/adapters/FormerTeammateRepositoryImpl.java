@@ -48,6 +48,12 @@ private final FormerTeammateMapper formerTeammateMapper;
     }
 
     @Override
+    public Optional<FormerTeammate> findByCode(String code) {
+        var formerTeammateEntity = formerTeammateEntityRepository.findByCode((code));
+        return formerTeammateEntity.map(formerTeammateMapper::toModel);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         formerTeammateEntityRepository.deleteById(id);
     }

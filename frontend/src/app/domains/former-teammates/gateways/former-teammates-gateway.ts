@@ -12,6 +12,8 @@ export interface FormerTeammatesGateway {
 
   updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate): Observable<FormerTeammate>;
 
+  validateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate,code: UUID): Observable<FormerTeammate>
+
   deleteFormerTeammate(formerTeammateId: UUID): Observable<void>;
 
   getFormerTeammates(): HttpResourceRef<FormerTeammate[] | undefined>;
@@ -19,6 +21,8 @@ export interface FormerTeammatesGateway {
   getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined>;
 
   getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined>;
+
+  resendSMS(id: Readonly<UUID>): Observable<FormerTeammate>;
 }
 
 export const FORMER_TEAMMATES_GATEWAY = new InjectionToken<FormerTeammatesGateway>('FormerTeammatesGateway');

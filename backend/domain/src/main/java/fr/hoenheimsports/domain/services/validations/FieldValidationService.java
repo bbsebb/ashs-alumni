@@ -3,6 +3,8 @@ package fr.hoenheimsports.domain.services.validations;
 import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException;
 
+import java.util.List;
+
 /**
  * Service de validation des champs requis.
  * Centralise la logique de validation commune à tous les modèles du domaine.
@@ -43,7 +45,7 @@ public class FieldValidationService {
      * @param <T>  le type des éléments de la liste
      * @return la liste originale ou une liste vide si null
      */
-    public <T> java.util.List<T> validateListField(java.util.List<T> list) {
-        return list != null ? list : java.util.List.of();
+    public <T> java.util.List<T> validateListField(List<T> list) {
+        return list != null ? list : List.of();
     }
 }

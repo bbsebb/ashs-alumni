@@ -22,7 +22,7 @@ public class TwilioMessageMapper {
     
     public SMSHistory toSMSHistory(Message twilioMessage, UUID formerTeammateId) {
         return SMSHistory.builder()
-                .id(idGenerator.generateId())
+                .id(idGenerator.generateUUID())
                 .formerTeammateId(formerTeammateId)
                 .phoneNumber(twilioMessage.getTo())
                 .message(twilioMessage.getBody())

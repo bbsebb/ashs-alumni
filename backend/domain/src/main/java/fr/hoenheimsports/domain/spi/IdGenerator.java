@@ -4,5 +4,6 @@ import java.util.UUID;
 
 
 public interface IdGenerator {
-    UUID generateId();
+    UUID generateUUID();
+    String generateCode(int size);
 }

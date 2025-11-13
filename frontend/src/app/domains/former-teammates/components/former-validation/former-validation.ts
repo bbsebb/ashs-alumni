@@ -81,7 +81,7 @@ export class FormerValidation {
    */
   private updateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate) {
     this.isSubmitting.set(true);
-    this.formerTeammatesStore.updateFormerTeammate(updateFormerTeammate).subscribe({
+    this.formerTeammatesStore.validateFormerTeammate(updateFormerTeammate,this.code()).subscribe({
       next: this.handleSuccess(),
       error: this.handleError(),
       complete: this.handleComplete()

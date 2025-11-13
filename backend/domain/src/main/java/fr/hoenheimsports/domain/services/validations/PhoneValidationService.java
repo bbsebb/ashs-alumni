@@ -26,7 +26,7 @@ public class PhoneValidationService {
         if (phoneNumber == null) {
             return null;
         }
-        return phoneNumber.replaceAll("[\\s\\-]", "");
+        return phoneNumber.replaceAll("[\\s\\-.]", "");
     }
 
     /**

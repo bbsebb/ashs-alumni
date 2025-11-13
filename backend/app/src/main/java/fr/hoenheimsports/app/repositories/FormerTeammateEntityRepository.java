@@ -60,5 +60,5 @@ public interface FormerTeammateEntityRepository extends JpaRepository<FormerTeam
     Optional<FormerTeammateEntity> findByFirstNameIgnoreCaseAndLastNameIgnoreCase(@NonNull String firstName, @NonNull String lastName);
 
 
-
+    Optional<FormerTeammateEntity>  findByCode(String code);
 }

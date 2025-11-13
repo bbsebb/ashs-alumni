@@ -88,7 +88,7 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
 
         // Gestion SMS et mise à jour du statut
         if (context.currentUser().isPresent() && savedFormerTeammate.phone().isPresent()) {
-            savedFormerTeammate = handleSMSValidation.handleSMSValidation(savedFormerTeammate, context.currentUser().get().username());
+            savedFormerTeammate = handleSMSValidation.handleValidationBySMS(savedFormerTeammate, context.currentUser().get().username());
         }
 
         return savedFormerTeammate;
@@ -107,7 +107,7 @@ public class FormerTeammateRegistrar implements fr.hoenheimsports.domain.api.Reg
      */
     private FormerTeammate createInitialeFormerTeammate(FormerTeammateRegistrationRequest command, ContextDetails context) {
         // Création de l'ancien coéquipier via l'API dédiée
-        var formerTeammate = createFormerTeammate.createFormerTeammate(command, context);
+        var formerTeammate = createFormerTeammate.createFormerTeammate(command);
         
         // Création de l'entrée d'historique pour la création
         var updatedBy = context.currentUser().map(CurrentUser::username).orElse("Anonyme");

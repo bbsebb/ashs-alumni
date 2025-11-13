@@ -5,6 +5,8 @@
       <root url="jar://$USER_HOME$/scoop/persist/gradle/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-test/6.5.2/69b7a9bafe58878ab9d5f1163fd9382a5a0b9ad4/spring-security-test-6.5.2.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/scoop/persist/gradle/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-test/6.5.2/f5cd4b91c6ec11c005473ff9317b609a8b812c39/spring-security-test-6.5.2-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

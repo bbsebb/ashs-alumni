@@ -5,6 +5,7 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.entities.FormerTeammateEntity;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.api.commands.UpdateFormerTeammateRequest;
+import fr.hoenheimsports.domain.api.commands.ValidateFormerTeammateRequest;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.Phone;
 import org.mapstruct.Mapper;
@@ -40,7 +41,6 @@ public interface FormerTeammateMapper {
     @Mapping(target = "phone" , expression = "java(optionalPhoneToString(formerTeammate.phone()))")
     FormerTeammateEntity toEntity(FormerTeammate formerTeammate);
 
-
     FormerTeammate toModel(FormerTeammateEntity formerTeammateEntity);
 
 
@@ -70,6 +70,20 @@ public interface FormerTeammateMapper {
                 formerTeammateRegistrationRequest.email(),
                 formerTeammateRegistrationRequest.birthDate(),
                 formerTeammateRegistrationRequest.roles()
+        );
+    }
+
+    default ValidateFormerTeammateRequest toValidateRequest(String code, FormerTeammateRequest formerTeammateRequest) {
+        var formerTeammateRegistrationRequest = toRegistrationRequest(formerTeammateRequest);
+        return new ValidateFormerTeammateRequest(
+                formerTeammateRegistrationRequest.firstName(),
+                formerTeammateRegistrationRequest.lastName(),
+                formerTeammateRegistrationRequest.gender(),
+                formerTeammateRegistrationRequest.phone(),
+                formerTeammateRegistrationRequest.email(),
+                formerTeammateRegistrationRequest.birthDate(),
+                formerTeammateRegistrationRequest.roles(),
+                code.trim().toUpperCase()
         );
     }
 }

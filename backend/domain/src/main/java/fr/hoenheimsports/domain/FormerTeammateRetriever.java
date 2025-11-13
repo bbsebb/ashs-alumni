@@ -2,6 +2,7 @@ package fr.hoenheimsports.domain;
 
 import fr.hoenheimsports.domain.annotations.UseCase;
 import fr.hoenheimsports.domain.api.GetFormerTeammates;
+import fr.hoenheimsports.domain.exceptions.FormerTeammateNotFoundException;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
@@ -23,6 +24,11 @@ public class FormerTeammateRetriever implements GetFormerTeammates {
     @Override
     public List<FormerTeammate> findAllActiveFormerTeammates() {
         return this.formerTeammateRepository.findAllActiveFormerTeammates();
+    }
+
+    @Override
+    public FormerTeammate findByCode(String code) {
+        return this.formerTeammateRepository.findByCode(code).orElseThrow(() -> new FormerTeammateNotFoundException("Le code de validation est invalide ou inconnu"));
     }
 
 }

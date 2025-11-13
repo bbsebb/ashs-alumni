@@ -35,7 +35,8 @@ public record FormerTeammate(
         Optional<String> email,
         Optional<LocalDate> birthDate,
         List<Role> roles,
-        ContactStatus status
+        ContactStatus status,
+        String code
 ) {
 
     private static final FieldValidationService validationService = new FieldValidationService();
@@ -55,9 +56,10 @@ public record FormerTeammate(
         validationService.validateRequiredField(email, "email");
         validationService.validateRequiredField(birthDate, "birthDate");
         validationService.validateRequiredField(status, "status");
+        validationService.validateRequiredStringField(code, "code");
 
         // Ensure that the roles list is never null
-        roles = validationService.validateListField(roles);
+        roles = List.copyOf(validationService.validateListField(roles));
     }
 
     /**
@@ -71,7 +73,7 @@ public record FormerTeammate(
      */
     public FormerTeammate withContactStatus(ContactStatus newStatus) {
         validationService.validateRequiredField(newStatus, "newStatus");
-        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus);
+        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus, code);
     }
 
     /**
@@ -97,6 +99,7 @@ public record FormerTeammate(
         private LocalDate birthDate;
         private List<Role> roles = new ArrayList<>();
         private ContactStatus status;
+        private String code;
 
         private Builder() {
         }
@@ -153,7 +156,7 @@ public record FormerTeammate(
          * @throws InvalidPhoneNumberException if the phone number format is invalid (not E.164 format)
          */
         public Builder phone(String phone) {
-            if(phone == null) {
+            if(phone == null || phone.isBlank()) {
                 return this;
             }
             this.phone = Phone.of(phone);
@@ -167,6 +170,9 @@ public record FormerTeammate(
          * @return this builder instance for method chaining
          */
         public Builder email(String email) {
+            if(email == null || email.isBlank()) {
+                return this;
+            }
             this.email = email;
             return this;
         }
@@ -206,6 +212,17 @@ public record FormerTeammate(
         }
 
         /**
+         * Sets the code of the former teammate.
+         *
+         * @param code the code
+         * @return this builder instance for method chaining
+         */
+        public Builder code(String code) {
+            this.code = code;
+            return this;
+        }
+
+        /**
          * Builds a new FormerTeammate instance with validation.
          * Validates that all required fields are set before creating the instance.
          *
@@ -219,10 +236,11 @@ public record FormerTeammate(
             validationService.validateRequiredStringField(lastName, "lastName");
             validationService.validateRequiredField(gender, "gender");
             validationService.validateRequiredField(status, "status");
+            validationService.validateRequiredStringField(code, "code");
 
             return new FormerTeammate(id, firstName, lastName, gender, 
                     Optional.ofNullable(phone), Optional.ofNullable(email), Optional.ofNullable(birthDate),
-                    List.copyOf(roles), status);
+                    List.copyOf(roles), status,code);
         }
 
     }

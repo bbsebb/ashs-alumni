@@ -16,5 +16,5 @@ public record UpdateFormerTeammateRequest(
         String newEmail,
         LocalDate newBirthDate,
         List<Role> roles
-) {
+) implements FormerTeammateModificationRequest{
 }

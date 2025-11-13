@@ -7,8 +7,6 @@ import fr.hoenheimsports.domain.models.Phone;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")

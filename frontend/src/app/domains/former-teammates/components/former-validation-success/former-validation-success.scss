@@ -77,6 +77,53 @@ mat-card-header {
         text-align: left;
       }
 
+      .benefits-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 12px 0;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-on-tertiary-container);
+        font-size: 0.95rem;
+        font-weight: 500;
+        width: fit-content;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .account-required-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-on-tertiary-container);
+        border: 1px solid var(--mat-sys-on-tertiary-container);
+        font-size: 0.8rem;
+        line-height: 1.2;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+
+        mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+        }
+
+        .badge-text {
+          letter-spacing: .2px;
+        }
+      }
+
       .benefits-list {
         list-style: none;
         padding: 0;

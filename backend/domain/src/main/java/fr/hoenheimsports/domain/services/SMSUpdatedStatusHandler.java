@@ -2,6 +2,7 @@ package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
+import fr.hoenheimsports.domain.exceptions.FormerTeammateNotFoundException;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateRepositoryException;
 import fr.hoenheimsports.domain.exceptions.SMSHistoryRepositoryException;
 import fr.hoenheimsports.domain.models.ContactStatus;
@@ -104,7 +105,7 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      */
     private FormerTeammate retrieveFormerTeammate(SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
         return formerTeammateRepository.findById(UUID.fromString(smsUpdatedStatusDetails.formerTeammateReference().formerTeammateId()))
-                .orElseThrow(() -> new FormerTeammateRepositoryException(
+                .orElseThrow(() -> new FormerTeammateNotFoundException(
                         "Le contact n'a pas été trouvé avec l'id %s".formatted(smsUpdatedStatusDetails.formerTeammateReference().formerTeammateId())));
     }
 

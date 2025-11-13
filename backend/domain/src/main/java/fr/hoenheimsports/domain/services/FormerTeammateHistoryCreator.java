@@ -92,7 +92,7 @@ public class FormerTeammateHistoryCreator implements CreateFormerTeammateHistory
      */
     private void createHistoryEntry(FormerTeammate formerTeammate, String updatedBy, String description, HistoryAction historyAction) {
         var formerTeammateHistory = FormerTeammateHistory.builder()
-                .id(idGenerator.generateId())
+                .id(idGenerator.generateUUID())
                 .formerTeammateId(formerTeammate.id())
                 .phoneAtTime(formerTeammate.phone().orElse(null))
                 .emailAtTime(formerTeammate.email().orElse(null))

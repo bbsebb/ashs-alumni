@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.c4-soft.springaddons:spring-addons-oauth2-test:6.1.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.c4-soft.springaddons" artifactId="spring-addons-oauth2-test" version="6.1.0" baseVersion="6.1.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/scoop/persist/gradle/.gradle/caches/modules-2/files-2.1/com.c4-soft.springaddons/spring-addons-oauth2-test/6.1.0/3d3ed35c920d69f2a1b8fe7a6adc36dcb13f2aa1/spring-addons-oauth2-test-6.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/scoop/persist/gradle/.gradle/caches/modules-2/files-2.1/com.c4-soft.springaddons/spring-addons-oauth2-test/6.1.0/c1b3b24ebd63d87dc99e607da9644977fa487646/spring-addons-oauth2-test-6.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

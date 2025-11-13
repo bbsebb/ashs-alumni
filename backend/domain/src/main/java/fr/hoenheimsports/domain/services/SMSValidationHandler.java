@@ -1,7 +1,9 @@
 package fr.hoenheimsports.domain.services;
 
+import fr.hoenheimsports.domain.SMSHistoryRetriever;
 import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
+import fr.hoenheimsports.domain.exceptions.SMSLimitExceededException;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.SMSHistory;
@@ -40,11 +42,14 @@ import fr.hoenheimsports.domain.models.SMSHistory;
  */
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
-    private static final String SMS_VALIDATION_MESSAGE = "message test du sms"; // TODO: Finaliser le message de validation
-
+    private static final String SMS_VALIDATION_MESSAGE = """
+            message test du sms
+            """;
+    private static final int SMS_SEND_LIMIT = 3;
     private final UpdateFormerTeammate updateFormerTeammate;
     private final SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate;
     private final CreateFormerTeammateHistory createFormerTeammateHistory;
+    private final SMSHistoryRetriever smsHistoryRetriever;
 
     /**
      * Constructeur principal pour l'injection des dépendances.
@@ -56,10 +61,11 @@ public class SMSValidationHandler implements HandleSMSValidation{
      * @param sendSMSToValidateFormerTeammate service d'envoi de SMS de validation
      * @param createFormerTeammateHistory service de création d'entrées d'historique
      */
-    public SMSValidationHandler(UpdateFormerTeammate updateFormerTeammate, SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate, CreateFormerTeammateHistory createFormerTeammateHistory) {
+    public SMSValidationHandler(UpdateFormerTeammate updateFormerTeammate, SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate, CreateFormerTeammateHistory createFormerTeammateHistory, SMSHistoryRetriever smsHistoryRetriever) {
         this.updateFormerTeammate = updateFormerTeammate;
         this.sendSMSToValidateFormerTeammate = sendSMSToValidateFormerTeammate;
         this.createFormerTeammateHistory = createFormerTeammateHistory;
+        this.smsHistoryRetriever = smsHistoryRetriever;
     }
 
     /**
@@ -90,7 +96,13 @@ public class SMSValidationHandler implements HandleSMSValidation{
      * @throws NullPointerException si formerTeammate ou updatedBy est null
      */
     @Override
-    public FormerTeammate handleSMSValidation(FormerTeammate formerTeammate, String updatedBy) {
+    public FormerTeammate handleValidationBySMS(FormerTeammate formerTeammate, String updatedBy) {
+        int SMSHistoriesCount = smsHistoryRetriever.findAllSMSHistoryByFormerTeammateId(formerTeammate.id()).size();
+
+        if(SMSHistoriesCount > SMS_SEND_LIMIT -1) {
+            throw new SMSLimitExceededException("Limite d'envoi de SMS dépassée : %d envois effectués sur un maximum de %d autorisés".formatted(SMSHistoriesCount, SMS_SEND_LIMIT));
+        }
+
         var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(
                 formerTeammate.phone().orElseThrow().getRawValue(),
                 SMS_VALIDATION_MESSAGE,

@@ -56,7 +56,7 @@ public interface CreateFormerTeammateHistory {
      * Crée une entrée d'historique pour une action de suppression d'un ancien coéquipier.
      *
      * <p>Cette méthode enregistre la suppression logique d'un {@link FormerTeammate} en
-     * capturant son dernier état connu avec l'action {@link HistoryAction#REMOVE}.
+     * capturant son dernier état connu avec l'action {@link HistoryAction#REMOVED}.
      * Elle permet de conserver une trace complète de l'entité et du contexte
      * de suppression (qui, quand, pourquoi) afin d'assurer la traçabilité.</p>
      *

@@ -34,13 +34,15 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:$lombokMapstructBindingVersion")
 
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
 
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.c4-soft.springaddons:spring-addons-oauth2-test:6.1.0")
+
 
     // https://mvnrepository.com/artifact/com.twilio.sdk/twilio
     implementation("com.twilio.sdk:twilio:10.9.2")

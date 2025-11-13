@@ -6,11 +6,7 @@ import fr.hoenheimsports.app.mappers.FormerTeammateMapper;
 import fr.hoenheimsports.app.services.FormerTeammateService;
 import fr.hoenheimsports.app.services.SecurityContextService;
 import fr.hoenheimsports.domain.FormerTeammateRetriever;
-import fr.hoenheimsports.domain.api.EditFormerTeammate;
-import fr.hoenheimsports.domain.api.GetFormerTeammates;
-import fr.hoenheimsports.domain.api.RegisterFormerTeammate;
-import fr.hoenheimsports.domain.api.RemoveFormerTeammate;
-import fr.hoenheimsports.domain.models.HistoryAction;
+import fr.hoenheimsports.domain.api.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,33 +19,44 @@ import java.util.UUID;
 @RequestMapping("/api/former-teammates")
 public class FormerTeammateController {
 
-    private final RegisterFormerTeammate registerFormerTeammate;
-    private final EditFormerTeammate editFormerTeammate;
+    private final RegisterFormerTeammate formerTeammateRegistrar;
+    private final EditFormerTeammate formerTeammateEditor;
     private final GetFormerTeammates formerTeammateRetriever;
     private final FormerTeammateMapper formerTeammateMapper;
     private final FormerTeammateService formerTeammateService;
     private final SecurityContextService securityContextService;
-    private final RemoveFormerTeammate removeFormerTeammate;
+    private final RemoveFormerTeammate formerTeammateRemover;
+    private final ResendSMSToFormerTeammate SMSToFormerTeammateSender;
+    private final ValidateFormerTeammate formerTeammateValidator;
 
-    public FormerTeammateController(RegisterFormerTeammate registerFormerTeammate, EditFormerTeammate editFormerTeammate,
+    public FormerTeammateController(RegisterFormerTeammate formerTeammateRegistrar, EditFormerTeammate formerTeammateEditor,
                                     FormerTeammateRetriever formerTeammateRetriever,
                                     FormerTeammateMapper formerTeammateMapper,
                                     FormerTeammateService formerTeammateService,
-                                    SecurityContextService securityContextService, RemoveFormerTeammate removeFormerTeammate) {
-        this.registerFormerTeammate = registerFormerTeammate;
-        this.editFormerTeammate = editFormerTeammate;
+                                    SecurityContextService securityContextService, RemoveFormerTeammate formerTeammateRemover, ResendSMSToFormerTeammate SMSToFormerTeammateSender, ValidateFormerTeammate formerTeammateValidator) {
+        this.formerTeammateRegistrar = formerTeammateRegistrar;
+        this.formerTeammateEditor = formerTeammateEditor;
         this.formerTeammateRetriever = formerTeammateRetriever;
         this.formerTeammateMapper = formerTeammateMapper;
         this.formerTeammateService = formerTeammateService;
         this.securityContextService = securityContextService;
-        this.removeFormerTeammate = removeFormerTeammate;
+        this.formerTeammateRemover = formerTeammateRemover;
+        this.SMSToFormerTeammateSender = SMSToFormerTeammateSender;
+        this.formerTeammateValidator = formerTeammateValidator;
     }
 
     @PostMapping()
     @Transactional
     public ResponseEntity<FormerTeammateResponse> registerFormerTeammate(@RequestBody @Valid FormerTeammateRequest formerTeammateRequest) {
         var formerTeammateRegistrationRequest = formerTeammateMapper.toRegistrationRequest(formerTeammateRequest);
-        var formerTeammate = registerFormerTeammate.registerFormerTeammate(formerTeammateRegistrationRequest, securityContextService.getCurrentContext());
+        var formerTeammate = formerTeammateRegistrar.registerFormerTeammate(formerTeammateRegistrationRequest, securityContextService.getCurrentContext());
+        return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
+    }
+
+    @PostMapping("/{id}/resend-sms")
+    @Transactional
+    public ResponseEntity<FormerTeammateResponse> resendSms(@PathVariable String id) {
+        var formerTeammate = SMSToFormerTeammateSender.resendSMS(UUID.fromString(id),securityContextService.getCurrentContext());
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
     }
 
@@ -57,9 +64,18 @@ public class FormerTeammateController {
     @Transactional
     public ResponseEntity<FormerTeammateResponse> editFormerTeammate(@PathVariable String id,@RequestBody @Valid FormerTeammateRequest formerTeammateRequest) {
         var updateFormerTeammate = formerTeammateMapper.toUpdateRequest(id,formerTeammateRequest);
-        var formerTeammate = editFormerTeammate.editFormerTeammate(updateFormerTeammate, securityContextService.getCurrentContext());
+        var formerTeammate = formerTeammateEditor.editFormerTeammate(updateFormerTeammate, securityContextService.getCurrentContext());
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
     }
+
+    @PutMapping("/validate/{code}")
+    @Transactional
+    public ResponseEntity<FormerTeammateResponse> validateFormerTeammate(@PathVariable String code,@RequestBody @Valid FormerTeammateRequest formerTeammateRequest) {
+        var validateFormerTeammateRequest = formerTeammateMapper.toValidateRequest(code,formerTeammateRequest);
+        var formerTeammate = formerTeammateValidator.valideFormerTeammate(validateFormerTeammateRequest);
+        return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
+    }
+
 
     @GetMapping()
     public ResponseEntity<List<FormerTeammateResponse>> findAllFormerTeammates(@RequestParam(required = false) boolean isActive) {
@@ -68,9 +84,16 @@ public class FormerTeammateController {
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/validate/{code}")
+    public ResponseEntity<FormerTeammateResponse> findFormerTeammatesByCode(@PathVariable String code) {
+        var formerTeammate  = formerTeammateRetriever.findByCode(code);
+        var response = formerTeammateService.buildFormerTeammateResponse(formerTeammate);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeFormerTeammate(@PathVariable String id) {
-        removeFormerTeammate.removeFormerTeammate(UUID.fromString(id),securityContextService.getCurrentContext());
+        formerTeammateRemover.removeFormerTeammate(UUID.fromString(id),securityContextService.getCurrentContext());
         return ResponseEntity.noContent().build();
     }
 

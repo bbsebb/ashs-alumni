@@ -67,23 +67,20 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
      * </ol>
      *
      * @param command les données de l'ancien coéquipier à créer
-     * @param context le contexte d'exécution contenant l'utilisateur courant
      * @return l'ancien coéquipier créé et sauvegardé
      * @throws fr.hoenheimsports.domain.exceptions.MissingRequiredFieldException si des champs obligatoires sont manquants
      * @throws fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException si le format du téléphone est invalide
      * @throws FormerTeammateAlreadyExistsException si le contact existe déjà
      */
     @Override
-    public FormerTeammate createFormerTeammate(FormerTeammateRegistrationRequest command, ContextDetails context) {
+    public FormerTeammate createFormerTeammate(FormerTeammateRegistrationRequest command) {
         uniquenessValidationService.validateNameUniqueness(command.firstName(), command.lastName());
         uniquenessValidationService.validatePhoneUniqueness(command.phone());
-
-        var uuid = idGenerator.generateId();
-        var initialStatus = command.phone() != null? ContactStatus.SUBMITTED : ContactStatus.UNREACHABLE;
+        var initialStatus = command.phone().isBlank()?  ContactStatus.UNREACHABLE : ContactStatus.SUBMITTED;
         
         // Création de l'entité
         var formerTeammate = FormerTeammate.builder()
-                .id(uuid)
+                .id(idGenerator.generateUUID())
                 .gender(command.gender())
                 .firstName(command.firstName())
                 .lastName(command.lastName())
@@ -92,6 +89,7 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
                 .birthDate(command.birthDate())
                 .roles(command.roles())
                 .status(initialStatus)
+                .code(idGenerator.generateCode(6))
                 .build();
 
         return formerTeammateRepository.save(formerTeammate);

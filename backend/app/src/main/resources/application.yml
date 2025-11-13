@@ -2,6 +2,10 @@ spring:
   application:
     name: ashs-alumni-backend
 
+  mvc:
+    problemdetails:
+      enabled: true
+
   security:
     oauth2:
       resourceserver:

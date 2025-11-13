@@ -13,13 +13,14 @@ import {environment} from '@environments/environment.development';
   providedIn: 'root'
 })
 export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
+
   private readonly httpClient = inject(HttpClient);
   getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined> {
     return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/${id}`)
   }
 
   getFormerTeammateByCode(code: string): HttpResourceRef<FormerTeammate | undefined> {
-    return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/code/${code}`)
+    return httpResource<FormerTeammate | undefined>(() => `${environment.apiUrl}/former-teammates/validate/${code}`)
   }
 
   createFormerTeammate(createFormerTeammate: CreateFormerTeammate): Observable<FormerTeammate> {
@@ -30,6 +31,10 @@ export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
     return this.httpClient.put<FormerTeammate>(`${environment.apiUrl}/former-teammates/${updateFormerTeammate.id}`, updateFormerTeammate)
   }
 
+  validateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate,code: UUID): Observable<FormerTeammate> {
+    return this.httpClient.put<FormerTeammate>(`${environment.apiUrl}/former-teammates/validate/${code}`, updateFormerTeammate)
+  }
+
   deleteFormerTeammate(formerTeammateId: UUID): Observable<void> {
     return this.httpClient.delete<void>(`${environment.apiUrl}/former-teammates/${formerTeammateId}`)
   }
@@ -38,5 +43,10 @@ export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
     return httpResource<FormerTeammate[] | undefined>(() =>
       `${environment.apiUrl}/former-teammates?isActive=true`)
   }
+
+  resendSMS(id: Readonly<UUID>): Observable<FormerTeammate> {
+    return this.httpClient.post<FormerTeammate>(`${environment.apiUrl}/former-teammates/${id}/resend-sms`, null);
+  }
+
 
 }
