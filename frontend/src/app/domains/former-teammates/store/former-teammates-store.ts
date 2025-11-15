@@ -12,7 +12,7 @@ import {Form} from '@angular/forms';
   providedIn: 'root'
 })
 export class FormerTeammatesStore {
-  private readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined>;
+  private readonly formerTeammatesResource: HttpResourceRef<FormerTeammate[] | undefined>;
   private formerTeammatesGateway = inject(FORMER_TEAMMATES_GATEWAY)
 
   constructor() {

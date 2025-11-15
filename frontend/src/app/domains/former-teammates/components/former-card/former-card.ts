@@ -213,7 +213,7 @@ export class FormerCard {
     }
 
     if(formerTeammate.status !== "VALIDATED") {
-      void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
+      return void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
     }
 
     // Prepare confirmation dialog content

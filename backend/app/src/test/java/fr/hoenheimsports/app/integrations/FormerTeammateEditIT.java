@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -40,6 +41,12 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @Transactional
 @Testcontainers
 public class FormerTeammateEditIT extends FormerTeammateIT {
+    @Autowired
+    Environment env;
+    @Test
+    void checkOrigin() {
+        System.out.println("myapp.origin = " + env.getProperty("myapp.origin"));
+    }
     @Autowired
     private WebApplicationContext context;
 

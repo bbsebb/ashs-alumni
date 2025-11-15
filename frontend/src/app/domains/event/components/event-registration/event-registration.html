@@ -1,0 +1,49 @@
+
+
+    <h2>Inscription à l'événement</h2>
+    <h3>Prix de l'inscription: {{ priceEuros }} €</h3>
+
+
+    <form class="registration-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="on">
+      <mat-form-field  class="full-width">
+        <mat-label>Nom</mat-label>
+        <input matInput placeholder="Nom" formControlName="lastName" required>
+        <mat-error>
+          Le nom est obligatoire.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field  class="full-width">
+        <mat-label>Prénom</mat-label>
+        <input matInput placeholder="Prénom" formControlName="firstName" required>
+        <mat-error>
+          Le prénom est obligatoire.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field  class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" placeholder="Mon email" formControlName="email" required>
+        <mat-error>
+          L'email est obligatoire et doit être valide.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field  class="full-width">
+        <mat-label>Ajouter un commentaire ou une suggestion</mat-label>
+        <textarea
+          matInput
+          placeholder="Notez ici si, pour n'importe quelle raison, vous venez accompagné(e) (conjoint et/ou enfant)"
+          formControlName="comment"
+          rows="4"
+        ></textarea>
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+          S'inscrire — {{ priceEuros }} €
+        </button>
+      </div>
+    </form>
+
+

@@ -3,6 +3,7 @@ package fr.hoenheimsports.app.controllers;
 import fr.hoenheimsports.domain.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -84,6 +85,21 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
                 ex.getMessage()
+        );
+        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/unauthorisation"));
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ProblemDetail handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        String title = "Authorisation manquante";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                "Vous n'avez pas les autorisations requises"
         );
         problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/unauthorisation"));
         problemDetail.setTitle(title);

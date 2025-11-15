@@ -1,0 +1,11 @@
+@if (isLoading()) {
+  Loading...
+} @else if (hasError()) {
+  Erreur...
+} @else {
+  @for (participant of participants; track participant.id) {
+    <p>{{ participant.firstname }} {{ participant.lastname }}</p>
+  } @empty {
+    <p>Aucun participant</p>
+  }
+}
