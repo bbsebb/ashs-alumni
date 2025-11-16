@@ -33,14 +33,14 @@
         <mat-label>Ajouter un commentaire ou une suggestion</mat-label>
         <textarea
           matInput
-          placeholder="Notez ici si, pour n'importe quelle raison, vous venez accompagné(e) (conjoint et/ou enfant)"
-          formControlName="comment"
+          placeholder="Notez ici si, pour n'importe quelle raison, si vous devez venir accompagné(e) (conjoint et/ou enfant)"
+          formControlName="comments"
           rows="4"
         ></textarea>
       </mat-form-field>
 
       <div class="actions">
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+        <button mat-raised-button type="submit" [disabled]="form.invalid || isSubmitting()">
           S'inscrire — {{ priceEuros }} €
         </button>
       </div>

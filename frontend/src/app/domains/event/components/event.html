@@ -1,2 +1,8 @@
-<app-event-registration />
+@if(isAuth()) {
+  <app-event-registration />
+} @else {
+  <app-event-registration-guard />
+}
+
+<mat-divider></mat-divider>
 <app-event-registrations-list />

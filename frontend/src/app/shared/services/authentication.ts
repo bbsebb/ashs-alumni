@@ -1,4 +1,4 @@
-import {computed, inject, Injectable} from '@angular/core';
+import {computed, inject, Injectable, resource} from '@angular/core';
 import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType, ReadyArgs, typeEventArgs} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
 
@@ -9,8 +9,12 @@ export class AuthenticationService {
   isAuthenticatedSignal;
   private readonly keycloakEventSignal = inject(KEYCLOAK_EVENT_SIGNAL);
   private readonly keycloak = inject(Keycloak);
-
+  userProfileResource = resource({
+    loader:  () => this.keycloak.loadUserProfile()
+  });
   constructor() {
+
+
     this.isAuthenticatedSignal = computed(() => {
       if (this.keycloakEventSignal().type === KeycloakEventType.Ready) {
         return typeEventArgs<ReadyArgs>(this.keycloakEventSignal().args);
@@ -39,6 +43,8 @@ export class AuthenticationService {
       redirectUri: `${window.location.origin}${url}`,
     });
   }
+
+
 
 
 }

@@ -24,6 +24,7 @@ import {FormerTeammate} from '@app/domains/former-teammates/models/former-teamma
 import {LoadingComponent} from '@app/shared/components/loading/loading';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import {ProblemDetail} from '@app/shared/models/problem-detail';
 
 /**
  * FormerCard Component
@@ -150,10 +151,10 @@ export class FormerCard {
         void this.router.navigate(['/former-teammates']);
         console.log('Contact deleted.');
       },
-      error: () => {
+      error: (err) => {
         this.isDeleting.set(false);
         // Deletion failed - show an error message
-        this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+        this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');
       }
     });
   }
@@ -189,9 +190,9 @@ export class FormerCard {
         this.notificationService.showSuccess('Le sms a été renvoyé');
         console.log('SMS  sent.');
       },
-      error: () => {
+      error: (err) => {
         // Deletion failed - show an error message
-        this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+        this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');
       }
     });
 
@@ -227,8 +228,8 @@ export class FormerCard {
           void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
         }
       },
-      error: () => {
-        this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+      error: (err) => {
+        this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');
       }
     });
   }

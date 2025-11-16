@@ -1,6 +1,8 @@
 package fr.hoenheimsports.app.controllers;
 
+import fr.hoenheimsports.app.exceptions.ParticipantAlreadyExistsException;
 import fr.hoenheimsports.domain.exceptions.*;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -22,6 +24,30 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
 
+    // Regroupe toutes les valeurs de ProblemDetail#setType dans un enum unique
+    @Getter
+    private enum ErrorType {
+        VALIDATION("https://api.hoenheimsports.fr/errors/validation"),
+        UNAUTHORIZED("https://api.hoenheimsports.fr/errors/unauthorized"),
+        PARTICIPANT_ALREADY_EXISTS("https://api.hoenheimsports.fr/errors/participant-already-exists"),
+        CONTACT_ALREADY_EXISTS("https://api.hoenheimsports.fr/errors/contact-already-exists"),
+        ENTITY_ALREADY_REMOVED("https://api.hoenheimsports.fr/errors/entity-already-removed"),
+        INVALID_PHONE_NUMBER("https://api.hoenheimsports.fr/errors/invalid-phone-number"),
+        MISSING_REQUIRED_FIELD("https://api.hoenheimsports.fr/errors/missing-required-field"),
+        SMS_HISTORY_NOT_FOUND("https://api.hoenheimsports.fr/errors/sms-history-not-found"),
+        FORMER_TEAMMATE_NOT_FOUND("https://api.hoenheimsports.fr/errors/former-teammate-not-found"),
+        SMS_LIMIT_EXCEEDED("https://api.hoenheimsports.fr/errors/sms-limit-exceeded"),
+        RUNTIME("https://api.hoenheimsports.fr/errors/runtime"),
+        INTERNAL("https://api.hoenheimsports.fr/errors/internal");
+
+        private final URI uri;
+
+        ErrorType(String uri) {
+            this.uri = URI.create(uri);
+        }
+
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid( MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String title = "Champs erronés";
@@ -31,7 +57,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 "Erreur de validation des données"
         );
 
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/validation"));
+        problemDetail.setType(ErrorType.VALIDATION.getUri());
         problemDetail.setTitle(title);
 
         BindingResult bindingResult = ex.getBindingResult();
@@ -86,7 +112,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.UNAUTHORIZED,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/unauthorisation"));
+        problemDetail.setType(ErrorType.UNAUTHORIZED.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -101,7 +127,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.UNAUTHORIZED,
                 "Vous n'avez pas les autorisations requises"
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/unauthorisation"));
+        problemDetail.setType(ErrorType.UNAUTHORIZED.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -115,7 +141,21 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/contact-already-exists"));
+        problemDetail.setType(ErrorType.CONTACT_ALREADY_EXISTS.getUri());
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ParticipantAlreadyExistsException.class)
+    public ProblemDetail handleParticipantAlreadyExistsException(ParticipantAlreadyExistsException ex) {
+        String title = "Le participant existe déjà";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage()
+        );
+        problemDetail.setType(ErrorType.CONTACT_ALREADY_EXISTS.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -129,7 +169,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.GONE,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/entity-already-removed"));
+        problemDetail.setType(ErrorType.ENTITY_ALREADY_REMOVED.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -143,7 +183,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/invalid-phone-number"));
+        problemDetail.setType(ErrorType.INVALID_PHONE_NUMBER.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -158,7 +198,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/missing-required-field"));
+        problemDetail.setType(ErrorType.MISSING_REQUIRED_FIELD.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -173,7 +213,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/sms-history-not-found"));
+        problemDetail.setType(ErrorType.SMS_HISTORY_NOT_FOUND.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -187,7 +227,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/former-teammate-not-found"));
+        problemDetail.setType(ErrorType.FORMER_TEAMMATE_NOT_FOUND.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -201,7 +241,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.TOO_MANY_REQUESTS,
                 ex.getMessage()
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/sms-limit-exceeded"));
+        problemDetail.setType(ErrorType.SMS_LIMIT_EXCEEDED.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -215,7 +255,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Une erreur d'exécution inattendue s'est produite !"
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/runtime"));
+        problemDetail.setType(ErrorType.RUNTIME.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
@@ -231,7 +271,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Une erreur interne s'est produite !"
         );
-        problemDetail.setType(URI.create("https://api.hoenheimsports.fr/errors/internal"));
+        problemDetail.setType(ErrorType.INTERNAL.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
 

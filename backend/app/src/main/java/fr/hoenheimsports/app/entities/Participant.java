@@ -28,10 +28,10 @@ public class Participant {
     private long id;
     @NotBlank
     @Column(nullable = false)
-    String firstName;
+    String firstname;
     @NotBlank
     @Column(nullable = false)
-    String lastName;
+    String lastname;
     @Email
     @NotBlank
     @Column(nullable = false)

@@ -28,7 +28,6 @@ public class EventController {
     }
 
     @GetMapping("participants")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<ParticipantResponse>> findAllParticipants() {
         return ResponseEntity.ok(this.eventService.findAllParticipants());
     }

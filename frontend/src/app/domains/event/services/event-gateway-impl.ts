@@ -3,6 +3,8 @@ import {HttpClient, httpResource} from '@angular/common/http';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {environment} from '@environments/environment.development';
 import {Participant} from '@app/domains/event/models/participant';
+import {Observable} from 'rxjs';
+import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
 
 @Injectable(
   {providedIn: 'root'}
@@ -15,5 +17,9 @@ export class EventGatewayImpl {
 
   public getParticipants() {
     return httpResource<Participant[] | undefined>(() => `${environment.apiUrl}/event/participants`)
+  }
+
+  registerParticipant(participantRequest: ParticipantRequest): Observable<Participant> {
+    return this.httpClient.post<Participant>(`${environment.apiUrl}/event/participants`, participantRequest);
   }
 }

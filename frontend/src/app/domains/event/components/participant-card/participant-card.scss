@@ -1,0 +1,24 @@
+
+
+mat-card {
+  border-radius: 999px; // effet très arrondi type badge
+  padding: 0.4rem 1.2rem;
+  background: var(--mat-sys-secondary);;
+  color: var(--mat-sys-on-secondary);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+mat-card-subtitle{
+  color: var(--mat-sys-on-secondary);
+}
+
+/* Optionnel : réduire l’avatar et le texte pour renforcer l’effet badge */
+mat-card-header {
+  padding: 0;
+}
+
+

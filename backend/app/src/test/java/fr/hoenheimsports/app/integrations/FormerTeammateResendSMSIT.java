@@ -237,7 +237,7 @@ public class FormerTeammateResendSMSIT extends FormerTeammateIT{
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
         assertThat(response.getTitle()).isEqualTo("Permission utilisateur manquante");
-        assertThat(response.getType().toString()).isEqualTo("https://api.hoenheimsports.fr/errors/unauthorisation");
+        assertThat(response.getType().toString()).isEqualTo("https://api.hoenheimsports.fr/errors/unauthorized");
         assertThat(response.getDetail()).isEqualTo("Vous n'avez pas les autorisations requises");
     }
 
@@ -280,7 +280,7 @@ public class FormerTeammateResendSMSIT extends FormerTeammateIT{
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
         assertThat(response.getTitle()).isEqualTo("Permission utilisateur manquante");
-        assertThat(response.getType().toString()).isEqualTo("https://api.hoenheimsports.fr/errors/unauthorisation");
+        assertThat(response.getType().toString()).isEqualTo("https://api.hoenheimsports.fr/errors/unauthorized");
         assertThat(response.getDetail()).isEqualTo("Vous n'avez pas les autorisations requises");
     }
 }

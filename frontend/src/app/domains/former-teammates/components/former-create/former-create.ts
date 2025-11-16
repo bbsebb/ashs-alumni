@@ -6,6 +6,7 @@ import {NotificationService} from '@app/shared/services/notification';
 import {Router} from '@angular/router';
 import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
+import {ProblemDetail} from '@app/shared/models/problem-detail';
 
 @Component({
   selector: 'app-former-create',
@@ -79,7 +80,7 @@ export class FormerCreate {
   private handleError(): (err: any) => void {
     return (err: any) => {
       this.isSubmitting.set(false);
-      this.showErrorNotification();
+      this.showErrorNotification(err.error as ProblemDetail);
       console.error(err);
     }
   }
@@ -103,8 +104,8 @@ export class FormerCreate {
   /**
    * Shows generic error notification
    */
-  private showErrorNotification() {
-    this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+  private showErrorNotification(err:ProblemDetail) {
+    this.notificationService.showError(err,'Une erreur est survenue. Veuillez réessayer plus tard.');
   }
 
   /**

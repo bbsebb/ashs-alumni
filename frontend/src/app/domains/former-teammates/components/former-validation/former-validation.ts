@@ -11,6 +11,7 @@ import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/u
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
 import {LoadingComponent} from '@app/shared/components/loading/loading';
+import {ProblemDetail} from '@app/shared/models/problem-detail';
 
 @Component({
   selector: 'app-former-validation',
@@ -131,7 +132,7 @@ export class FormerValidation {
   private handleError(): (err: any) => void {
     return (err: any) => {
       this.isSubmitting.set(false);
-      this.showErrorNotification();
+      this.showErrorNotification(err.error as ProblemDetail);
       console.error(err);
     }
   }
@@ -165,8 +166,8 @@ export class FormerValidation {
   /**
    * Shows generic error notification
    */
-  private showErrorNotification() {
-    this.notificationService.showError('Une erreur est survenue. Veuillez réessayer plus tard.');
+  private showErrorNotification(err:ProblemDetail) {
+    this.notificationService.showError(err,'Une erreur est survenue. Veuillez réessayer plus tard.');
   }
 
 

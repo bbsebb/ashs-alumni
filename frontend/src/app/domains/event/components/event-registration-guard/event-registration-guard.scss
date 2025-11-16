@@ -1,0 +1,100 @@
+@use '@angular/material' as mat;
+
+.guard-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 0 12px;
+}
+
+.guard-card {
+  width: 500px;
+  max-width: 880px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 16px;
+}
+
+
+
+mat-card-header {
+  background: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+  @include mat.card-overrides((
+    subtitle-text-color: var(--mat-sys-on-tertiary),
+  ));
+}
+
+
+.guard-content {
+  padding: 20px 24px 8px;
+}
+
+.intro {
+  margin: 0 0 16px;
+  color: rgba(0,0,0,0.74);
+}
+
+.benefits-section {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+
+
+}
+
+.benefits-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.benefits-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.benefit-item {
+  display: flex;
+  flex-direction: row;
+  gap:12px;
+
+  mat-icon {
+    padding: 0 20px 0;
+  }
+}
+
+.benefit-text {
+  display: flex;
+  flex-direction: column;     /* titre + desc l’un sous l’autre */
+}
+
+.benefit-title {
+  font-weight: 600;
+}
+
+.benefit-desc {
+  font-size: 12px;
+}
+
+/* badges supprimés avec l'icône "compte requis" */
+
+.guard-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px 20px;
+}
+
+.primary-actions,
+.secondary-links {
+  display: flex;
+  gap: 8px;
+}
+
+
+

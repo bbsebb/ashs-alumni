@@ -5,6 +5,8 @@ import {UUID} from '@app/shared/types/uuid';
 import {EventGatewayImpl} from '@app/domains/event/services/event-gateway-impl';
 import {Participant} from '@app/domains/event/models/participant';
 import {HttpResourceRef} from '@angular/common/http';
+import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
+import {Observable, tap} from 'rxjs';
 
 @Injectable(
   {providedIn: 'root'}
@@ -27,6 +29,12 @@ export class EventStore {
 
   get formerTeammatesResourceRef() {
     return this.participantsResource;
+  }
+
+  registerParticipant( participantRequest:ParticipantRequest): Observable<Participant> {
+    return this.eventGateway.registerParticipant(participantRequest).pipe(
+      tap(() => this.participantsResource.reload()) //TODO: reload only if the participants is the one that was updated
+    );
   }
 
   getFormerTeammateById(id: number) {

@@ -20,7 +20,7 @@ public record FormerTeammateRequest(
         String phone,
         @Email(message = "L'adresse email est invalide")
         String email,
-        @Past
+        @Past(message = "La date de naissance doit être dans le passé")
         LocalDate birthDate,
         List<Role> roles
 ) {

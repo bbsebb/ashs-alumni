@@ -1,0 +1,63 @@
+<div class="guard-container">
+  <mat-card class="guard-card" role="main" aria-labelledby="guard-title">
+
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>lock</mat-icon>Compte requis
+      </mat-card-title>
+      <mat-card-subtitle>
+        Créez votre compte ou connectez‑vous pour vous inscrire à l’événement.
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="guard-content">
+      <p class="intro">
+        Pour vous inscrire à la soirée, il faut disposer d'un compte.
+      </p>
+
+      <div class="benefits-section">
+        <h3 class="benefits-title">Ce que votre compte vous apporte en plus</h3>
+
+
+        <div class="benefits-list-items">
+          <div class="benefit-item">
+            <mat-icon aria-hidden="true">event_available</mat-icon>
+            <div class="benefit-text">
+              <div class="benefit-title">Inscription possible</div>
+              <div class="benefit-desc">Rejoignez la soirée des anciens en quelques clics</div>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <mat-icon aria-hidden="true">sms</mat-icon>
+            <div class="benefit-text">
+              <div class="benefit-title">Ajouter des contacts</div>
+              <div class="benefit-desc">Envoi automatique d'un SMS aux anciens que vous créez</div>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <mat-icon aria-hidden="true">edit</mat-icon>
+            <div class="benefit-text">
+              <div class="benefit-title">Corriger les informations des contacts</div>
+              <div class="benefit-desc">Gérez vos données et celles des anciens</div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions class="guard-actions">
+        <button mat-raised-button color="primary" (click)="register()" class="primary-action">
+          <mat-icon>person_add</mat-icon>
+          <span>Créer mon compte</span>
+        </button>
+        <button mat-stroked-button (click)="login()" class="secondary-action">
+          <mat-icon>login</mat-icon>
+          <span>Me connecter</span>
+        </button>
+    </mat-card-actions>
+
+  </mat-card>
+</div>
