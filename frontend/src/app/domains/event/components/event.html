@@ -1,6 +1,11 @@
-@if(isAuth()) {
+<app-event-details />
+@let participant = participantSignal();
+@if(participant) {
+  <app-event-registered [participant]="participant"/>
+} @else if(isAuth()) {
   <app-event-registration />
-} @else {
+}
+@else {
   <app-event-registration-guard />
 }
 

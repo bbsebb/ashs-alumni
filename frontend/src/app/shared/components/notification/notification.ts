@@ -1,11 +1,5 @@
 import {Component, inject, ViewEncapsulation} from '@angular/core';
-import {
-  MAT_SNACK_BAR_DATA,
-  MatSnackBarAction,
-  MatSnackBarActions,
-  MatSnackBarLabel,
-  MatSnackBarRef
-} from '@angular/material/snack-bar';
+import {MAT_SNACK_BAR_DATA, MatSnackBarAction, MatSnackBarLabel, MatSnackBarRef} from '@angular/material/snack-bar';
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 
@@ -13,7 +7,6 @@ import {MatIcon} from '@angular/material/icon';
   selector: 'app-notification',
   imports: [
     MatSnackBarLabel,
-    MatSnackBarActions,
     MatSnackBarAction,
     MatButton,
     MatIcon

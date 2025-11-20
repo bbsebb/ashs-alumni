@@ -1,0 +1,71 @@
+.registered-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2e7d32; // Green for success
+    margin: 0;
+  }
+
+  .instruction {
+    font-size: 1.1rem;
+  }
+
+  .details {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+    h3 {
+      margin-top: 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0.25rem 0;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .payment-alert {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #fff3e0; // Light orange for warning/attention
+    color: #e65100;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ffe0b2;
+
+    mat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .payment-text {
+      strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+      }
+      p {
+        margin: 0;
+      }
+    }
+  }
+}

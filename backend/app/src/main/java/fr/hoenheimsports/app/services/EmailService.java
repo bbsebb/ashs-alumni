@@ -1,11 +1,16 @@
 package fr.hoenheimsports.app.services;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class EmailService {
     private final JavaMailSender mailSender;
 
@@ -17,12 +22,20 @@ public class EmailService {
     public void envoyerEmailTexte(
             String destinataire,
             String sujet,
-            String contenu
+            String contenuHtml
     ) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(destinataire);
-        message.setSubject(sujet);
-        message.setText(contenu);
-        mailSender.send(message);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            // Le 2ème paramètre "utf-8" assure une bonne gestion des accents
+            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            helper.setTo(destinataire);
+            helper.setSubject(sujet);
+            // Le boolean 'true' indique que le contenu est du HTML
+            helper.setText(contenuHtml, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            log.error("Erreur lors de l'envoi de l'email texte", e);
+            throw new RuntimeException("Erreur lors de l'envoi de l'email HTML", e);
+        }
     }
 }

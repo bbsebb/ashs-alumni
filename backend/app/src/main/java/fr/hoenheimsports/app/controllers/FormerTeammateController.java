@@ -28,12 +28,13 @@ public class FormerTeammateController {
     private final RemoveFormerTeammate formerTeammateRemover;
     private final ResendSMSToFormerTeammate SMSToFormerTeammateSender;
     private final ValidateFormerTeammate formerTeammateValidator;
+    private final MarkAsNotRequestedFormerTeammate formerTeammateNotRequestedMarker;
 
     public FormerTeammateController(RegisterFormerTeammate formerTeammateRegistrar, EditFormerTeammate formerTeammateEditor,
                                     FormerTeammateRetriever formerTeammateRetriever,
                                     FormerTeammateMapper formerTeammateMapper,
                                     FormerTeammateService formerTeammateService,
-                                    SecurityContextService securityContextService, RemoveFormerTeammate formerTeammateRemover, ResendSMSToFormerTeammate SMSToFormerTeammateSender, ValidateFormerTeammate formerTeammateValidator) {
+                                    SecurityContextService securityContextService, RemoveFormerTeammate formerTeammateRemover, ResendSMSToFormerTeammate SMSToFormerTeammateSender, ValidateFormerTeammate formerTeammateValidator, MarkAsNotRequestedFormerTeammate formerTeammateNotRequestedMarker) {
         this.formerTeammateRegistrar = formerTeammateRegistrar;
         this.formerTeammateEditor = formerTeammateEditor;
         this.formerTeammateRetriever = formerTeammateRetriever;
@@ -43,6 +44,7 @@ public class FormerTeammateController {
         this.formerTeammateRemover = formerTeammateRemover;
         this.SMSToFormerTeammateSender = SMSToFormerTeammateSender;
         this.formerTeammateValidator = formerTeammateValidator;
+        this.formerTeammateNotRequestedMarker = formerTeammateNotRequestedMarker;
     }
 
     @PostMapping()
@@ -57,6 +59,13 @@ public class FormerTeammateController {
     @Transactional
     public ResponseEntity<FormerTeammateResponse> resendSms(@PathVariable String id) {
         var formerTeammate = SMSToFormerTeammateSender.resendSMS(UUID.fromString(id),securityContextService.getCurrentContext());
+        return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
+    }
+
+    @PostMapping("/{id}/not_requested")
+    @Transactional
+    public ResponseEntity<FormerTeammateResponse> markAsNotRequested(@PathVariable String id) {
+        var formerTeammate = formerTeammateNotRequestedMarker.markAsNotRequestedFormerTeammate(UUID.fromString(id),securityContextService.getCurrentContext());
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
     }
 

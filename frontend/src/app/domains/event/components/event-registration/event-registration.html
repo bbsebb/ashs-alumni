@@ -33,15 +33,25 @@
         <mat-label>Ajouter un commentaire ou une suggestion</mat-label>
         <textarea
           matInput
-          placeholder="Notez ici si, pour n'importe quelle raison, si vous devez venir accompagné(e) (conjoint et/ou enfant)"
+          placeholder="Notez ici si, pour n'importe quelle raison, si vous devez venir accompagné(e) (conjoint et/ou enfants)"
           formControlName="comments"
           rows="4"
         ></textarea>
       </mat-form-field>
 
+      <div class="full-width">
+        <mat-checkbox formControlName="hasVegetarianOption">
+          Je souhaite prendre l'option végétarienne
+        </mat-checkbox>
+      </div>
+
       <div class="actions">
         <button mat-raised-button type="submit" [disabled]="form.invalid || isSubmitting()">
+          @if (isSubmitting()) {
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+          } @else {
           S'inscrire — {{ priceEuros }} €
+          }
         </button>
       </div>
     </form>

@@ -39,4 +39,5 @@ public class Participant {
     String comments;
     @Column(nullable = false, unique = true)
     UUID kcId;
+    Boolean hasVegetarianOption;
 }

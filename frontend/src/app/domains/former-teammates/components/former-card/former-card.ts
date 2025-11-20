@@ -75,6 +75,9 @@ export class FormerCard {
     () => this.formerTeammateSignal()?.formerTeammateHistories?.some(
       formerTeammateHistory => formerTeammateHistory.historyAction === 'REMOVED')
   )
+
+  isMarkedAsNotRequestedFormerTeammateSignal = computed(() => this.formerTeammateSignal()?.status === 'NOT_REQUESTED')
+
   /** Loading state signal for the former teammates resource */
   isLoading: Signal<boolean>;
   /** Error state signal for the former teammates resource */
@@ -227,6 +230,33 @@ export class FormerCard {
         if(response) {
           void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
         }
+      },
+      error: (err) => {
+        this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');
+      }
+    });
+  }
+
+  protected onMarkNotRequested() {
+    const formerTeammate = this.formerTeammateSignal();
+
+    // Defensive check to ensure teammate exists before attempting deletion
+    if (!formerTeammate) {
+      console.warn('the teammate is undefined');
+      return;
+    }
+    // Prepare confirmation dialog content
+    const content = `Le contact  « ${formerTeammate.firstName} ${formerTeammate.lastName} » sera noté comme ne souhaitant plus être contacté`;
+    const title = 'Marquer le contact comme non sollicité';
+
+    // Show a confirmation dialog and handle the response
+    this.dialogService.showConfirmation(content, title)
+      .pipe(
+        switchMap(() => this.formerTeammatesStore.handleMarkAsNotRequested(formerTeammate.id))
+      )
+      .subscribe({
+      next: (response) => {
+        this.notificationService.showSuccess('Le status du contact a été mis à jour vers « NON SOLLICITÉ »');
       },
       error: (err) => {
         this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');

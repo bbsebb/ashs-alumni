@@ -12,9 +12,11 @@ export class NotificationService {
   constructor() { }
 
 
+/*
   showInfo(message: string) {
     this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'info',0))
   }
+*/
 
   showError(error:ProblemDetail,defaultMessage: string) {
     const message = createMessageFromProblemDetail(error,defaultMessage);
@@ -83,6 +85,9 @@ function createMessageFromProblemDetail(error:ProblemDetail,defaultMessage:strin
       message = createMessage(error.title,error.detail);
       break;
     case 'https://api.hoenheimsports.fr/errors/sms-limit-exceeded':
+      message = createMessage(error.title,error.detail);
+      break;
+    case 'https://api.hoenheimsports.fr/errors/former-teammate-not-requested':
       message = createMessage(error.title,error.detail);
       break;
     case 'https://api.hoenheimsports.fr/errors/runtime':

@@ -5,6 +5,7 @@ export interface Participant {
   firstname: string;
   lastname: string;
   email: string;
+  hasVegetarianOption: boolean;
   comments: string;
   kcId: Readonly<UUID>;
 }

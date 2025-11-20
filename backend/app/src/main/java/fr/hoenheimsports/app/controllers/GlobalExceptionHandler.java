@@ -4,6 +4,7 @@ import fr.hoenheimsports.app.exceptions.ParticipantAlreadyExistsException;
 import fr.hoenheimsports.domain.exceptions.*;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindingResult;
@@ -20,7 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Log4j2
+@Slf4j
+
 @RestControllerAdvice
 public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
 
@@ -36,6 +38,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
         MISSING_REQUIRED_FIELD("https://api.hoenheimsports.fr/errors/missing-required-field"),
         SMS_HISTORY_NOT_FOUND("https://api.hoenheimsports.fr/errors/sms-history-not-found"),
         FORMER_TEAMMATE_NOT_FOUND("https://api.hoenheimsports.fr/errors/former-teammate-not-found"),
+        FORMER_TEAMMATE_NOT_REQUESTED("https://api.hoenheimsports.fr/errors/former-teammate-not-requested"),
         SMS_LIMIT_EXCEEDED("https://api.hoenheimsports.fr/errors/sms-limit-exceeded"),
         RUNTIME("https://api.hoenheimsports.fr/errors/runtime"),
         INTERNAL("https://api.hoenheimsports.fr/errors/internal");
@@ -156,6 +159,20 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 ex.getMessage()
         );
         problemDetail.setType(ErrorType.CONTACT_ALREADY_EXISTS.getUri());
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(FormerTeammateForbiddenByStatusException.class)
+    public ProblemDetail handleFormerTeammateForbiddenByStatusException(FormerTeammateForbiddenByStatusException ex) {
+        String title = "Le contact est marqué comme « NON SOLLICITÉ »";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage()
+        );
+        problemDetail.setType(ErrorType.FORMER_TEAMMATE_NOT_REQUESTED.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;

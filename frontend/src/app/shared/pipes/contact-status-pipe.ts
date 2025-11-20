@@ -15,7 +15,7 @@ export class ContactStatusPipe implements PipeTransform {
       case 'VALIDATED':
         return 'Validé';
       case 'NOT_REQUESTED':
-        return 'Non demandé';
+        return 'Non sollicité';
       case 'UNREACHABLE':
         return 'Injoignable';
       default:

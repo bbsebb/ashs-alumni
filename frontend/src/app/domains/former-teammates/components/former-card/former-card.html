@@ -89,12 +89,19 @@
           <button mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true" (click)="onUpdate()" [disabled]="isDeleting()">
             Modifier
           </button>
+          @if (formerTeammate.status !== 'NOT_REQUESTED') {
+          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="onMarkNotRequested()" [disabled]="isDeleting()">
+            Non sollicité
+          </button>
+          }
           <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="onDelete()" [disabled]="isDeleting()">
             Supprimer
           </button>
+          @if (formerTeammate.status !== 'NOT_REQUESTED') {
           <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" [disabled]="isDeleting()" (click)="onSendSMS()">
             Renvoyer SMS
           </button>
+          }
         }
       </mat-card-actions>
     </mat-card>

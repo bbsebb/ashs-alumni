@@ -1,5 +1,31 @@
-p {
-  background: red;
-  margin:0;
-  padding:clamp(8px, 2vw, 24px)
+/* Styles minimalistes et accessibles pour le footer */
+.app-footer {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  p {
+    margin: 0;
+    padding: clamp(8px, 2vw, 16px);
+    text-align: center;
+    font-size: clamp(12px, 1.6vw, 14px);
+    line-height: 1.5;
+  }
+
+  a {
+    color: inherit; /* cohérent avec le thème */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease, text-decoration-thickness 0.2s ease;
+
+    &:hover {
+      color: var(--mat-sys-primary);
+      text-decoration-thickness: 2px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary);
+      outline-offset: 2px;
+    }
+  }
 }

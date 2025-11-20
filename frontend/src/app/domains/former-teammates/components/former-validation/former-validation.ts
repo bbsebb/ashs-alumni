@@ -1,4 +1,4 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal} from '@angular/core';
 import {NotificationService} from '@app/shared/services/notification';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
@@ -42,6 +42,7 @@ export class FormerValidation {
   readonly isSubmitting = signal(false);
   hasError;
 
+
   constructor() {
     // Initialize the identifier from route parameters
     this.code = toSignal(this.getCodeFromRoute(), {requireSync: true});
@@ -49,6 +50,9 @@ export class FormerValidation {
     this.loadedResource = this.formerTeammatesStore.getFormerTeammateByCode(this.code());
 
 
+    effect(() => {
+      console.log('Loaded resource:', this.loadedResource.error());
+    });
     this.hasError = computed(() => !!this.loadedResource.error());
     this.isLoading = this.loadedResource.isLoading;
 

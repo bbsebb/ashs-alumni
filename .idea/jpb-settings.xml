@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DatabaseMigrationSettings" lastSelectedDirectory="$PROJECT_DIR$/backend/app/build/generated/sources/annotationProcessor/java/main/backend/app/src/main/resources/db/migration" />
+  <component name="JpaLiquibaseChangesConfig">
+    <exclude-change idName="participant#firstname" tagName="addColumn" />
+    <exclude-change idName="participant#" tagName="addUniqueConstraint" />
+    <exclude-change idName="participant#last_name" tagName="dropColumn" />
+    <exclude-change idName="participant#first_name" tagName="dropColumn" />
+    <exclude-change idName="participant#lastname" tagName="addNotNullConstraint" />
+    <exclude-change idName="participant#firstname" tagName="addNotNullConstraint" />
+    <exclude-change idName="participant#lastname" tagName="addColumn" />
+  </component>
 </project>

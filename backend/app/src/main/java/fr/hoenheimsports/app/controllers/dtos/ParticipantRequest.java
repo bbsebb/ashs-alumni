@@ -7,13 +7,14 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record ParticipantRequest(
-        @NotBlank
+        @NotBlank(message = "Le prénom est obligatoire")
         String firstname,
-        @NotBlank
+        @NotBlank(message = "Le nom est obligatoire")
         String lastname,
-        @NotBlank
-        @Email
+        @NotBlank(message = "L'adresse email est obligatoire")
+        @Email(message = "L'adresse email est invalide")
         String email,
-        String comments
+        String comments,
+        Boolean hasVegetarianOption
 ) {
 }

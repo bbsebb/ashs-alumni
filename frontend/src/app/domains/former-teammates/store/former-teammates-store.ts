@@ -73,4 +73,10 @@ export class FormerTeammatesStore {
       tap(() => this.formerTeammatesResource.reload()) //TODO: reload only if the formerTeammate is the one that was updated
     );
   }
+
+  handleMarkAsNotRequested(id: Readonly<UUID>):Observable<FormerTeammate> {
+    return this.formerTeammatesGateway.markFormerTeammateAsNotRequested(id).pipe(
+      tap(() => this.formerTeammatesResource.reload()) //TODO: reload only if the formerTeammate is the one that was updated
+    );
+  }
 }

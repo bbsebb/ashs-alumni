@@ -41,12 +41,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @Transactional
 @Testcontainers
 public class FormerTeammateEditIT extends FormerTeammateIT {
-    @Autowired
-    Environment env;
-    @Test
-    void checkOrigin() {
-        System.out.println("myapp.origin = " + env.getProperty("myapp.origin"));
-    }
+
     @Autowired
     private WebApplicationContext context;
 

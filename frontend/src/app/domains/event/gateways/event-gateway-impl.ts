@@ -3,7 +3,7 @@ import {HttpClient, httpResource} from '@angular/common/http';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {environment} from '@environments/environment.development';
 import {Participant} from '@app/domains/event/models/participant';
-import {Observable} from 'rxjs';
+import {delay, Observable} from 'rxjs';
 import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
 
 @Injectable(

@@ -1,1 +1,3 @@
+export const CONTACT_STATUSES: ContactStatus[] = ['SUBMITTED', 'PENDING', 'VALIDATED', 'NOT_REQUESTED', 'UNREACHABLE'];
+
 export type ContactStatus = 'SUBMITTED' | 'PENDING' | 'VALIDATED' | 'NOT_REQUESTED' | 'UNREACHABLE';

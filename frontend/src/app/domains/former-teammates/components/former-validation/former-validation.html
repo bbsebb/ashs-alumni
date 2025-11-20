@@ -1,5 +1,5 @@
 @if (hasError()) {
-  <app-load-error backLink="/former-teammates"></app-load-error>
+  <app-load-error message="Le code de validation est incorrect ou inconnu" backLink="/former-teammates"></app-load-error>
 } @else if (isLoading()) {
   <app-loading></app-loading>
 } @else {

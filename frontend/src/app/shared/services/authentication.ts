@@ -10,7 +10,13 @@ export class AuthenticationService {
   private readonly keycloakEventSignal = inject(KEYCLOAK_EVENT_SIGNAL);
   private readonly keycloak = inject(Keycloak);
   userProfileResource = resource({
-    loader:  () => this.keycloak.loadUserProfile()
+    loader:  async () => {
+      try {
+        return await this.keycloak.loadUserProfile()
+      } catch(e) {
+        return undefined
+      }
+    }
   });
   constructor() {
 

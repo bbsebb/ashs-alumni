@@ -5,7 +5,7 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
 import {ContactStatusPipe} from '@app/shared/pipes/contact-status-pipe';
 import {Gender} from '@app/domains/former-teammates/models/gender';
-import {ContactStatus} from '@app/domains/former-teammates/models/contact-status';
+import {CONTACT_STATUSES, ContactStatus} from '@app/domains/former-teammates/models/contact-status';
 
 @Component({
   selector: 'app-former-filter',
@@ -39,7 +39,7 @@ export class FormerFilter implements OnInit{
     searchByName: new FormControl<string>('')
   });
 
-  readonly statusFilter: ContactStatus[] = ["SUBMITTED","PENDING","VALIDATED","UNREACHABLE"]
+  readonly statusFilter: ContactStatus[] = CONTACT_STATUSES;
 
   ngOnInit(): void {
     this.formFilter.valueChanges.subscribe( filter => this.filterChange.emit({

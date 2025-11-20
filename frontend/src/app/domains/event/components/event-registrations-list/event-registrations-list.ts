@@ -3,8 +3,6 @@ import {EventStore} from '@app/domains/event/stores/event-store';
 import {Participant} from '@app/domains/event/models/participant';
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {MatDivider} from '@angular/material/divider';
-import {MatListItem, MatNavList} from '@angular/material/list';
-import {UpperCasePipe} from '@angular/common';
 import {MatIcon} from '@angular/material/icon';
 import {ParticipantCard} from '@app/domains/event/components/participant-card/participant-card';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -18,11 +16,8 @@ import {MatProgressBar} from '@angular/material/progress-bar';
     MatCardSubtitle,
     MatDivider,
     MatCardContent,
-    MatNavList,
-    MatListItem,
     MatIcon,
     MatProgressBar,
-    UpperCasePipe,
     ParticipantCard
   ],
   templateUrl: './event-registrations-list.html',

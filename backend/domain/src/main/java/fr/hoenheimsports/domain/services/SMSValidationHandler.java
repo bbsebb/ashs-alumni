@@ -2,7 +2,9 @@ package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.SMSHistoryRetriever;
 import fr.hoenheimsports.domain.annotations.DomainService;
+import fr.hoenheimsports.domain.exceptions.FormerTeammateForbiddenByStatusException;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
+import fr.hoenheimsports.domain.exceptions.SMSDeliveryException;
 import fr.hoenheimsports.domain.exceptions.SMSLimitExceededException;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
@@ -43,7 +45,10 @@ import fr.hoenheimsports.domain.models.SMSHistory;
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
     private static final String SMS_VALIDATION_MESSAGE = """
-            message test du sms
+            Bonjour, c'est Sébastien Burckhardt. Un ancien de la SM1 de Hoenheim t'a ajouté à l'annuaire.
+            Merci de valider ton contact ici : alumni.hoenheimsports.fr/former-teammates/validate/%s
+            Tu es aussi invité à la soirée des anciens le samedi 10 décembre.
+            Si erreur ou pour ne plus être contacté, réponds à ce SMS.
             """;
     private static final int SMS_SEND_LIMIT = 3;
     private final UpdateFormerTeammate updateFormerTeammate;
@@ -97,6 +102,13 @@ public class SMSValidationHandler implements HandleSMSValidation{
      */
     @Override
     public FormerTeammate handleValidationBySMS(FormerTeammate formerTeammate, String updatedBy) {
+        if(formerTeammate.status() == ContactStatus.NOT_REQUESTED) {
+            throw new FormerTeammateForbiddenByStatusException("Le contact ne souhaite plus être sollicité.");
+        }
+        if(formerTeammate.code() == null) {
+            throw new SMSDeliveryException("Le code d'envoi du SMS est indisponible.");
+        }
+
         int SMSHistoriesCount = smsHistoryRetriever.findAllSMSHistoryByFormerTeammateId(formerTeammate.id()).size();
 
         if(SMSHistoriesCount > SMS_SEND_LIMIT -1) {
@@ -105,7 +117,7 @@ public class SMSValidationHandler implements HandleSMSValidation{
 
         var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(
                 formerTeammate.phone().orElseThrow().getRawValue(),
-                SMS_VALIDATION_MESSAGE,
+                SMS_VALIDATION_MESSAGE.formatted(formerTeammate.code()),
                 formerTeammate.id()
         );
 

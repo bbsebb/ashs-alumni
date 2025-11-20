@@ -23,6 +23,10 @@ export class FormerTeammatesGatewayStub implements FormerTeammatesGateway {
 
   }
 
+  markFormerTeammateAsNotRequested(id: Readonly<UUID>): Observable<FormerTeammate> {
+        throw new Error("Method not implemented.");
+    }
+
   validateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate, code: UUID): Observable<FormerTeammate> {
         throw new Error("Method not implemented.");
     }

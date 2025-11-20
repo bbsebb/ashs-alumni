@@ -3,4 +3,5 @@ export interface ParticipantRequest {
   lastname:string;
   email:string;
   comments:string;
+  hasVegetarianOption:boolean;
 }

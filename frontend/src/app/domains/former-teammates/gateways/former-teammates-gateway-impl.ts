@@ -13,6 +13,9 @@ import {environment} from '@environments/environment.development';
   providedIn: 'root'
 })
 export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
+  markFormerTeammateAsNotRequested(id: Readonly<UUID>): Observable<FormerTeammate> {
+    return this.httpClient.post<FormerTeammate>(`${environment.apiUrl}/former-teammates/${id}/not_requested`, null);
+  }
 
   private readonly httpClient = inject(HttpClient);
   getFormerTeammateById(id: string | UUID): HttpResourceRef<FormerTeammate | undefined> {

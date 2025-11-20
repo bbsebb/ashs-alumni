@@ -9,6 +9,14 @@ import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
 import {NotificationService} from '@app/shared/services/notification';
 import {ProblemDetail} from '@app/shared/models/problem-detail';
 import {AuthenticationService} from '@app/shared/services/authentication';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {MatDialog} from '@angular/material/dialog';
+import {
+  EventRegistrationConfirmation
+} from '@app/domains/event/components/event-registration/event-registration-confirmation';
+import {filter, switchMap, tap} from 'rxjs';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+
 
 @Component({
   selector: 'app-event-registration',
@@ -18,7 +26,9 @@ import {AuthenticationService} from '@app/shared/services/authentication';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    MatCheckbox,
+    MatProgressSpinner
   ],
   templateUrl: './event-registration.html',
   styleUrls: ['./event-registration.scss']
@@ -28,7 +38,7 @@ export class EventRegistration {
   private readonly eventStore = inject(EventStore);
   private readonly notificationService = inject(NotificationService);
   private readonly authenticationService = inject(AuthenticationService);
-
+  private readonly dialog = inject(MatDialog);
 
   constructor(
   ) {
@@ -50,15 +60,27 @@ export class EventRegistration {
     lastName: ['', Validators.required],
     firstName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    comments: ['']
+    comments: [''],
+    hasVegetarianOption: [false]
   });
 
 
   onSubmit() {
     this.isSubmitting.set(true);
     if (this.form.valid) {
-      this.eventStore.registerParticipant(this.buildParticipantRequest())
-        .subscribe({
+      const request = this.buildParticipantRequest();
+      this.dialog.open(EventRegistrationConfirmation, {
+        data: request,
+        width: '500px'
+      }).afterClosed().pipe(
+        tap(confirmed => {
+          if (!confirmed) {
+            this.isSubmitting.set(false);
+          }
+        }),
+        filter(confirmed => !!confirmed),
+        switchMap(() => this.eventStore.registerParticipant(request)),
+      ).subscribe({
           next: () => {
             this.notificationService.showSuccess("Inscription validée. Merci pour votre participation !");
             this.isSubmitting.set(false);
@@ -75,13 +97,14 @@ export class EventRegistration {
   }
 
   private buildParticipantRequest(): ParticipantRequest {
-    const { firstName, lastName, email, comments } = this.form.getRawValue();
+    const { firstName, lastName, email, comments, hasVegetarianOption } = this.form.getRawValue();
 
     return {
       firstname: firstName,
       lastname: lastName,
       email: email,
-      comments: comments
+      comments: comments,
+      hasVegetarianOption: hasVegetarianOption
     };
   }
 }

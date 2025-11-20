@@ -37,18 +37,19 @@ spring:
             enable: true
 
 # Actuator configuration
+
+
 management:
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_TRACING_ENDPOINT}
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: when-authorized
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+        include: "health,info,metrics,prometheus"
+  tracing:
+    sampling:
+      probability: 0.1
 
 # Server configuration
 server:
@@ -68,3 +69,4 @@ twilio:
   auth-token: ${TWILIO_AUTH_TOKEN}
   phone-number: ${TWILIO_PHONE_NUMBER}
   webhook-url: ${TWILIO_WEBHOOK_URL:https://your-domain.com/api/webhooks/twilio/status}
+

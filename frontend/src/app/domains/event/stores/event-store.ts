@@ -2,7 +2,7 @@ import {computed, effect, inject, Injectable, ResourceRef, Signal} from '@angula
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
-import {EventGatewayImpl} from '@app/domains/event/services/event-gateway-impl';
+import {EventGatewayImpl} from '@app/domains/event/gateways/event-gateway-impl';
 import {Participant} from '@app/domains/event/models/participant';
 import {HttpResourceRef} from '@angular/common/http';
 import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
@@ -37,7 +37,7 @@ export class EventStore {
     );
   }
 
-  getFormerTeammateById(id: number) {
-    return computed(() => this.participantsResource.value()?.find((participant) => participant.id === id))
+  getFormerTeammateByKcId(kcId: UUID): Participant | undefined {
+    return computed(() => this.participantsResource.value()?.find((participant) => participant.kcId === kcId))()
   }
 }

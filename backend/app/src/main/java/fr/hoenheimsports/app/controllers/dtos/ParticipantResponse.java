@@ -7,6 +7,7 @@ public record ParticipantResponse(
         String firstname,
         String lastname,
         String email,
+        Boolean hasVegetarianOption,
         String comments,
         UUID kcId
 ) {

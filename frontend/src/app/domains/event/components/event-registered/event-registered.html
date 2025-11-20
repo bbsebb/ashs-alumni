@@ -1,0 +1,28 @@
+<div class="registered-container">
+  <h2><mat-icon>check_circle</mat-icon> Vous êtes enregistré pour la soirée !</h2>
+
+  <p class="instruction">
+    Merci {{ participant()?.firstname }} ! Votre inscription est bien prise en compte.
+  </p>
+
+  <div class="details">
+    <h3>Détails de l'inscription :</h3>
+    <ul>
+      <li><strong>Nom :</strong> {{ participant()?.lastname }} {{ participant()?.firstname }}</li>
+      <li><strong>Email :</strong> {{ participant()?.email }}</li>
+      <li><strong>Commentaires :</strong> {{ participant()?.comments}}</li>
+      <li>
+        <strong>Option végétarienne :</strong>
+        {{ participant()?.hasVegetarianOption ? 'Oui' : 'Non' }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="payment-alert">
+    <mat-icon>payment</mat-icon>
+    <div class="payment-text">
+      <strong>À régler sur place : 25€</strong>
+      <p>Le paiement se fera directement lors de votre arrivée à l'événement.</p>
+    </div>
+  </div>
+</div>

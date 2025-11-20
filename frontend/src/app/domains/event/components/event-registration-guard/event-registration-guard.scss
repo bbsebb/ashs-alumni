@@ -7,7 +7,7 @@
   padding: 0 12px;
 }
 
-.guard-card {
+mat-card {
   width: 500px;
   max-width: 880px;
   overflow: hidden;
@@ -15,23 +15,31 @@
   border-radius: 16px;
 }
 
+mat-card-title {
+  mat-icon {
+    @include mat.icon-overrides((
+      color: var(--mat-sys-error)
+    ));
+  }
+}
+
 
 
 mat-card-header {
-  background: var(--mat-sys-tertiary);
-  color: var(--mat-sys-on-tertiary);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
   @include mat.card-overrides((
-    subtitle-text-color: var(--mat-sys-on-tertiary),
+    subtitle-text-color: var(--mat-sys-on-error-container),
+
   ));
+  padding-bottom: 10px;
 }
 
 
-.guard-content {
-  padding: 20px 24px 8px;
-}
+
 
 .intro {
-  margin: 0 0 16px;
+  margin: 10px 0 16px;
   color: rgba(0,0,0,0.74);
 }
 
@@ -81,7 +89,7 @@ mat-card-header {
 
 /* badges supprimés avec l'icône "compte requis" */
 
-.guard-actions {
+mat-card-actions {
   display: flex;
   justify-content: center;
   align-items: center;
