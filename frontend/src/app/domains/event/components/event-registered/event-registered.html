@@ -8,12 +8,12 @@
   <div class="details">
     <h3>Détails de l'inscription :</h3>
     <ul>
-      <li><strong>Nom :</strong> {{ participant()?.lastname }} {{ participant()?.firstname }}</li>
-      <li><strong>Email :</strong> {{ participant()?.email }}</li>
-      <li><strong>Commentaires :</strong> {{ participant()?.comments}}</li>
+      <li><strong>Nom :</strong> {{ participant().lastname }} {{ participant().firstname }}</li>
+      <li><strong>Email :</strong> {{ participant().email }}</li>
+      <li><strong>Commentaires :</strong> {{ participant().comments}}</li>
       <li>
         <strong>Option végétarienne :</strong>
-        {{ participant()?.hasVegetarianOption ? 'Oui' : 'Non' }}
+        {{ participant().hasVegetarianOption ? 'Oui' : 'Non' }}
       </li>
     </ul>
   </div>

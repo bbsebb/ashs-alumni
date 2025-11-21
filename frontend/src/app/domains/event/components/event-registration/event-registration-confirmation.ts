@@ -2,7 +2,6 @@ import {Component, inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
-  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle
@@ -17,8 +16,7 @@ import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatButton,
-    MatDialogClose
+    MatButton
   ],
   template: `
     <h2 mat-dialog-title>Confirmation inscription</h2>
