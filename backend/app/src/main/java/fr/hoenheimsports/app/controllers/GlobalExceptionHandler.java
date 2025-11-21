@@ -25,6 +25,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
 
+
     // Regroupe toutes les valeurs de ProblemDetail#setType dans un enum unique
     @Getter
     private enum ErrorType {
