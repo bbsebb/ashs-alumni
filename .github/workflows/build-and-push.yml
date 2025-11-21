@@ -15,7 +15,6 @@ env:
 jobs:
   build-backend:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (contains(github.event.head_commit.modified, 'backend/') || contains(github.event.head_commit.added, 'backend/') || contains(github.event.head_commit.removed, 'backend/')))
     permissions:
       contents: read
       packages: write
@@ -69,7 +68,6 @@ jobs:
   build-frontend:
     runs-on: ubuntu-latest
     # Ce job ne se lance que si le dossier frontend est modifié
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.head_commit.added, 'frontend/') || contains(github.event.head_commit.removed, 'frontend/')))
     permissions:
       contents: read
       packages: write
