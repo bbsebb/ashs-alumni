@@ -41,6 +41,7 @@ import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
  * @see ContactStatus
  */
 @UseCase
+
 public class FormerTeammateEditor implements EditFormerTeammate {
     
     private final FormerTeammateRepository formerTeammateRepository;

@@ -57,11 +57,7 @@ server:
 
 
 # Logging configuration
-logging:
-  level:
-    org.springframework.web: INFO
-    fr.hoenheimsports: DEBUG
-    org.hibernate: INFO
+
 
 
 twilio:

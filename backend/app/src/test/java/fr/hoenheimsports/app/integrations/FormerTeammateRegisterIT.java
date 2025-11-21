@@ -379,7 +379,8 @@ class FormerTeammateRegisterIT extends FormerTeammateIT{
                 "SMSHistories.formerTeammateId",
                 "SMSHistories.sentAt",
                 "SMSHistories.updatedAt",
-                "SMSHistories.externalId"
+                "SMSHistories.externalId",
+                "SMSHistories.message"
         ).isEqualTo(expectedResponse);
         assertThat(response.formerTeammateHistories()).allMatch(
                 isParentFormerTeammateIdEqualForFormerTeammateHistoryResponse(response),

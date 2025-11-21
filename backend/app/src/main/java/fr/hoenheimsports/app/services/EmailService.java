@@ -33,6 +33,7 @@ public class EmailService {
             // Le boolean 'true' indique que le contenu est du HTML
             helper.setText(contenuHtml, true);
             mailSender.send(message);
+            log.info("Email envoyé à {} avec le sujet {}", destinataire, sujet);
         } catch (MessagingException e) {
             log.error("Erreur lors de l'envoi de l'email texte", e);
             throw new RuntimeException("Erreur lors de l'envoi de l'email HTML", e);

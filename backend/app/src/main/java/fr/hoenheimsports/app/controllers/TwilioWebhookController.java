@@ -39,8 +39,10 @@ TwilioWebhookController {
     @Transactional
     public ResponseEntity<Void> handleStatusCallback(
             @ModelAttribute TwilioWebhookRequest request, @RequestParam String formerTeammateId) {
+        log.info("Handling status callback {}", request);
         SMSUpdatedStatusDetails command = twilioMessageMapper.toSMSUpdatedStatusCommand(request, formerTeammateId);
         handleSMSUpdatedStatus.handleSMSStatusUpdated(command);
+        log.info("Status callback handled");
         return ResponseEntity.ok().build();
     }
 

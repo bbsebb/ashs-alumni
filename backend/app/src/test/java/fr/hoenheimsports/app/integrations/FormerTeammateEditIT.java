@@ -237,11 +237,7 @@ public class FormerTeammateEditIT extends FormerTeammateIT {
         List<FormerTeammateHistoryResponse> oldFormerTeammateHistoriesResponse = filterOldFormerTeammateHistoryResponses(response, contextResponse);
         List<FormerTeammateHistoryResponse> newFormerTeammateHistoriesResponse = filterNewTeammateHistoryResponses(response, contextResponse);
         assertThat(oldFormerTeammateHistoriesResponse).isEqualTo(contextResponse.formerTeammateHistories());
-        System.out.println("Response");
-        System.out.println(response);
-        System.out.println("newFormerTeammateHistoriesResponse");
         newFormerTeammateHistoriesResponse.forEach(System.out::println);
-        System.out.println("oldFormerTeammateHistoriesResponse");
         oldFormerTeammateHistoriesResponse.forEach(System.out::println);
         if (!expectedNewFormerTeammateHistoryResponse.isEmpty()) {
             assertThat(newFormerTeammateHistoriesResponse).hasSize(expectedNewFormerTeammateHistoryResponse.size());
@@ -261,7 +257,7 @@ public class FormerTeammateEditIT extends FormerTeammateIT {
             assertThat(newSMSHistoriesResponse).hasSize(expectedNewSMSHistoryResponse.size());
             assertThat(newSMSHistoriesResponse)
                     .usingRecursiveComparison()
-                    .ignoringFields("id", "formerTeammateId", "updatedAt", "sentAt", "externalId")
+                    .ignoringFields("id", "formerTeammateId", "updatedAt", "sentAt", "externalId","message")
                     .isEqualTo(expectedNewSMSHistoryResponse);
         } else {
             assertThat(newSMSHistoriesResponse).isEmpty();
@@ -289,7 +285,12 @@ public class FormerTeammateEditIT extends FormerTeammateIT {
     }
 
 
-
+    private static final String SMS_VALIDATION_MESSAGE = """
+            Bonjour, c'est Sébastien Burckhardt. Un ancien de la SM1 de Hoenheim t'a ajouté à l'annuaire.
+            Merci de valider ton contact ici : alumni.hoenheimsports.fr/former-teammates/validate/%s
+            Tu es aussi invité à la soirée des anciens le samedi 10 décembre.
+            Si erreur ou pour ne plus être contacté, réponds à ce SMS.
+            """;
 
     public static Stream<Arguments> provideValidScenariosWithAuthentication() {
         return Stream.of(
@@ -522,7 +523,7 @@ public class FormerTeammateEditIT extends FormerTeammateIT {
                                         null,
                                         null,
                                         "+33638***416",
-                                        "message test du sms",
+                                        SMS_VALIDATION_MESSAGE.formatted("AAAAAA"),
                                         SMSStatus.QUEUED,
                                         null,
                                         null,

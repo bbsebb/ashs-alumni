@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Import des réglages par défaut de Spring Boot (couleurs, etc.) -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!-- Configuration par défaut (pour tous les profils si non surchargé) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Profil DEV : Log dans la console uniquement avec niveau DEBUG pour l'app -->
+    <springProfile name="debug">
+        <!-- Pas besoin de redéfinir root ici si c'est le même,
+             mais on peut changer le niveau de log spécifique -->
+        <logger name="fr.hoenheimsports" level="DEBUG"/>
+    </springProfile>
+
+</configuration>

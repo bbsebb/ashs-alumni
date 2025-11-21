@@ -1,0 +1,137 @@
+name: build-and-push.yml
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/deploy-and_push.yml'
+env:
+  REGISTRY: ghcr.io
+  # Remplacez par le nom de votre repo (ex: mon-user/mon-repo)
+  IMAGE_NAME: ${{ github.repository_owner }}/alumni_ashs_backend
+  FRONTEND_DIR: ./frontend
+  BACKEND_DIR: ./backend
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (contains(github.event.head_commit.modified, 'backend/') || contains(github.event.head_commit.added, 'backend/') || contains(github.event.head_commit.removed, 'backend/')))
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: ./gradlew bootJar
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Dockerfile for backend module
+        run: |
+          cat > ${{ env.BACKEND_DIR }}/Dockerfile << 'EOF'
+          FROM eclipse-temurin:24-jre-alpine
+          WORKDIR /app
+          COPY build/libs/*.jar app.jar
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOF
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.BACKEND_DIR }}
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    # Ce job ne se lance que si le dossier frontend est modifié
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.head_commit.added, 'frontend/') || contains(github.event.head_commit.removed, 'frontend/')))
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm ci
+
+      - name: Build Angular App
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run build --configuration=production
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+
+      - name: Create Dockerfile for frontend app
+        run: |
+          cat > ${{ env.FRONTEND_DIR }}/Dockerfile << 'EOF'
+          FROM nginx:alpine
+          COPY dist/${{env.APP_NAME}}/browser /usr/share/nginx/html
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
+          EXPOSE 80
+          CMD ["nginx", "-g", "daemon off;"]
+          EOF
+
+          cat > ${{ env.FRONTEND_DIR }}/nginx.conf << 'EOF'
+          server {
+            listen 80;
+            server_name localhost;
+            root /usr/share/nginx/html;
+            index index.html;
+          
+            location / {
+              try_files $uri $uri/ /index.html;
+            }
+          }
+          EOF
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.FRONTEND_DIR }}
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}

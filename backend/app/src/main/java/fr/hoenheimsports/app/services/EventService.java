@@ -6,6 +6,7 @@ import fr.hoenheimsports.app.entities.Participant;
 import fr.hoenheimsports.app.exceptions.ParticipantAlreadyExistsException;
 import fr.hoenheimsports.app.mappers.ParticipantMapper;
 import fr.hoenheimsports.app.repositories.EventRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class EventService {
     private final ParticipantMapper participantMapper;
     private final EventRepository eventRepository;
@@ -37,6 +39,7 @@ public class EventService {
                 });
         participant.setKcId(UUID.fromString(extractSubFromSecurityContext()));
         this.eventRepository.save(participant);
+        log.info("Participant {} avec ne nom : {} et prénom : {} enregistré",participant.getId(),participant.getFirstname(),participant.getLastname());
         emailService.envoyerEmailTexte(
                 participant.getEmail(),
                 "Confirmation d’inscription",

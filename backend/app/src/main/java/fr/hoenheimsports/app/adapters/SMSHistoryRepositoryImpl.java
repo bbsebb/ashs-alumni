@@ -5,6 +5,7 @@ import fr.hoenheimsports.app.mappers.SMSHistoryMapper;
 import fr.hoenheimsports.app.repositories.SMSHistoryEntityRepository;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Slf4j
 public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
     private final SMSHistoryEntityRepository smsHistoryEntityRepository;
     private final SMSHistoryMapper smsHistoryMapper;
@@ -23,20 +25,22 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
 
     @Override
     public void save(SMSHistory smsHistory) {
-
+        log.info("Saving SMS history {}", smsHistory);
         // Vérifie si l'entité existe déjà
         var existingEntity = smsHistoryEntityRepository.findById(smsHistory.id());
-
+        SMSHistoryEntity smsHistoryEntity;
         if (existingEntity.isPresent()) {
+            log.debug("Entity already exists, updating it");
             // Met à jour l'entité existante pour préserver la relation formerTeammate
             var entityToUpdate = existingEntity.get();
             updateExistingEntity(entityToUpdate, smsHistory);
-            smsHistoryEntityRepository.save(entityToUpdate);
+            smsHistoryEntity = smsHistoryEntityRepository.save(entityToUpdate);
         } else {
+            log.debug("Entity does not exist, creating it");
             // Nouvelle entité
-            smsHistoryEntityRepository.save(smsHistoryMapper.toEntity(smsHistory));
+            smsHistoryEntity =smsHistoryEntityRepository.save(smsHistoryMapper.toEntity(smsHistory));
         }
-
+        log.info("SMS history saved {}", smsHistoryEntity);
     }
 
     /**
@@ -44,6 +48,7 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
      * en préservant les relations JPA existantes.
      */
     private void updateExistingEntity(SMSHistoryEntity entity, SMSHistory smsHistory) {
+        log.debug("Updating existing entity {}", entity);
         // Met à jour seulement les champs modifiables, pas la relation formerTeammate
         entity.setFormerTeammateId(smsHistory.formerTeammateId());
         entity.setPhoneNumber(smsHistory.phoneNumber().value());
@@ -59,11 +64,17 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
 
     @Override
     public Optional<SMSHistory> findByExternalID(String externalId) {
-        return smsHistoryEntityRepository.findByExternalId(externalId).map(smsHistoryMapper::toModel);
+        log.info("Retrieving SMS history with external id {}", externalId);
+        var smsHistoryOptional = smsHistoryEntityRepository.findByExternalId(externalId).map(smsHistoryMapper::toModel);
+        log.info("SMS history retrieved {}", smsHistoryOptional);
+        return smsHistoryOptional;
     }
 
     @Override
     public List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId) {
-       return smsHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(smsHistoryMapper::toModel).toList();
+        log.info("Retrieving all SMS history by former teammate id {}", formerTeammateId);
+        List<SMSHistory> smsHistoryList = smsHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(smsHistoryMapper::toModel).toList();
+        log.info("SMS histories retrieved {}", smsHistoryList);
+        return smsHistoryList;
     }
 }
