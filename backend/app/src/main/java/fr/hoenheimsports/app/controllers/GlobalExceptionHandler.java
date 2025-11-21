@@ -3,7 +3,6 @@ package fr.hoenheimsports.app.controllers;
 import fr.hoenheimsports.app.exceptions.ParticipantAlreadyExistsException;
 import fr.hoenheimsports.domain.exceptions.*;
 import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.authorization.AuthorizationDeniedException;
