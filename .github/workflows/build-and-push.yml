@@ -3,8 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    paths:
-      - '.github/workflows/deploy-and_push.yml'
+
 env:
   REGISTRY: ghcr.io
   # Remplacez par le nom de votre repo (ex: mon-user/mon-repo)
