@@ -6,7 +6,7 @@ import {UpdateFormerTeammate} from '../dto/payloads/updateFormerTeammate';
 import {FormerTeammate} from '../models/former-teammates';
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {environment} from '@environments/environment.development';
+import {environment} from '@environments/environment';
 
 
 @Injectable({

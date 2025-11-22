@@ -3,18 +3,6 @@ spring:
     activate:
       on-profile: prod
 
-  datasource:
-    # En PROD, on force l'utilisation de variables d'environnement
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      idle-timeout: 30000
-      max-lifetime: 1800000
-
   jpa:
     show-sql: false
     hibernate:

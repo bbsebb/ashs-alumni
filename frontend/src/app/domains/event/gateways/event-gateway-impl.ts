@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, httpResource} from '@angular/common/http';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
-import {environment} from '@environments/environment.development';
+import {environment} from '@environments/environment';
 import {Participant} from '@app/domains/event/models/participant';
 import {delay, Observable} from 'rxjs';
 import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';

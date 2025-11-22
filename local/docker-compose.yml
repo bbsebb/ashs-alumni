@@ -19,7 +19,10 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - OAUTH2_ISSUER_URI=${OAUTH2_ISSUER_URI}
-
+      -
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-alumni-service:5432/ashs_alumni
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
 
       - SERVER_PORT=8080
 
@@ -53,8 +56,9 @@ services:
     image: postgres:17-alpine
     environment:
       POSTGRES_DB: ashs_alumni
-      POSTGRES_USER: ashs_user
-      POSTGRES_PASSWORD: ashs_password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    container_name: postgres-alumni-service
     ports:
       - "5432:5432"
     volumes:
