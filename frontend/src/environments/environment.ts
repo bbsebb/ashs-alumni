@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  apiUrl: '',
+  apiUrl: 'http://alumni-backend:8080/api',
   keycloak: {
-    url: '',
+    url: 'http://keycloak-dev:8079',
     realm: 'ashs-alumni',
     clientId: 'angular-frontend'
   }
