@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   # Remplacez par le nom de votre repo (ex: mon-user/mon-repo)
-  IMAGE_NAME: ${{ github.repository_owner }}/alumni_ashs_backend
+  IMAGE_NAME: ${{ github.repository_owner }}/alumni_ashs
   FRONTEND_DIR: ./frontend
   BACKEND_DIR: ./backend
 

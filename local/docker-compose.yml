@@ -1,0 +1,23 @@
+services:
+  backend:
+    # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub (ou organisation)
+    # Le tag 'main' correspond à la branche construite dans votre workflow
+    image: ghcr.io/votre_nom_utilisateur/alumni_ashs_backend:main
+    container_name: alumni-backend
+    ports:
+      - "8080:8080" # Port hôte : Port conteneur (Spring Boot défaut)
+    environment:
+      # Ajoutez ici les variables d'environnement nécessaires à votre backend
+      # (Exemple : connexion BDD si elle n'est pas intégrée ou gérée ailleurs)
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: unless-stopped
+
+  frontend:
+    # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub
+    image: ghcr.io/votre_nom_utilisateur/alumni_ashs_backend-frontend:main
+    container_name: alumni-frontend
+    ports:
+      - "80:80" # Le Dockerfile frontend expose le port 80 via Nginx
+    depends_on:
+      - backend
+    restart: unless-stopped

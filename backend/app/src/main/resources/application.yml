@@ -40,16 +40,13 @@ spring:
 
 
 management:
-  zipkin:
-    tracing:
-      endpoint: ${ZIPKIN_TRACING_ENDPOINT}
   endpoints:
     web:
       exposure:
         include: "health,info,metrics,prometheus"
-  tracing:
-    sampling:
-      probability: 0.1
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 # Server configuration
 server:
