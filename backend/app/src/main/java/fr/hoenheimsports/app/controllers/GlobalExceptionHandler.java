@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-
 @RestControllerAdvice
 public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
 
@@ -158,7 +157,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
-        problemDetail.setType(ErrorType.CONTACT_ALREADY_EXISTS.getUri());
+        problemDetail.setType(ErrorType.PARTICIPANT_ALREADY_EXISTS.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
