@@ -1,4 +1,60 @@
-# Environment variables
+# --- Global / OS ---
+.DS_Store
+Thumbs.db
 .env
-/backend/app/src/test/resources/application.yml
-backend/app/build/
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# --- VS Code (si utilisé pour le frontend) ---
+.vscode/
+
+# --- Backend (Spring Boot / Java) ---
+# Build results
+backend/**/target/
+backend/**/build/
+
+# Gradle wrapper (optionnel: à garder si vous voulez versionner le wrapper, sinon décommentez)
+# backend/gradle/wrapper/gradle-wrapper.jar
+
+# Maven wrapper (optionnel: même logique)
+# backend/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+backend/**/*.log
+
+# Eclipse specific (si importé depuis Eclipse)
+backend/**/.classpath
+backend/**/.project
+backend/**/.settings/
+
+# Application secrets
+backend/app/src/test/resources/application.yml
+backend/**/application-secret.properties
+backend/**/application-secret.yml
+
+# --- Frontend (Angular) ---
+# Node modules
+frontend/node_modules/
+
+# Angular build output
+frontend/dist/
+frontend/.angular/
+
+# Yarn / NPM logs
+frontend/yarn-error.log
+frontend/npm-debug.log*
+
+# Test coverage
+frontend/coverage/
+
+# Karma
+frontend/.karma/
+
+# --- Misc ---
+tmp/
+temp/

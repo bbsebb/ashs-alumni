@@ -11,7 +11,7 @@
         <http>
             <url>${lokiUrl}</url>
         </http>
-        <format>
+        <format class="com.github.loki4j.logback.JavaLokiLayout">
             <label>
                 <pattern>app=${appName},host=${HOSTNAME},level=%level</pattern>
             </label>

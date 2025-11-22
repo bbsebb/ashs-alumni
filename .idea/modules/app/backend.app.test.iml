@@ -208,7 +208,6 @@
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-socks:4.1.123.Final" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.postgresql:postgresql:42.7.7" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: io.micrometer:micrometer-registry-prometheus:1.15.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.springframework.boot:spring-boot-docker-compose:3.5.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.junit.platform:junit-platform-launcher:1.12.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: io.jsonwebtoken:jjwt-impl:0.12.6" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.checkerframework:checker-qual:3.49.3" level="project" />

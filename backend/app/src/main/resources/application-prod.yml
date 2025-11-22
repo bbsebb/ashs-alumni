@@ -19,6 +19,7 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: validate # Très important : ne jamais utiliser 'update' ou 'create' en prod
+    open-in-view: false
 
   security:
     oauth2:
