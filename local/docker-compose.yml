@@ -7,16 +7,35 @@ services:
     ports:
       - "8080:8080" # Port hôte : Port conteneur (Spring Boot défaut)
 
-    env_file:
-      - ../.env
     environment:
-      - OAUTH2_ISSUER_URI=http://keycloak-dev:8079/realms/ashs-alumni
+      # Ajoutez ici les variables d'environnement nécessaires à votre backend
+      # (Exemple : connexion BDD si elle n'est pas intégrée ou gérée ailleurs)
+      - SPRING_PROFILES_ACTIVE=prod
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - OAUTH2_ISSUER_URI=${OAUTH2_ISSUER_URI}
+
+
       - SERVER_PORT=8080
-      - LOKI_URL=http://loki:3100/loki/api/v1/push
+
+      - TWILIO_WEBHOOK_URL=${TWILIO_WEBHOOK_URL}
+
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+
+      - LOKI_URL=${LOKI_URL}
     restart: unless-stopped
+    depends_on:
+      - postgres
     networks:
       - observability-network
       - keycloak-network
+      - ashs-alumni-network
 
   frontend:
     # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub
@@ -30,9 +49,36 @@ services:
     networks:
       - keycloak-network
 
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ashs_alumni
+      POSTGRES_USER: ashs_user
+      POSTGRES_PASSWORD: ashs_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ashs-alumni-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ashs_user -d ashs_alumni" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+
 
 networks:
   observability-network:
     external: true
   keycloak-network:
     external: true
+  postes-sql-network:
+    driver: bridge
+  ashs-alumni-network:
+    driver: bridge

@@ -1,0 +1,38 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    # En PROD, on force l'utilisation de variables d'environnement
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      max-lifetime: 1800000
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate # Très important : ne jamais utiliser 'update' ou 'create' en prod
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # URL Keycloak de production (souvent HTTPS)
+          issuer-uri: ${OAUTH2_ISSUER_URI}
+
+  # Docker Compose désactivé en prod (l'infra est gérée autrement, ex: Kubernetes, Docker Swarm)
+  docker:
+    compose:
+      enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.ashs.alumni: INFO

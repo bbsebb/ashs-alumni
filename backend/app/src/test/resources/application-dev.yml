@@ -1,0 +1,31 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  docker:
+    compose:
+      enabled: true
+      file: backend/docker-compose.yml
+      lifecycle-management: start_and_stop
+  jpa:
+    # Affiche les requêtes SQL pour le debug
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # En dev, on laisse Flyway gérer le schéma, mais on valide
+    hibernate:
+      ddl-auto: validate
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # URL Keycloak locale
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8079/realms/ashs-alumni}
+logging:
+  level:
+    root: INFO
+    # Logs détaillés pour le projet en dev
+    com.ashs.alumni: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
