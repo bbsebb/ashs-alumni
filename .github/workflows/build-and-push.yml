@@ -37,6 +37,11 @@ jobs:
           chmod +x gradlew
           ./gradlew bootJar
 
+      # AJOUT : Supprime le jar 'plain' (non exécutable) pour éviter la confusion lors du COPY
+      - name: Remove plain jar
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: rm build/libs/*-plain.jar || true
+
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:

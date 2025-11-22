@@ -2,22 +2,37 @@ services:
   backend:
     # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub (ou organisation)
     # Le tag 'main' correspond à la branche construite dans votre workflow
-    image: ghcr.io/votre_nom_utilisateur/alumni_ashs_backend:main
+    image: ghcr.io/bbsebb/alumni_ashs:main
     container_name: alumni-backend
     ports:
       - "8080:8080" # Port hôte : Port conteneur (Spring Boot défaut)
+
+    env_file:
+      - ../.env
     environment:
-      # Ajoutez ici les variables d'environnement nécessaires à votre backend
-      # (Exemple : connexion BDD si elle n'est pas intégrée ou gérée ailleurs)
-      - SPRING_PROFILES_ACTIVE=prod
+      - OAUTH2_ISSUER_URI=http://keycloak-dev:8079/realms/ashs-alumni
+      - SERVER_PORT=8080
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
     restart: unless-stopped
+    networks:
+      - observability-network
+      - keycloak-network
 
   frontend:
     # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub
-    image: ghcr.io/votre_nom_utilisateur/alumni_ashs_backend-frontend:main
+    image: ghcr.io/bbsebb/alumni_ashs-frontend:main
     container_name: alumni-frontend
     ports:
       - "80:80" # Le Dockerfile frontend expose le port 80 via Nginx
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - keycloak-network
+
+
+networks:
+  observability-network:
+    external: true
+  keycloak-network:
+    external: true

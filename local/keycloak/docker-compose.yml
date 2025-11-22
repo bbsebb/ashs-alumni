@@ -48,3 +48,4 @@ volumes:
 networks:
   keycloak-network:
     driver: bridge
+    name: keycloak-network
