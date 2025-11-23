@@ -15,14 +15,13 @@ services:
       - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
       - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
 
-      - DB_URL=${DB_URL}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
+
       - OAUTH2_ISSUER_URI=${OAUTH2_ISSUER_URI}
-      -
+
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-alumni-service:5432/ashs_alumni
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - LOGGING_LEVEL_ROOT=INFO
 
       - SERVER_PORT=8080
 
@@ -34,7 +33,8 @@ services:
       - LOKI_URL=${LOKI_URL}
     restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - observability-network
       - keycloak-network
@@ -51,6 +51,7 @@ services:
     restart: unless-stopped
     networks:
       - keycloak-network
+      - ashs-alumni-network
 
   postgres:
     image: postgres:17-alpine
@@ -66,7 +67,7 @@ services:
     networks:
       - ashs-alumni-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ashs_user -d ashs_alumni" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ashs_alumni" ]
       interval: 30s
       timeout: 10s
       retries: 3

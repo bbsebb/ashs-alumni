@@ -22,6 +22,12 @@ spring:
         jwt:
           # URL Keycloak locale
           issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8079/realms/ashs-alumni}
+
+app:
+  cors:
+    allowed-origins:
+      - "http://localhost:4200"
+
 logging:
   level:
     root: INFO
