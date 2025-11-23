@@ -23,8 +23,7 @@ spring:
 
 app:
   cors:
-    allowed-origins:
-      - "http://localhost:80"
+    allowed-origins: http://localhost:80
 
 logging:
   level:
