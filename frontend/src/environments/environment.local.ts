@@ -4,6 +4,6 @@ export const environment = {
   keycloak: {
     url: 'http://localhost:8079',
     realm: 'ashs-alumni',
-    clientId: 'angular-frontend'
+    clientId: 'angular-frontend-docker'
   }
 };
