@@ -95,7 +95,7 @@ jobs:
 
       - name: Build Angular App
         working-directory: ${{ env.FRONTEND_DIR }}
-        run: npm run build --configuration=local
+        run: npx ng build --configuration=staging
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
