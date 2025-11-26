@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "concurrently \"npm run api\" \"ng serve\"",
     "build": "ng build",
+    "build:staging": "ng build --configuration=staging",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "api": "json-server --watch ../local/db/db.json --port 3000"

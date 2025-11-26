@@ -23,7 +23,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - LOGGING_LEVEL_ROOT=INFO
 
-      - SERVER_PORT=8080
+      - SERVER_PORT=${BACKEND_PORT}
 
       - TWILIO_WEBHOOK_URL=${TWILIO_WEBHOOK_URL}
 
@@ -72,6 +72,23 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: tunnel-ngrok
+    restart: unless-stopped
+    ports:
+      - "4040:4040"      # Pour voir les requêtes (Dashboard local)
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    networks:
+      - ashs-alumni-network   # <--- On attache au MEME réseau
+
+    # COMMANDE CLEF :
+    # On utilise le nom du service "mon-api" comme nom de domaine (DNS Docker)
+    command: "http --domain=${NGROK_DOMAIN} alumni-backend:${BACKEND_PORT}"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
