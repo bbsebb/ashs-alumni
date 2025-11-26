@@ -15,6 +15,7 @@ spring:
         jwt:
           # URL Keycloak de production (souvent HTTPS)
           issuer-uri: ${OAUTH2_ISSUER_URI}
+          jwk-set-uri: ${OAUTH2_JWK_SET_URI}
 
   # Docker Compose désactivé en prod (l'infra est gérée autrement, ex: Kubernetes, Docker Swarm)
   docker:

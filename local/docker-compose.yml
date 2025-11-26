@@ -17,6 +17,7 @@ services:
 
 
       - OAUTH2_ISSUER_URI=${OAUTH2_ISSUER_URI}
+      - OAUTH2_JWK_SET_URI=${OAUTH2_JWK_SET_URI}
 
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-alumni-service:5432/ashs_alumni
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
