@@ -57,3 +57,11 @@ twilio:
   phone-number: ${TWILIO_PHONE_NUMBER}
   webhook-url: ${TWILIO_WEBHOOK_URL:https://your-domain.com/api/webhooks/twilio/status}
 
+logging:
+  level:
+    # Si LOGGING_LEVEL_ROOT n'est pas défini, on utilise WARN par défaut
+    root: ${LOGGING_LEVEL_ROOT:WARN}
+    # Si LOGGING_LEVEL_APP n'est pas défini, on utilise INFO par défaut
+    fr.hoenheimsports.app: ${LOGGING_LEVEL_APP:INFO}
+    # Si LOGGING_LEVEL_DOMAIN n'est pas défini, on utilise INFO par défaut
+    fr.hoenheimsports.domain: ${LOGGING_LEVEL_DOMAIN:INFO}

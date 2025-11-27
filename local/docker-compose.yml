@@ -22,7 +22,9 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-alumni-service:5432/ashs_alumni
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - LOGGING_LEVEL_ROOT=INFO
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-WARN}
+      - LOGGING_LEVEL_APP=${LOGGING_LEVEL_APP:-INFO}
+      - LOGGING_LEVEL_DOMAIN=${LOGGING_LEVEL_DOMAIN:-INFO}
 
       - SERVER_PORT=${BACKEND_PORT}
 
@@ -51,7 +53,6 @@ services:
       - backend
     restart: unless-stopped
     networks:
-      - keycloak-network
       - ashs-alumni-network
 
   postgres:

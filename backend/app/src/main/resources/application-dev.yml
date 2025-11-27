@@ -27,10 +27,3 @@ app:
   cors:
     allowed-origins: http://localhost:4200,http://localhost:8080
 
-logging:
-  level:
-    root: INFO
-    # Logs détaillés pour le projet en dev
-    com.ashs.alumni: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG

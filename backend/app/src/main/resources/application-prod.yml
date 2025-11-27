@@ -26,7 +26,3 @@ app:
   cors:
     allowed-origins: http://localhost:80,http://localhost
 
-logging:
-  level:
-    root: WARN
-    com.ashs.alumni: INFO
