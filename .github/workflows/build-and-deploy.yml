@@ -202,6 +202,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "deployment/docker-compose.yml,deployment/.env"
           target: "~/ashs-alumni"
+          strip_components: 1
 
       # Étape 4 : Lancer le déploiement via SSH
       - name: Deploy on VPS
