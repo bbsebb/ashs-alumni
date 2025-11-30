@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api',
+  apiUrl: 'https://alumni-api.hoenheimsports.fr/api',
   keycloak: {
-    url: 'http://localhost:8079',
+    url: 'https://kc.hoenheimsports.fr',
     realm: 'ashs-alumni',
     clientId: 'angular-frontend'
   }

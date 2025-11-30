@@ -6,6 +6,8 @@ on:
     paths-ignore:
       - '.github/workflows/build-and-deploy.yml'
       - 'deployment/**'
+      - 'frontend/src/environments/environment.ts'
+      - 'frontend/src/environments/environment.development.ts'
 
 
 env:
