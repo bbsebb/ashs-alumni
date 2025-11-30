@@ -156,7 +156,7 @@ jobs:
       # J'ai réparti les variables entre secrets (sensible) et vars (config), adaptez selon votre config GitHub
       - name: Create .env file
         run: |
-          cat <<EOF > .env
+          cat > deployment/.env << EOF
           # Variables PostgreSQL
           POSTGRES_USER=${{ vars.POSTGRES_USER }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
@@ -190,8 +190,8 @@ jobs:
       # On remplace le tag ':main' par le tag git actuel (ex: :v1.0.0) pour que la prod soit sur la version précise
       - name: Prepare docker-compose.yml
         run: |
-          sed -i 's/:main/:${{ github.ref_name }}/g' docker-compose.yml
-          cat docker-compose.yml # Pour vérification dans les logs
+          sed -i 's/:main/:${{ github.ref_name }}/g' deployment/docker-compose.yml
+          cat deployment/docker-compose.yml # Pour vérification dans les logs
 
       # Étape 3 : Copier les fichiers sur le VPS via SCP
       - name: Copy files to VPS
@@ -200,7 +200,7 @@ jobs:
           host: ${{ vars.VPS_HOST }}
           username: ${{ vars.VPS_USERNAME }}
           key: ${{ secrets.VPS_KEY }}
-          source: "docker-compose.yml,.env"
+          source: "deployment/docker-compose.yml,deployment/.env"
           target: "~/ashs-alumni"
 
       # Étape 4 : Lancer le déploiement via SSH
