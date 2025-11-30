@@ -1,5 +1,6 @@
 package fr.hoenheimsports.domain.spi;
 
+import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.models.SMSHistory;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public interface SMSHistoryRepository {
     Optional<SMSHistory> findByExternalID(String externalId);
     List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId);
 
+    List<SMSHistory> findAllSMSHistoryByPhoneNumber(Phone phoneNumber);
 }

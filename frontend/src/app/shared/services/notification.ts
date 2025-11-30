@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSnackBar, MatSnackBarConfig} from '@angular/material/snack-bar';
 import {Notification} from '@app/shared/components/notification/notification';
 import {ProblemDetail} from '@app/shared/models/problem-detail';
 
@@ -29,11 +29,12 @@ export class NotificationService {
 }
 
 
-function buildNotificationConfig(message: string,level:'info' | 'error' | 'success' = 'info',duration = 5000) {
+function buildNotificationConfig(message: string,level:'info' | 'error' | 'success' = 'info',duration = 5000): MatSnackBarConfig<string> {
   return {
     panelClass: [`${level}-notification`],
     data: message,
     duration: duration,
+    verticalPosition: 'top',
   };
 }
 

@@ -109,7 +109,9 @@ public class SMSValidationHandler implements HandleSMSValidation{
             throw new SMSDeliveryException("Le code d'envoi du SMS est indisponible.");
         }
 
-        int SMSHistoriesCount = smsHistoryRetriever.findAllSMSHistoryByFormerTeammateId(formerTeammate.id()).size();
+        int SMSHistoriesCount = formerTeammate.phone()
+                .map(phone -> smsHistoryRetriever.findAllSMSHistoryByPhoneNumber(phone).size())
+                .orElse(0);
 
         if(SMSHistoriesCount > SMS_SEND_LIMIT -1) {
             throw new SMSLimitExceededException("Limite d'envoi de SMS dépassée : %d envois effectués sur un maximum de %d autorisés".formatted(SMSHistoriesCount, SMS_SEND_LIMIT));

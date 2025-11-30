@@ -1,5 +1,6 @@
 package fr.hoenheimsports.domain.spi.stubs;
 
+import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 
@@ -22,5 +23,10 @@ public class SMSHistoryRepositoryStub implements SMSHistoryRepository {
     @Override
     public List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId) {
         return storage.values().stream().filter(smsHistory -> smsHistory.formerTeammateId().equals(formerTeammateId)).toList();
+    }
+
+    @Override
+    public List<SMSHistory> findAllSMSHistoryByPhoneNumber(Phone phoneNumber) {
+        return List.of();
     }
 }

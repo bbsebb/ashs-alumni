@@ -3,6 +3,7 @@ package fr.hoenheimsports.app.adapters;
 import fr.hoenheimsports.app.entities.SMSHistoryEntity;
 import fr.hoenheimsports.app.mappers.SMSHistoryMapper;
 import fr.hoenheimsports.app.repositories.SMSHistoryEntityRepository;
+import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,15 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
     public List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId) {
         log.info("Retrieving all SMS history by former teammate id {}", formerTeammateId);
         List<SMSHistory> smsHistoryList = smsHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(smsHistoryMapper::toModel).toList();
-        log.info("SMS histories retrieved {}", smsHistoryList);
+        log.info("SMS histories by former teammate id retrieved {}", smsHistoryList);
+        return smsHistoryList;
+    }
+
+    @Override
+    public List<SMSHistory> findAllSMSHistoryByPhoneNumber(Phone phoneNumber) {
+        log.info("Retrieving all SMS history by phone number {}", phoneNumber);
+        List<SMSHistory> smsHistoryList = smsHistoryEntityRepository.findAllByPhoneNumber(phoneNumber.getRawValue()).stream().map(smsHistoryMapper::toModel).toList();
+        log.info("SMS histories by phone retrieved {}", smsHistoryList);
         return smsHistoryList;
     }
 }

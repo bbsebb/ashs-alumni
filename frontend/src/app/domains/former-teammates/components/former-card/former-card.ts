@@ -19,7 +19,7 @@ import {MatButton} from '@angular/material/button';
 import {HasRolesDirective} from 'keycloak-angular';
 import {NotificationService} from '@app/shared/services/notification';
 import {DialogService} from '@app/shared/services/dialog';
-import {EMPTY, switchMap} from 'rxjs';
+import {EMPTY, filter, switchMap} from 'rxjs';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {LoadingComponent} from '@app/shared/components/loading/loading';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
@@ -177,14 +177,9 @@ export class FormerCard {
 
     // Show a confirmation dialog and handle the response
     this.dialogService.showConfirmation(content, title).pipe(
+      filter(response => response),
       switchMap((confirmation) => {
-        if (confirmation) {
-          // User confirmed deletion - proceed with deletion
           return this.formerTeammatesStore.handleResendSMS(formerTeammate.id);
-        } else {
-          // User cancelled deletion - return empty observable
-          return EMPTY;
-        }
       })
     ).subscribe({
       next: () => {
@@ -225,11 +220,11 @@ export class FormerCard {
     const title = 'Allez à la page de modification';
 
     // Show a confirmation dialog and handle the response
-    this.dialogService.showConfirmation(content, title).subscribe({
+    this.dialogService.showConfirmation(content, title)
+      .pipe(filter(response => response))
+      .subscribe({
       next: (response) => {
-        if(response) {
           void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
-        }
       },
       error: (err) => {
         this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');
@@ -251,7 +246,9 @@ export class FormerCard {
 
     // Show a confirmation dialog and handle the response
     this.dialogService.showConfirmation(content, title)
+
       .pipe(
+        filter(response => response),
         switchMap(() => this.formerTeammatesStore.handleMarkAsNotRequested(formerTeammate.id))
       )
       .subscribe({

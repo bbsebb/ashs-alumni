@@ -11,6 +11,7 @@ repositories {
 }
 val mapstructVersion = "1.6.3"
 val lombokMapstructBindingVersion = "0.2.0"
+val testcontainersVersion = "1.20.4"
 dependencies {
     implementation(project(":domain"))
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -37,8 +38,12 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter:${testcontainersVersion}")
+    testImplementation("org.testcontainers:postgresql:${testcontainersVersion}")
+// Il est souvent nécessaire de forcer le noyau aussi pour éviter les conflits
+    testImplementation("org.testcontainers:testcontainers:${testcontainersVersion}")
+    testImplementation("net.java.dev.jna:jna:5.14.0")
+    testImplementation("net.java.dev.jna:jna-platform:5.14.0")
 
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
