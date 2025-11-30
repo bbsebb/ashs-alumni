@@ -1,0 +1,17 @@
+services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: tunnel-ngrok
+    restart: unless-stopped
+    ports:
+      - "4040:4040"      # Pour voir les requêtes (Dashboard local)
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    networks:
+      - ashs-alumni-network   # <--- On attache au MEME réseau
+
+    # COMMANDE CLEF :
+    # On utilise le nom du service "mon-api" comme nom de domaine (DNS Docker)
+    command: "http --domain=${NGROK_DOMAIN} alumni-backend:${SERVER_PORT}"
+    depends_on:
+      - backend

@@ -46,7 +46,7 @@ public class EventService {
                 getMessageHtml(participant)
         );
         emailService.envoyerEmailTexte(
-                "sebastien.burckhardt@gmail.com",
+                "sebastien.burckhardt@hoenheimsports.fr",
                 "Inscription soirée ancien",
                 getMessageForAdmin(participant)
         );
@@ -94,17 +94,17 @@ public class EventService {
                     <html>
                     <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
                         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            
+                           \s
                             <!-- En-tête -->
                             <div style="background-color: #2E86C1; padding: 20px; text-align: center; color: #ffffff;">
                                 <h1 style="margin: 0; font-size: 24px;">Inscription Validée ✅</h1>
                             </div>
-                    
+                   \s
                             <!-- Contenu Principal -->
                             <div style="padding: 20px;">
                                 <p style="font-size: 16px; color: #333;">Bonjour <strong>%s</strong>,</p>
                                 <p style="font-size: 16px; color: #333;">C'est tout bon ! Votre inscription pour la soirée des anciens est bien enregistrée.</p>
-                                
+                               \s
                                 <!-- Récapitulatif -->
                                 <div style="background-color: #f8f9fa; border-left: 4px solid #2E86C1; padding: 15px; margin: 20px 0;">
                                     <h3 style="margin-top: 0; color: #2E86C1;">📝 Vos informations</h3>
@@ -114,7 +114,7 @@ public class EventService {
                                         <li><strong>Commentaire :</strong> %s</li>
                                     </ul>
                                 </div>
-                    
+                   \s
                                 <!-- Détails Pratiques -->
                                 <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; color: #333;">📍 Infos Pratiques</h3>
                                 <p>
@@ -122,7 +122,7 @@ public class EventService {
                                     📍 <strong>Lieu :</strong> Gymnase municipal de Hoenheim, rue des Vosges<br>
                                     💶 <strong>À régler sur place :</strong> 25€ <span style="font-size: 0.9em; color: #666;">(Paiement à l'arrivée)</span>
                                 </p>
-                    
+                   \s
                                 <!-- Programme -->
                                 <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; color: #333;">🏐 Programme de la soirée</h3>
                                 <table style="width: 100%%; border-collapse: collapse;">
@@ -135,11 +135,11 @@ public class EventService {
                                         <td style="padding: 8px 0;">Début du repas 🍽️<br><em style="color: #555;">(Bouchée à la reine)</em></td>
                                     </tr>
                                 </table>
-                    
+                   \s
                                 <br>
                                 <p style="text-align: center; margin-top: 30px;">À très vite !<br><strong>Séb.</strong></p>
                             </div>
-                            
+                           \s
                             <!-- Pied de page -->
                             <div style="background-color: #eee; padding: 10px; text-align: center; font-size: 12px; color: #777;">
                                 Hoenheim Sports
@@ -147,7 +147,7 @@ public class EventService {
                         </div>
                     </body>
                     </html>
-                    """.formatted(
+                   \s""".formatted(
                 participant.getFirstname(),
                 participant.getFirstname(),
                 participant.getLastname(),

@@ -1,0 +1,223 @@
+name: build-and-deploy.yml
+on:
+  push:
+    tags:
+      - 'v*' # Se déclenche sur les tags comme v1.0.0, v2.3.1, etc.
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/alumni_ashs
+  FRONTEND_DIR: ./frontend
+  BACKEND_DIR: ./backend
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: |
+          chmod +x gradlew
+          ./gradlew bootJar
+
+      - name: Remove plain jar
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: rm app/build/libs/*-plain.jar || true
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Dockerfile for backend module
+        run: |
+          cat > ${{ env.BACKEND_DIR }}/Dockerfile << 'EOF'
+          FROM eclipse-temurin:24-jre-alpine
+          WORKDIR /app
+          COPY app/build/libs/*.jar app.jar
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOF
+
+      # MODIFICATION : Génération des tags (Git Tag + Latest)
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.BACKEND_DIR }}
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm ci
+
+      - name: Build Angular App
+        working-directory: ${{ env.FRONTEND_DIR }}
+        # Build pour la prod
+        run: npm run build
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # MODIFICATION : Génération des tags (Git Tag + Latest)
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+
+      - name: Create Dockerfile for frontend app
+        run: |
+          cat > ${{ env.FRONTEND_DIR }}/Dockerfile << 'EOF'
+          FROM nginx:alpine
+          COPY dist/frontend/browser /usr/share/nginx/html
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
+          EXPOSE 80
+          CMD ["nginx", "-g", "daemon off;"]
+          EOF
+
+          cat > ${{ env.FRONTEND_DIR }}/nginx.conf << 'EOF'
+          server {
+            listen 80;
+            server_name localhost;
+            root /usr/share/nginx/html;
+            index index.html;
+          
+            location / {
+              try_files $uri $uri/ /index.html;
+            }
+          }
+          EOF
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.FRONTEND_DIR }}
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+
+  deploy:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Étape 1 : Création du fichier .env localement pour le transfert
+      # J'ai réparti les variables entre secrets (sensible) et vars (config), adaptez selon votre config GitHub
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          # Variables PostgreSQL
+          POSTGRES_USER=${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          
+          # Variables Backend
+          SPRING_PROFILES_ACTIVE=prod
+          BACKEND_PORT=${{ vars.BACKEND_PORT}}
+          
+          # Twilio
+          TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_PHONE_NUMBER=${{ vars.TWILIO_PHONE_NUMBER }}
+          TWILIO_WEBHOOK_URL=${{ vars.TWILIO_WEBHOOK_URL }}
+          
+          # OAuth / Keycloak
+          OAUTH2_ISSUER_URI=${{ vars.OAUTH2_ISSUER_URI }}
+          OAUTH2_JWK_SET_URI=${{ vars.OAUTH2_JWK_SET_URI }}
+          
+          # Mail
+          MAIL_USERNAME=${{ vars.MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          
+          # Logging / Observability
+          LOGGING_LEVEL_ROOT=${{ vars.LOGGING_LEVEL_ROOT || 'WARN' }}
+          LOGGING_LEVEL_APP=${{ vars.LOGGING_LEVEL_APP || 'INFO' }}
+          LOGGING_LEVEL_DOMAIN=${{ vars.LOGGING_LEVEL_DOMAIN || 'INFO' }}
+          LOKI_URL=${{ vars.LOKI_URL }}
+          EOF
+
+      # Étape 2 : Préparer le docker-compose.yml
+      # On remplace le tag ':main' par le tag git actuel (ex: :v1.0.0) pour que la prod soit sur la version précise
+      - name: Prepare docker-compose.yml
+        run: |
+          sed -i 's/:main/:${{ github.ref_name }}/g' docker-compose.yml
+          cat docker-compose.yml # Pour vérification dans les logs
+
+      # Étape 3 : Copier les fichiers sur le VPS via SCP
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ vars.VPS_HOST }}
+          username: ${{ vars.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          source: "docker-compose.yml,.env"
+          target: "~/ashs-alumni"
+
+      # Étape 4 : Lancer le déploiement via SSH
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.VPS_HOST }}
+          username: ${{ vars.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            cd ~/ashs-alumni
+            
+            # Pull des dernières images (au cas où le tag a été écrasé, ou pour les images externes comme postgres)
+            docker compose pull
+            
+            # Relancer les conteneurs en mode détaché
+            docker compose up -d --remove-orphans
+            
+            # Nettoyage des images inutilisées (optionnel, garde le disque propre)
+            docker image prune -f

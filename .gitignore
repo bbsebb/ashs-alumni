@@ -1,7 +1,7 @@
 # --- Global / OS ---
 .DS_Store
 Thumbs.db
-.env
+*.env*
 
 # --- IntelliJ IDEA ---
 .idea/
@@ -58,3 +58,4 @@ frontend/.karma/
 # --- Misc ---
 tmp/
 temp/
+
