@@ -23,7 +23,7 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSecurity()
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")
@@ -80,7 +80,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
