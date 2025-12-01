@@ -18,6 +18,7 @@ export class FormerTeammateMapper {
       firstName: formerTeammateFormValue.firstName,
       lastName: formerTeammateFormValue.lastName,
       phone: formerTeammateFormValue.phone,
+      email: formerTeammateFormValue.email,
       birthDate: formerTeammateFormValue.birthDate,
       roles: formerTeammateFormValue.roles
     };
@@ -29,6 +30,7 @@ export class FormerTeammateMapper {
       firstName: formerTeammate.firstName,
       lastName: formerTeammate.lastName,
       phone: formerTeammate.phone || null,
+      email: formerTeammate.email || null,
       birthDate: formerTeammate.birthDate || null,
       roles: formerTeammate.roles
     };
@@ -40,6 +42,7 @@ export class FormerTeammateMapper {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
       phone: formValue.phone,
+      email: formValue.email,
       birthDate: formValue.birthDate,
       roles: formValue.roles
     };

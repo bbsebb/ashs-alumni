@@ -16,7 +16,7 @@ export interface FormerTeammate {
   gender: Gender;
   phone?: string;
   email?: string;
-  birthDate?: Date;          // format ISO (YYYY-MM-DD)
+  birthDate?: string;          // format ISO (YYYY-MM-DD)
   roles: Role[];
   status: ContactStatus;
   formerTeammateHistories?: FormerTeammateHistory[];

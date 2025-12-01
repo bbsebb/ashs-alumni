@@ -9,6 +9,7 @@ export interface UpdateFormerTeammate {
   lastName: string;
   gender: Gender;
   phone: string | null;
-  birthDate: Date | null;            // format ISO (YYYY-MM-DD)
+  birthDate: string | null;            // format ISO (YYYY-MM-DD)
+  email: string | null;
   roles: Role[];
 }

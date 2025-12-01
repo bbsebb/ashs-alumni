@@ -99,7 +99,6 @@ export class FormerCard {
   constructor() {
     // Initialize computed signals for teammate and their histories
     this.formerTeammateSignal = this.findFormerTeammate();
-
     this.isLoading = this.formerTeammatesStore.isLoading();
     this.hasError = this.formerTeammatesStore.hasError();
     effect(() => {
@@ -178,7 +177,7 @@ export class FormerCard {
     // Show a confirmation dialog and handle the response
     this.dialogService.showConfirmation(content, title).pipe(
       filter(response => response),
-      switchMap((confirmation) => {
+      switchMap(() => {
           return this.formerTeammatesStore.handleResendSMS(formerTeammate.id);
       })
     ).subscribe({
@@ -223,7 +222,7 @@ export class FormerCard {
     this.dialogService.showConfirmation(content, title)
       .pipe(filter(response => response))
       .subscribe({
-      next: (response) => {
+      next: () => {
           void this.router.navigate(['/former-teammates','edit', formerTeammate.id]);
       },
       error: (err) => {
@@ -252,7 +251,7 @@ export class FormerCard {
         switchMap(() => this.formerTeammatesStore.handleMarkAsNotRequested(formerTeammate.id))
       )
       .subscribe({
-      next: (response) => {
+      next: () => {
         this.notificationService.showSuccess('Le status du contact a été mis à jour vers « NON SOLLICITÉ »');
       },
       error: (err) => {

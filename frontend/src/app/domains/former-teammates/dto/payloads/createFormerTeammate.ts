@@ -7,6 +7,7 @@ export interface CreateFormerTeammate {
   firstName: string;
   lastName: string ;
   phone: string | null;
-  birthDate: Date | null;
+  birthDate: string | null;
+  email: string | null;
   roles: Role[];
 }

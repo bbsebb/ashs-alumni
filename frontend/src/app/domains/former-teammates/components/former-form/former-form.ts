@@ -98,8 +98,31 @@ export class FormerForm {
   onSubmit(): void {
     if (this.formerForm.valid) {
       const formValue = this.formerForm.getRawValue();
-      formValue.phone = PhoneUtils.formatPhoneNumberWithPrefix(formValue.phone);
-      this.formerTeammateFormValueSubmitted.emit(formValue);
+
+      // Conversion manuelle : Le MatDatepicker met un objet Date, on veut une string YYYY-MM-DD
+      let formattedBirthDate: string | null = null;
+      // On cast en 'any' ou 'unknown' car TypeScript pense que c'est une string, mais au runtime c'est une Date
+      const rawDate = formValue.birthDate as unknown;
+
+      if (rawDate instanceof Date) {
+        // On utilise les méthodes locales pour éviter la conversion UTC
+        const year = rawDate.getFullYear();
+        const month = (rawDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = rawDate.getDate().toString().padStart(2, '0');
+        formattedBirthDate = `${year}-${month}-${day}`;
+      } else if (typeof rawDate === 'string') {
+        // Si c'est déjà une string (ex: pré-remplissage sans modification)
+        formattedBirthDate = rawDate;
+      }
+
+      // On reconstruit l'objet avec la bonne date stringifiée
+      const payload: FormerTeammateFormValue = {
+        ...formValue,
+        birthDate: formattedBirthDate,
+        phone: PhoneUtils.formatPhoneNumberWithPrefix(formValue.phone)
+      };
+
+      this.formerTeammateFormValueSubmitted.emit(payload);
     }
   }
 
@@ -122,6 +145,7 @@ export class FormerForm {
       firstName: formerTeammateFormValue.firstName,
       lastName: formerTeammateFormValue.lastName,
       phone: PhoneUtils.removePhoneNumberPrefix(formerTeammateFormValue.phone),
+      email: formerTeammateFormValue.email,
       birthDate: formerTeammateFormValue.birthDate,
       roles: formerTeammateFormValue.roles,
     });
@@ -143,7 +167,8 @@ export class FormerForm {
       firstName: new FormControl<string>('', {nonNullable: true, validators: [Validators.required]}),
       lastName: new FormControl<string>('', {nonNullable: true, validators: [Validators.required]}),
       phone: new FormControl<string>(''),
-      birthDate: new FormControl<Date | null>(null),
+      email: new FormControl<string>(''),
+      birthDate: new FormControl<string | null>(null),
       roles: new FormControl<Role[]>([], {nonNullable: true}),
     });
   }
@@ -155,7 +180,8 @@ export interface FormerTeammateFormValue {
   firstName: string,
   lastName: string,
   phone: string | null,
-  birthDate: Date | null,
+  birthDate: string | null,
+  email: string | null,
   roles: Role[]
 }
 
