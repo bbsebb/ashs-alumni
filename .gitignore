@@ -17,7 +17,7 @@ out/
 # Build results
 backend/**/target/
 backend/**/build/
-
+backend/.gradle/
 # Gradle wrapper (optionnel: à garder si vous voulez versionner le wrapper, sinon décommentez)
 # backend/gradle/wrapper/gradle-wrapper.jar
 

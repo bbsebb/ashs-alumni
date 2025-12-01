@@ -118,7 +118,7 @@ public class EventService {
                                 <!-- Détails Pratiques -->
                                 <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; color: #333;">📍 Infos Pratiques</h3>
                                 <p>
-                                    📅 <strong>Date :</strong> Samedi 10 janvier 2025<br>
+                                    📅 <strong>Date :</strong> Samedi 10 janvier 2026<br>
                                     📍 <strong>Lieu :</strong> Gymnase municipal de Hoenheim, rue des Vosges<br>
                                     💶 <strong>À régler sur place :</strong> 25€ <span style="font-size: 0.9em; color: #666;">(Paiement à l'arrivée)</span>
                                 </p>

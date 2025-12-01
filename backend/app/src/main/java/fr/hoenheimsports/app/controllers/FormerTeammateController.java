@@ -9,12 +9,13 @@ import fr.hoenheimsports.domain.FormerTeammateRetriever;
 import fr.hoenheimsports.domain.api.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/former-teammates")
@@ -58,6 +59,32 @@ public class FormerTeammateController {
         log.info("Former teammate {} registered", formerTeammate);
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
     }
+
+    @PostMapping("/group")
+    public ResponseEntity<List<Map<String, Object>>> registerFormerTeammates(@RequestBody @Valid List<FormerTeammateRequest> formerTeammateRequests) {
+        log.info("Registering former teammates group of size {}", formerTeammateRequests.size());
+        List<Map<String, Object>> results = new ArrayList<>();
+
+        for (FormerTeammateRequest request : formerTeammateRequests) {
+            Map<String, Object> itemResult = new HashMap<>();
+            try {
+                var formerTeammateRegistrationRequest = formerTeammateMapper.toRegistrationRequest(request);
+                var formerTeammate = formerTeammateRegistrar.registerFormerTeammate(formerTeammateRegistrationRequest, securityContextService.getCurrentContext());
+
+                itemResult.put("result", formerTeammate.id());
+                itemResult.put("object", formerTeammateService.buildFormerTeammateResponse(formerTeammate));
+            } catch (Exception e) {
+                log.error("Error processing request in group", e);
+                itemResult.put("result", "error");
+                itemResult.put("object", ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage()));
+            }
+            results.add(itemResult);
+        }
+
+        log.info("Former teammates group processed");
+        return ResponseEntity.ok(results);
+    }
+
 
     @PostMapping("/{id}/resend-sms")
     @Transactional

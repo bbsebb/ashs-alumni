@@ -1,5 +1,4 @@
 import {Routes} from '@angular/router';
-import {Home} from './core/layout/home/home';
 import {FormerList} from '@app/domains/former-teammates/components/former-list/former-list';
 import {NotFound} from './core/layout/not-found/not-found';
 
@@ -13,8 +12,7 @@ import {
 import {Event} from '@app/domains/event/components/event';
 
 export const routes: Routes = [
-  {path: '', redirectTo: '/home', pathMatch: 'full'},
-  {path: 'home', component: Home},
+  {path: '', redirectTo: '/former-teammates', pathMatch: 'full'},
   {path: 'event-registration', component: Event},
   {path: 'former-teammates', component: FormerList},
   {path: 'former-teammates/create', component: FormerCreate},

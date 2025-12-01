@@ -16,7 +16,17 @@
   align-items: center;
 }
 
+// Ajout pour rendre les groupes de boutons responsive
+mat-button-toggle-group {
+  flex-wrap: wrap;     // Autorise les boutons à passer à la ligne
+  max-width: 100%;     // Empêche le dépassement hors de l'écran
+  overflow: hidden;    // Sécurité pour les coins arrondis
 
+  // Optionnel : Permet aux boutons de prendre toute la largeur dispo sur mobile
+  mat-button-toggle {
+    flex-grow: 1;
+  }
+}
 mat-form-field {
   height: 45px;
 }
