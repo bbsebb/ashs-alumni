@@ -1,14 +1,17 @@
 package fr.hoenheimsports.app.controllers;
 
+import com.twilio.twiml.MessagingResponse;
 import fr.hoenheimsports.app.controllers.dtos.TwilioWebhookRequest;
 import fr.hoenheimsports.app.mappers.TwilioMessageMapper;
-import fr.hoenheimsports.domain.services.HandleSMSUpdatedStatus;
+import fr.hoenheimsports.app.services.EmailService;
 import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
+import fr.hoenheimsports.domain.services.HandleSMSUpdatedStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +24,12 @@ public class
 TwilioWebhookController {
     private final HandleSMSUpdatedStatus handleSMSUpdatedStatus;
     private final TwilioMessageMapper twilioMessageMapper;
+    private final EmailService emailService;
 
-    public TwilioWebhookController(HandleSMSUpdatedStatus handleSMSUpdatedStatus, TwilioMessageMapper twilioMessageMapper) {
+    public TwilioWebhookController(HandleSMSUpdatedStatus handleSMSUpdatedStatus, TwilioMessageMapper twilioMessageMapper, EmailService emailService) {
         this.handleSMSUpdatedStatus = handleSMSUpdatedStatus;
         this.twilioMessageMapper = twilioMessageMapper;
+        this.emailService = emailService;
     }
 
 
@@ -39,11 +44,32 @@ TwilioWebhookController {
     @Transactional
     public ResponseEntity<Void> handleStatusCallback(
             @ModelAttribute TwilioWebhookRequest request, @RequestParam String formerTeammateId) {
-        log.info("Handling status callback {}", request);
+        log.debug("Handling status callback {}", request);
         SMSUpdatedStatusDetails command = twilioMessageMapper.toSMSUpdatedStatusCommand(request, formerTeammateId);
         handleSMSUpdatedStatus.handleSMSStatusUpdated(command);
-        log.info("Status callback handled");
+        log.debug("Status callback handled");
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(value = "/income", produces = MediaType.APPLICATION_XML_VALUE)
+    public String receiveSms(
+            @RequestParam(value = "From") String fromNumber,
+            @RequestParam(value = "Body") String messageBody,
+            @RequestParam(value = "To") String toNumber
+    ) {
+
+        this.emailService.envoyerEmailTexte(
+                "sebastien.burckhardt@hoenheimsports.fr",
+                "SMS Income",
+                """
+                        Message de : %s
+                        Pour : %s
+                        Contenu : %s
+                        """.formatted(fromNumber, toNumber, messageBody)
+        );
+
+        MessagingResponse twiml = new MessagingResponse.Builder().build();
+        return twiml.toXml();
     }
 
 

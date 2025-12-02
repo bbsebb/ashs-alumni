@@ -39,7 +39,7 @@ public class EventService {
                 });
         participant.setKcId(UUID.fromString(extractSubFromSecurityContext()));
         this.eventRepository.save(participant);
-        log.info("Participant {} avec ne nom : {} et prénom : {} enregistré",participant.getId(),participant.getFirstname(),participant.getLastname());
+        log.debug("Participant {} avec ne nom : {} et prénom : {} enregistré",participant.getId(),participant.getFirstname(),participant.getLastname());
         emailService.envoyerEmailTexte(
                 participant.getEmail(),
                 "Confirmation d’inscription",

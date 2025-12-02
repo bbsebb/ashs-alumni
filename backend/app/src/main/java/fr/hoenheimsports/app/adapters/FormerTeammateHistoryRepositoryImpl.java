@@ -23,13 +23,13 @@ public class FormerTeammateHistoryRepositoryImpl implements FormerTeammateHistor
 
     @Override
     public FormerTeammateHistory save(FormerTeammateHistory formerTeammateHistory) {
-        log.info("Saving former teammate history {}", formerTeammateHistory);
+        log.debug("Saving former teammate history {}", formerTeammateHistory);
         return formerTeammateHistoryMapper.toModel(formerTeammateHistoryEntityRepository.save(formerTeammateHistoryMapper.toEntity(formerTeammateHistory)));
     }
 
     @Override
     public List<FormerTeammateHistory> findAllFormerTeammateHistoryByFormerTeammateId(UUID formerTeammateId) {
-        log.info("Finding all former teammate history by former teammate id {}", formerTeammateId);
+        log.debug("Finding all former teammate history by former teammate id {}", formerTeammateId);
         return formerTeammateHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(formerTeammateHistoryMapper::toModel).toList();
     }
 }

@@ -33,15 +33,15 @@ public class SendSMS implements SMSSender {
     @Override
     public SMSHistory sendSMS(String message, String phoneNumber, UUID formerTeammateId) {
         try {
-            log.info("Sending SMS to {} with message {} to {}", phoneNumber, message, formerTeammateId);
+            log.debug("Sending SMS to {} with message {} to {}", phoneNumber, message, formerTeammateId);
             var callbackUri = buildCallbackUri(formerTeammateId);
             log.debug("Using callback URI {}", callbackUri);
             var response = Message.creator(new PhoneNumber(phoneNumber), new PhoneNumber(twilioConfig.getPhoneNumber()), message)
                     .setStatusCallback(callbackUri)
                     .create();
-            log.info("SMS sent to {} with message {} to {}", phoneNumber, message, formerTeammateId);
+            log.debug("SMS sent to {} with message {} to {}", phoneNumber, message, formerTeammateId);
             var smsHistory = twilioMessageMapper.toSMSHistory(response, formerTeammateId);
-            log.info("SMS history created {}", smsHistory);
+            log.debug("SMS history created {}", smsHistory);
             return smsHistory;
         } catch (Exception e) {
             log.error("Error while sending SMS to {} with message {} to {}", phoneNumber, message, formerTeammateId, e);

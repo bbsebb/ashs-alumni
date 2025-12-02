@@ -105,6 +105,10 @@ export class FormerCard {
       console.log('isRemovedFormerTeammateSignal', this.isRemovedFormerTeammateSignal());
     });
 
+    effect(() => {
+      console.log('fmt', this.formerTeammateSignal());
+    });
+
   }
 
 

@@ -2,7 +2,6 @@ package fr.hoenheimsports.app.controllers;
 
 import fr.hoenheimsports.app.controllers.dtos.ParticipantRequest;
 import fr.hoenheimsports.app.controllers.dtos.ParticipantResponse;
-import fr.hoenheimsports.app.entities.Participant;
 import fr.hoenheimsports.app.services.EventService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +24,15 @@ public class EventController {
     @PostMapping("participants")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> registerParticipant(@RequestBody @Valid ParticipantRequest participant) {
-        log.info("Registering participant {}", participant);
+        log.debug("Registering participant {}", participant);
         this.eventService.registerParticipant(participant);
-        log.info("Participant {} registered", participant);
+        log.debug("Participant {} registered", participant);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("participants")
     public ResponseEntity<List<ParticipantResponse>> findAllParticipants() {
-        log.info("Retrieving all participants");
+        log.debug("Retrieving all participants");
         return ResponseEntity.ok(this.eventService.findAllParticipants());
     }
 }

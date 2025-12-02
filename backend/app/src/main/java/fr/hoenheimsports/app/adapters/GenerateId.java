@@ -13,13 +13,13 @@ public class GenerateId implements IdGenerator {
     @Override
     public UUID generateUUID() {
         var uuid = UUID.randomUUID();
-        log.info("Generated UUID {}", uuid);
+        log.debug("Generated UUID {}", uuid);
         return uuid;
     }
 
     @Override
     public String generateCode(int size) {
-        log.info("Generating code of size {}", size);
+        log.debug("Generating code of size {}", size);
         if (size <= 0) {
             return "";
         }
@@ -31,7 +31,7 @@ public class GenerateId implements IdGenerator {
             char letter = (char) ('A' + random.nextInt(26));
             code.append(letter);
         }
-        log.info("Generated code {}", code);
+        log.debug("Generated code {}", code);
         return code.toString();
     }
 }

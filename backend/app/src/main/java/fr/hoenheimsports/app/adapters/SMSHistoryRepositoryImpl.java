@@ -26,7 +26,7 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
 
     @Override
     public void save(SMSHistory smsHistory) {
-        log.info("Saving SMS history {}", smsHistory);
+        log.debug("Saving SMS history {}", smsHistory);
         // Vérifie si l'entité existe déjà
         var existingEntity = smsHistoryEntityRepository.findById(smsHistory.id());
         SMSHistoryEntity smsHistoryEntity;
@@ -41,7 +41,7 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
             // Nouvelle entité
             smsHistoryEntity =smsHistoryEntityRepository.save(smsHistoryMapper.toEntity(smsHistory));
         }
-        log.info("SMS history saved {}", smsHistoryEntity);
+        log.debug("SMS history saved {}", smsHistoryEntity);
     }
 
     /**
@@ -65,25 +65,25 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
 
     @Override
     public Optional<SMSHistory> findByExternalID(String externalId) {
-        log.info("Retrieving SMS history with external id {}", externalId);
+        log.debug("Retrieving SMS history with external id {}", externalId);
         var smsHistoryOptional = smsHistoryEntityRepository.findByExternalId(externalId).map(smsHistoryMapper::toModel);
-        log.info("SMS history retrieved {}", smsHistoryOptional);
+        log.debug("SMS history retrieved {}", smsHistoryOptional);
         return smsHistoryOptional;
     }
 
     @Override
     public List<SMSHistory> findAllSMSHistoryByFormerTeammateId(UUID formerTeammateId) {
-        log.info("Retrieving all SMS history by former teammate id {}", formerTeammateId);
+        log.debug("Retrieving all SMS history by former teammate id {}", formerTeammateId);
         List<SMSHistory> smsHistoryList = smsHistoryEntityRepository.findByFormerTeammateId(formerTeammateId).stream().map(smsHistoryMapper::toModel).toList();
-        log.info("SMS histories by former teammate id retrieved {}", smsHistoryList);
+        log.debug("SMS histories by former teammate id retrieved {}", smsHistoryList);
         return smsHistoryList;
     }
 
     @Override
     public List<SMSHistory> findAllSMSHistoryByPhoneNumber(Phone phoneNumber) {
-        log.info("Retrieving all SMS history by phone number {}", phoneNumber);
+        log.debug("Retrieving all SMS history by phone number {}", phoneNumber);
         List<SMSHistory> smsHistoryList = smsHistoryEntityRepository.findAllByPhoneNumber(phoneNumber.getRawValue()).stream().map(smsHistoryMapper::toModel).toList();
-        log.info("SMS histories by phone retrieved {}", smsHistoryList);
+        log.debug("SMS histories by phone retrieved {}", smsHistoryList);
         return smsHistoryList;
     }
 }
