@@ -147,6 +147,33 @@ mat-card-header {
         }
       }
     }
+    .event-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 10px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background-color: #fff8e1; // Fond jaune très clair
+      border: 1px solid #ffecb3;
+      border-radius: 12px;
+      color: #5d4037;
+
+      mat-icon {
+        color: #ffa000; // Icône ambre
+        min-width: 24px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+
+        strong {
+          color: #f57c00; // Titre orange plus foncé
+        }
+      }
+    }
   }
 }
 

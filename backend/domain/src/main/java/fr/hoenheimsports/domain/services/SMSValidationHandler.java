@@ -47,7 +47,7 @@ public class SMSValidationHandler implements HandleSMSValidation{
     private static final String SMS_VALIDATION_MESSAGE = """
             Bonjour, c'est Sébastien Burckhardt. Un ancien de la SM1 de Hoenheim t'a ajouté à l'annuaire.
             Merci de valider ton contact ici : alumni.hoenheimsports.fr/former-teammates/validate/%s
-            Tu es aussi invité à la soirée des anciens le samedi 10 janvier 2026.
+            Tu pourras ensuite t'inscrire à la soirée des anciens le samedi 10 janvier 2026.
             Si erreur ou pour ne plus être contacté, réponds à ce SMS.
             """;
     private static final int SMS_SEND_LIMIT = 3;

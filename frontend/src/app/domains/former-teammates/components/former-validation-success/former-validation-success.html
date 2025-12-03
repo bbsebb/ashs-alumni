@@ -19,7 +19,14 @@
           Merci pour votre contribution ! Votre validation nous aide à maintenir
           l'annuaire des anciens joueurs à jour et accessible à tous.
         </p>
-
+        <!-- Ajout du bloc d'alerte -->
+        <div class="event-warning">
+          <mat-icon color="warn">campaign</mat-icon>
+          <p>
+            <strong>Attention :</strong> Cette validation ne vous inscrit pas à la soirée.
+            Si vous souhaitez venir, pensez à cliquer sur le bouton "Inscription soirée" ci-dessous.
+          </p>
+        </div>
         <div class="benefits-section">
           <h3 class="benefits-title">Profiter de toutes les fonctionnalités :</h3>
           <p class="benefits-note">
@@ -52,6 +59,7 @@
             <li>Explorer l'annuaire complet</li>
           </ul>
         </div>
+
       </section>
     </mat-card-content>
 
@@ -71,7 +79,7 @@
                 routerLink="/event-registration"
                 class="secondary-action">
           <mat-icon>event</mat-icon>
-          <span>Événements</span>
+          <span>Inscription soirée</span>
         </button>
 
         <button mat-stroked-button
