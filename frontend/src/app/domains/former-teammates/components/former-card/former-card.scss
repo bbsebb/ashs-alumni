@@ -20,7 +20,7 @@ mat-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center; // Changé pour aligner en haut
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 12px;
 
     app-gender-icon {
@@ -58,7 +58,7 @@ mat-card-header {
 mat-card-content {
   section {
     margin-bottom: 24px;
-    
+
   }
 
   // Contact info styling

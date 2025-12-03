@@ -14,7 +14,6 @@
           <span id="left-mat-card-title">
           {{ formerTeammate.firstName }} {{ formerTeammate.lastName }}
         </span>
-          <div id="right-mat-card-title">
             <app-contact-status-chip [status]="formerTeammate.status"/>
             @if (formerTeammate.phone) {
               <span>
@@ -27,7 +26,7 @@
               Aucun contact
             </span>
             }
-          </div>
+
         </mat-card-title>
         <mat-card-subtitle>
           <span

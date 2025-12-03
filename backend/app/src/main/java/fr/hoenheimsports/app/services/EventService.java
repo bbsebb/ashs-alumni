@@ -122,6 +122,9 @@ public class EventService {
                                     📍 <strong>Lieu :</strong> Gymnase municipal de Hoenheim, rue des Vosges<br>
                                     💶 <strong>À régler sur place :</strong> 25€ <span style="font-size: 0.9em; color: #666;">(Paiement à l'arrivée)</span>
                                 </p>
+                                <p style="color: #c0392b; font-size: 14px; margin-top: 10px;">
+                                    ⚠️ <strong>Attention :</strong> Toute annulation doit se faire 1 semaine à l'avance à l'adresse <a href="mailto:sebastien.burckhardt@hoenheimsports.fr" style="color: #c0392b;">sebastien.burckhardt@hoenheimsports.fr</a>
+                                </p>
                    \s
                                 <!-- Programme -->
                                 <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; color: #333;">🏐 Programme de la soirée</h3>
