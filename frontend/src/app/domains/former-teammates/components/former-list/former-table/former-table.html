@@ -7,8 +7,8 @@
       <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.gender}} </td>
     </ng-container>
 
-    <!-- Colonne Nom (avec tri) -->
-    <ng-container matColumnDef="firstName">
+    <!-- Colonne Nom (avec tri)  -->
+    <ng-container matColumnDef="lastName">
       <th
         mat-header-cell
         *matHeaderCellDef
@@ -18,14 +18,16 @@
       >
         Nom
       </th>
+      <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.lastName}} </td>
+    </ng-container>
+
+    <!-- Colonne prénom -->
+    <ng-container matColumnDef="firstName">
+      <th mat-header-cell *matHeaderCellDef> Prénom </th>
       <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.firstName}} </td>
     </ng-container>
 
-    <!-- Colonne Prénom -->
-    <ng-container matColumnDef="lastName">
-      <th mat-header-cell *matHeaderCellDef> Prénom </th>
-      <td mat-cell *matCellDef="let formerTeammate"> {{formerTeammate.lastName}} </td>
-    </ng-container>
+
 
     <!-- Colonne Téléphone -->
     <ng-container matColumnDef="phone">

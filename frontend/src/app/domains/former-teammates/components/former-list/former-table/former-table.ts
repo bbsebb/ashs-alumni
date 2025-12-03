@@ -71,7 +71,7 @@ export class FormerTable {
       if(breakpointObserver()?.matches) {
         return ['firstName', 'lastName', 'phone'];
       } else {
-        return ['gender', 'firstName', 'lastName', 'phone', 'status','view'];
+        return ['gender',  'lastName','firstName', 'phone', 'status','view'];
       }
     })
 
