@@ -1,11 +1,11 @@
 package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.annotations.DomainService;
-import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateRegistrationRequest;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateAlreadyExistsException;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
+import fr.hoenheimsports.domain.models.Phone;
 import fr.hoenheimsports.domain.services.validations.FormerTeammateUniquenessValidationService;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.domain.spi.IdGenerator;
@@ -74,8 +74,7 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
      */
     @Override
     public FormerTeammate createFormerTeammate(FormerTeammateRegistrationRequest command) {
-        uniquenessValidationService.validateNameUniqueness(command.firstName(), command.lastName());
-        uniquenessValidationService.validatePhoneUniqueness(command.phone());
+
         var initialStatus = command.phone().isBlank()?  ContactStatus.UNREACHABLE : ContactStatus.SUBMITTED;
         
         // Création de l'entité
@@ -91,7 +90,8 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
                 .status(initialStatus)
                 .code(idGenerator.generateCode(6))
                 .build();
-
+        uniquenessValidationService.validateNameUniqueness(formerTeammate.firstName(), formerTeammate.lastName());
+        uniquenessValidationService.validatePhoneUniqueness(formerTeammate.phone().map(Phone::getRawValue).orElse(null));
         return formerTeammateRepository.save(formerTeammate);
     }
 

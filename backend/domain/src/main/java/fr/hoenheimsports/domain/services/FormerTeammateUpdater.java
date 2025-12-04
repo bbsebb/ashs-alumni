@@ -102,14 +102,10 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
             return oldFormerTeammate;
         }
 
-        //Si le nom ou le prénom ont été modifié, on vérifie leur unicité
-        if(!oldFormerTeammate.firstName().equalsIgnoreCase(updateFormerTeammateRequest.newFirstName()) || !oldFormerTeammate.lastName().equalsIgnoreCase(updateFormerTeammateRequest.newLastName())) {
-            uniquenessValidationService.validateNameUniqueness(updateFormerTeammateRequest.newFirstName(), updateFormerTeammateRequest.newLastName());
-        }
+
         // Le téléphone étant masqué pour l'utilisateur, s'il n'y a pas de changement, on doit reprendre le numéro non masqué existant en base de donnée.
         String newPhone;
         if(hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
-            uniquenessValidationService.validatePhoneUniqueness(updateFormerTeammateRequest.newPhone());
             newPhone = updateFormerTeammateRequest.newPhone();
         } else {
             newPhone = oldFormerTeammate.phone().map(Phone::getRawValue).orElse(null);
@@ -126,6 +122,13 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
                 .status(oldFormerTeammate.status())
                 .code(oldFormerTeammate.code())
                 .build();
+        //Si le nom ou le prénom ont été modifié, on vérifie leur unicité
+        if(!oldFormerTeammate.firstName().equalsIgnoreCase(updatedFormerTeammate.firstName()) || !oldFormerTeammate.lastName().equalsIgnoreCase(updatedFormerTeammate.lastName())) {
+            uniquenessValidationService.validateNameUniqueness(updatedFormerTeammate.firstName(), updatedFormerTeammate.lastName());
+        }
+        if(hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
+            uniquenessValidationService.validatePhoneUniqueness(updatedFormerTeammate.phone().map(Phone::getRawValue).orElse(null));
+        }
 
 
         return formerTeammateRepository.save(updatedFormerTeammate);

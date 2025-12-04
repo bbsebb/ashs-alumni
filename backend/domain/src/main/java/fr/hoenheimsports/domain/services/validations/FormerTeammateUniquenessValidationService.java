@@ -50,13 +50,13 @@ public class FormerTeammateUniquenessValidationService {
         if (phone == null || phone.trim().isEmpty()) {
             return;
         }
-        
+
         formerTeammateRepository.findByPhone(phone).ifPresent(formerTeammate -> {
             String phoneDisplay = formerTeammate.phone()
                     .map(Phone::toString)
                     .orElse(phone);
             throw new FormerTeammateAlreadyExistsException(
-                    "Le contact existe déjà avec le numéro de téléphone : %s".formatted(phoneDisplay)
+                    "Le contact, %s %s, existe déjà avec le numéro de téléphone : %s".formatted(formerTeammate.firstName(),formerTeammate.lastName(),phoneDisplay)
             );
         });
     }
