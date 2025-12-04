@@ -88,6 +88,9 @@
           <button mat-button *kaHasRoles="['ADMIN','USER'],checkRealm:true" (click)="onUpdate()" [disabled]="isDeleting()">
             Modifier
           </button>
+          <button mat-button *kaHasNoRoles="['ADMIN','USER'],checkRealm:true" (click)="onUpdateWithoutAuthentication()" [disabled]="isDeleting()">
+            Modifier
+          </button>
           @if (formerTeammate.status !== 'NOT_REQUESTED') {
           <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="onMarkNotRequested()" [disabled]="isDeleting()">
             Non sollicité

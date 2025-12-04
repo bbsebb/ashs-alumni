@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal, Signal} from '@angular/core';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatIconModule} from '@angular/material/icon';
@@ -25,6 +25,8 @@ import {LoadingComponent} from '@app/shared/components/loading/loading';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {ProblemDetail} from '@app/shared/models/problem-detail';
+import {KaHasNoRolesDirective} from '@app/shared/directives/KaHasNoRolesDirective';
+import {AuthenticationService} from '@app/shared/services/authentication';
 
 /**
  * FormerCard Component
@@ -59,7 +61,8 @@ import {ProblemDetail} from '@app/shared/models/problem-detail';
     HasRolesDirective,
     LoadingComponent,
     LoadErrorComponent,
-    MatProgressBar
+    MatProgressBar,
+    KaHasNoRolesDirective
   ],
   templateUrl: './former-card.html',
   styleUrl: './former-card.scss'
@@ -86,6 +89,8 @@ export class FormerCard {
   private readonly notificationService = inject(NotificationService);
   /** Service for displaying confirmation and other dialogs */
   private readonly dialogService = inject(DialogService);
+  private readonly authService = inject(AuthenticationService);
+
 
   // ===== SIGNALS AND COMPUTED PROPERTIES =====
   /** Angular router for navigation */
@@ -101,14 +106,6 @@ export class FormerCard {
     this.formerTeammateSignal = this.findFormerTeammate();
     this.isLoading = this.formerTeammatesStore.isLoading();
     this.hasError = this.formerTeammatesStore.hasError();
-    effect(() => {
-      console.log('isRemovedFormerTeammateSignal', this.isRemovedFormerTeammateSignal());
-    });
-
-    effect(() => {
-      console.log('fmt', this.formerTeammateSignal());
-    });
-
   }
 
 
@@ -202,6 +199,17 @@ export class FormerCard {
 
   private findFormerTeammate() {
     return this.formerTeammatesStore.getFormerTeammateById(this.paramsRouteSignal()['id'])
+  }
+
+  protected onUpdateWithoutAuthentication() {
+    const content = "Si vous souhaitez modifier ces informations, vous devez d'abord vous inscrire. Voulez-vous être redirigé vers la page de connexion ?";
+    const title = "🔒 Connexion requis";
+
+    this.dialogService.showConfirmation(content, title)
+      .pipe(filter(response => response))
+      .subscribe(() => {
+        this.authService.login();
+      });
   }
 
 
