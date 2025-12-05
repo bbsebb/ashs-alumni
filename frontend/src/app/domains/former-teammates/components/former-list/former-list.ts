@@ -112,10 +112,10 @@ export class FormerList {
    * @returns true si le prénom ou nom de famille contient le terme de recherche ou si aucun terme n'est saisi
    */
   private filterByName(formerTeammate: FormerTeammate): boolean {
-    let searchByNameFilter = this.formerTeammatesFilterSignal().searchByName;
+    let searchByNameFilter = this.formerTeammatesFilterSignal().searchByName.toLowerCase();
     if (searchByNameFilter.trim().length === 0) {
       return true;
     }
-    return formerTeammate.firstName.includes(searchByNameFilter) || formerTeammate.lastName.includes(searchByNameFilter);
+    return formerTeammate.firstName.toLowerCase().includes(searchByNameFilter) || formerTeammate.lastName.toLowerCase().includes(searchByNameFilter);
   }
 }
