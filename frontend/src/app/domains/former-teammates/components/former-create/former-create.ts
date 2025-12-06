@@ -7,11 +7,13 @@ import {Router} from '@angular/router';
 import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
 import {ProblemDetail} from '@app/shared/models/problem-detail';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-former-create',
   imports: [
-    FormerForm
+    FormerForm,
+    MatIcon
   ],
   templateUrl: './former-create.html',
   styleUrl: './former-create.scss'

@@ -1,0 +1,30 @@
+@use '@angular/material' as mat;
+
+.info-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 10px auto 24px;
+  padding: 16px;
+  background-color: var(--mat-sys-surface-variant); // Fond jaune très clair
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  max-width: 500px;
+
+
+  mat-icon {
+    color: var(--mat-sys-primary); // Icône ambre
+    min-width: 24px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+
+    strong {
+      color: #f57c00; // Titre orange plus foncé
+    }
+  }
+}
