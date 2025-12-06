@@ -45,7 +45,7 @@ import fr.hoenheimsports.domain.models.SMSHistory;
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
     private static final String SMS_VALIDATION_MESSAGE = """
-            Bonjour, c'est Sébastien Burckhardt. Un ancien de la SM1 de Hoenheim t'a ajouté à l'annuaire.
+            Bonjour, c'est Sébastien Burckhardt (+33638937416). Un ancien de la SM1/SF1 de Hoenheim t'a ajouté à l'annuaire.
             Merci de valider ton contact ici : alumni.hoenheimsports.fr/former-teammates/validate/%s
             Tu pourras ensuite t'inscrire à la soirée des anciens le samedi 10 janvier 2026.
             Si erreur, merci de l'indiquer en réponse; pour ne plus etre contacté, réponds STOP.
