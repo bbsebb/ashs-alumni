@@ -35,6 +35,7 @@ import java.util.UUID;
 public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
     private final FormerTeammateRepository formerTeammateRepository;
     private final SMSHistoryRepository smsHistoryRepository;
+    private final CreateFormerTeammateHistory createFormerTeammateHistory;
 
     /**
      * Constructeur du gestionnaire de mise à jour de statut SMS.
@@ -43,9 +44,11 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      * @param smsHistoryRepository le repository pour gérer l'historique des SMS
      * @throws NullPointerException si l'un des repositories est null
      */
-    public SMSUpdatedStatusHandler(FormerTeammateRepository formerTeammateRepository, SMSHistoryRepository smsHistoryRepository) {
+    public SMSUpdatedStatusHandler(FormerTeammateRepository formerTeammateRepository, SMSHistoryRepository smsHistoryRepository, CreateFormerTeammateHistory createFormerTeammateHistory) {
         this.formerTeammateRepository = formerTeammateRepository;
         this.smsHistoryRepository = smsHistoryRepository;
+        this.createFormerTeammateHistory = createFormerTeammateHistory;
+
     }
 
     /**

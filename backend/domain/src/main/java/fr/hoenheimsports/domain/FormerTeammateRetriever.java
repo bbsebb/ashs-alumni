@@ -7,6 +7,7 @@ import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @UseCase
 public class FormerTeammateRetriever implements GetFormerTeammates {
@@ -29,6 +30,11 @@ public class FormerTeammateRetriever implements GetFormerTeammates {
     @Override
     public FormerTeammate findByCode(String code) {
         return this.formerTeammateRepository.findByCode(code).orElseThrow(() -> new FormerTeammateNotFoundException("Le code de validation est invalide ou inconnu"));
+    }
+
+    @Override
+    public Optional<FormerTeammate> findByPhone(String phone) {
+        return this.formerTeammateRepository.findByPhone(phone);
     }
 
 }

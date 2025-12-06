@@ -4,6 +4,7 @@ import com.twilio.twiml.MessagingResponse;
 import fr.hoenheimsports.app.controllers.dtos.TwilioWebhookRequest;
 import fr.hoenheimsports.app.mappers.TwilioMessageMapper;
 import fr.hoenheimsports.app.services.EmailService;
+import fr.hoenheimsports.domain.api.GetFormerTeammates;
 import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
 import fr.hoenheimsports.domain.services.HandleSMSUpdatedStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,11 +26,14 @@ TwilioWebhookController {
     private final HandleSMSUpdatedStatus handleSMSUpdatedStatus;
     private final TwilioMessageMapper twilioMessageMapper;
     private final EmailService emailService;
+    private final GetFormerTeammates formerTeammateRetriever;
 
-    public TwilioWebhookController(HandleSMSUpdatedStatus handleSMSUpdatedStatus, TwilioMessageMapper twilioMessageMapper, EmailService emailService) {
+
+    public TwilioWebhookController(HandleSMSUpdatedStatus handleSMSUpdatedStatus, TwilioMessageMapper twilioMessageMapper, EmailService emailService, GetFormerTeammates formerTeammateRetriever) {
         this.handleSMSUpdatedStatus = handleSMSUpdatedStatus;
         this.twilioMessageMapper = twilioMessageMapper;
         this.emailService = emailService;
+        this.formerTeammateRetriever = formerTeammateRetriever;
     }
 
 
@@ -58,9 +62,10 @@ TwilioWebhookController {
             @RequestParam(value = "To") String toNumber
     ) {
 
+        var smsInputSenderName = this.formerTeammateRetriever.findByPhone(fromNumber).map(formerTeammate -> formerTeammate.firstName() + " " + formerTeammate.lastName()).orElse("Inconnu");
         this.emailService.envoyerEmailTexte(
                 "sebastien.burckhardt@hoenheimsports.fr",
-                "SMS Income",
+                "SMS Income de %s".formatted(smsInputSenderName),
                 """
                         Message de : %s
                         Pour : %s
