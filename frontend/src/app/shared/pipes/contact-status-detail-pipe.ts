@@ -13,7 +13,7 @@ export class ContactStatusDetailPipe implements PipeTransform {
       case 'PENDING':
         return 'SMS envoyé, en attente de réponse du destinataire';
       case 'VALIDATED':
-        return 'SMS envoyé et réponse positive du destinataire.';
+        return 'Le contact a été validé par son propriétaire.';
       case 'NOT_REQUESTED':
         return 'Ne souhaite plus être contacté';
       case 'UNREACHABLE':
