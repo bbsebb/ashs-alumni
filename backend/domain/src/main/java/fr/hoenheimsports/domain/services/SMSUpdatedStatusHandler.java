@@ -12,6 +12,7 @@ import fr.hoenheimsports.domain.models.SMSStatus;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -35,6 +36,7 @@ import java.util.UUID;
 public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
     private final FormerTeammateRepository formerTeammateRepository;
     private final SMSHistoryRepository smsHistoryRepository;
+    private final MapSMSStatusToContactStatus SMSStatusToContactStatusMapper;
     private final CreateFormerTeammateHistory createFormerTeammateHistory;
 
     /**
@@ -44,11 +46,12 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      * @param smsHistoryRepository le repository pour gérer l'historique des SMS
      * @throws NullPointerException si l'un des repositories est null
      */
-    public SMSUpdatedStatusHandler(FormerTeammateRepository formerTeammateRepository, SMSHistoryRepository smsHistoryRepository, CreateFormerTeammateHistory createFormerTeammateHistory) {
+    public SMSUpdatedStatusHandler(FormerTeammateRepository formerTeammateRepository, SMSHistoryRepository smsHistoryRepository, MapSMSStatusToContactStatus smsStatusToContactStatusMapper, CreateFormerTeammateHistory createFormerTeammateHistory) {
         this.formerTeammateRepository = formerTeammateRepository;
         this.smsHistoryRepository = smsHistoryRepository;
-        this.createFormerTeammateHistory = createFormerTeammateHistory;
 
+        SMSStatusToContactStatusMapper = smsStatusToContactStatusMapper;
+        this.createFormerTeammateHistory = createFormerTeammateHistory;
     }
 
     /**
@@ -78,11 +81,13 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
         }
 
         var formerTeammate = retrieveFormerTeammate(smsUpdatedStatusDetails);
-        var updatedSmsHistory = updateSMSHistoryWithStatus(smsHistory, smsUpdatedStatusDetails);
+        var updatedSmsHistory = addSMSHistoryWithStatus(smsHistory, smsUpdatedStatusDetails);
         var updatedFormerTeammate = updateFormerTeammateContactStatus(formerTeammate, updatedSmsHistory);
 
-        formerTeammateRepository.save(updatedFormerTeammate);
+
         smsHistoryRepository.save(updatedSmsHistory);
+        formerTeammate = formerTeammateRepository.save(updatedFormerTeammate);
+        createFormerTeammateHistory.createHistoryForUpdate(formerTeammate,"ASHS BOT", "Transition du status de suivi du SMS");
     }
 
     /**
@@ -122,15 +127,26 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      * @param smsUpdatedStatusDetails la commande contenant le nouveau statut et les informations d'erreur
      * @return l'historique SMS mis à jour avec le nouveau statut et éventuellement un message d'erreur
      */
-    private SMSHistory updateSMSHistoryWithStatus(SMSHistory originalSmsHistory, SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
-        var updatedSmsHistory = originalSmsHistory.withStatus(smsUpdatedStatusDetails.smsStatusUpdate().smsStatus());
+    private SMSHistory addSMSHistoryWithStatus(SMSHistory originalSmsHistory, SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
 
-        if (updatedSmsHistory.hasFailed()) {
-            updatedSmsHistory = updatedSmsHistory.withErrorMessage(
+        var newSmsHistory = SMSHistory.builder()
+                .id(originalSmsHistory.id())
+                .updatedAt(Instant.now())
+                .formerTeammateId(originalSmsHistory.formerTeammateId())
+                .externalId(originalSmsHistory.externalId())
+                .status(smsUpdatedStatusDetails.smsStatusUpdate().smsStatus())
+                .message(originalSmsHistory.message())
+                .sentAt(originalSmsHistory.sentAt())
+                .phoneNumber(originalSmsHistory.phoneNumber())
+                .errorMessage(originalSmsHistory.errorMessage())
+                .build();
+
+        if (newSmsHistory.hasFailed()) {
+            newSmsHistory = newSmsHistory.withErrorMessage(
                     "Erreur de type %s : %s".formatted(smsUpdatedStatusDetails.smsStatusUpdate().errorCode(), smsUpdatedStatusDetails.smsStatusUpdate().errorMessage()));
         }
 
-        return updatedSmsHistory;
+        return newSmsHistory;
     }
 
     /**
@@ -148,12 +164,11 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      * @return l'ancien coéquipier avec le statut de contact mis à jour
      */
     private FormerTeammate updateFormerTeammateContactStatus(FormerTeammate formerTeammate, SMSHistory updatedSmsHistory) {
-        if (updatedSmsHistory.status() == SMSStatus.DELIVERED) {
-            return formerTeammate.withContactStatus(ContactStatus.PENDING);
-        } else if (updatedSmsHistory.hasFailed()) {
-            return formerTeammate.withContactStatus(ContactStatus.UNREACHABLE);
-        } else {
-            return formerTeammate.withContactStatus(ContactStatus.SUBMITTED);
-        }
+
+        ContactStatus newContactStatus = this.SMSStatusToContactStatusMapper.map(updatedSmsHistory.status());
+        return formerTeammate.withContactStatus(newContactStatus);
+
     }
+
+
 }
