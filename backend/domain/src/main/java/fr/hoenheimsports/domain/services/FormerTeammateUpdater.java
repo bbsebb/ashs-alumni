@@ -161,8 +161,13 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
             return false;
         }
 
+
         // L'un est présent et l'autre non : changement
-        if (newPhone == null || oldPhone.isEmpty()) {
+        if ((newPhone == null || newPhone.isBlank()) && oldPhone.isPresent()) {
+            return true;
+        }
+
+        if (!newPhone.isBlank() && oldPhone.isEmpty()) {
             return true;
         }
 
@@ -171,8 +176,8 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
             return false;
         }
 
-        String oldMaskedPhoneStr = oldPhone.get().toString();
-        String oldUnmaskedPhoneStr = oldPhone.get().getRawValue();
+        String oldMaskedPhoneStr = oldPhone.map(Phone::toString).orElse("");
+        String oldUnmaskedPhoneStr = oldPhone.map(Phone::getRawValue).orElse("");
         // Les deux sont présents : comparer les valeurs
         return !oldMaskedPhoneStr.equals(newPhone) && !oldUnmaskedPhoneStr.equals(newPhone);
     }

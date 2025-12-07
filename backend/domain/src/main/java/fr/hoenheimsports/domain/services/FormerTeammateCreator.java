@@ -75,7 +75,8 @@ public class FormerTeammateCreator implements CreateFormerTeammate {
     @Override
     public FormerTeammate createFormerTeammate(FormerTeammateRegistrationRequest command) {
 
-        var initialStatus = command.phone().isBlank()?  ContactStatus.UNREACHABLE : ContactStatus.SUBMITTED;
+
+        var initialStatus = (command.phone() == null || command.phone().isBlank()) ?  ContactStatus.UNREACHABLE : ContactStatus.SUBMITTED;
         
         // Création de l'entité
         var formerTeammate = FormerTeammate.builder()
