@@ -139,7 +139,7 @@ public class SMSValidationHandler implements HandleSMSValidation{
      * @return UNREACHABLE si l'envoi a échoué, PENDING sinon
      */
     private ContactStatus determineNewStatus(SMSHistory smsHistory) {
-        return smsHistory.hasFailed() ? ContactStatus.UNREACHABLE : ContactStatus.PENDING;
+        return smsHistory.hasFailed() ? ContactStatus.UNREACHABLE : ContactStatus.SENDING;
     }
 
     /**
@@ -168,6 +168,7 @@ public class SMSValidationHandler implements HandleSMSValidation{
         return switch (newStatus) {
             case PENDING -> "Transition du status vers → EN ATTENTE : SMS de validation envoyé avec succès. " +
                     "En attente de la confirmation du contact.";
+            case SENDING -> "Mise à jour du status d'envoi du SMS. Transition du status vers → %s : SMS de validation a été envoyé mais non réceptionné".formatted(ContactStatus.SENDING.getLabel().toUpperCase());
             case UNREACHABLE -> "Transition du status vers → INJOIGNABLE : Échec de l'envoi du SMS. " +
                     "Le numéro de téléphone fourni est invalide ou absent.";
             default -> "Changement de statut vers " + newStatus;

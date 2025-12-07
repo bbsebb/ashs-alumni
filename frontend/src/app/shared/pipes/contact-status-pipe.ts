@@ -18,6 +18,10 @@ export class ContactStatusPipe implements PipeTransform {
         return 'Non sollicité';
       case 'UNREACHABLE':
         return 'Injoignable';
+      case 'SENDING':
+        return 'Envoi en cours';
+      case 'WAITING':
+        return 'Arrivé'
       default:
         return status;
     }
