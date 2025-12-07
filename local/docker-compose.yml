@@ -2,7 +2,7 @@ services:
   backend:
     # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub (ou organisation)
     # Le tag 'main' correspond à la branche construite dans votre workflow
-    image: ghcr.io/bbsebb/alumni_ashs:main
+    image: ghcr.io/bbsebb/alumni_ashs:${BACKEND_TAG:-main}
     container_name: alumni-backend
     ports:
       - "8080:8080" # Port hôte : Port conteneur (Spring Boot défaut)
@@ -26,7 +26,7 @@ services:
       - LOGGING_LEVEL_APP=${LOGGING_LEVEL_APP:-INFO}
       - LOGGING_LEVEL_DOMAIN=${LOGGING_LEVEL_DOMAIN:-INFO}
 
-      - SERVER_PORT=${BACKEND_PORT}
+      - SERVER_PORT=${SERVER_PORT}
 
       - TWILIO_WEBHOOK_URL=${TWILIO_WEBHOOK_URL}
 
@@ -45,7 +45,7 @@ services:
 
   frontend:
     # Remplacez VOTRE_NOM_UTILISATEUR par votre nom d'utilisateur GitHub
-    image: ghcr.io/bbsebb/alumni_ashs-frontend:main
+    image: ghcr.io/bbsebb/alumni_ashs-frontend:${FRONTEND_TAG:-main}
     container_name: alumni-frontend
     ports:
       - "80:80" # Le Dockerfile frontend expose le port 80 via Nginx

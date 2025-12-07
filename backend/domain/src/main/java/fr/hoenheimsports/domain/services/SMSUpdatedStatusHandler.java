@@ -81,13 +81,17 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
         }
 
         var formerTeammate = retrieveFormerTeammate(smsUpdatedStatusDetails);
+        var oldContactStatus = formerTeammate.status();
         var updatedSmsHistory = addSMSHistoryWithStatus(smsHistory, smsUpdatedStatusDetails);
         var updatedFormerTeammate = updateFormerTeammateContactStatus(formerTeammate, updatedSmsHistory);
+        var newContactStatus = updatedFormerTeammate.status();
 
 
         smsHistoryRepository.save(updatedSmsHistory);
         formerTeammate = formerTeammateRepository.save(updatedFormerTeammate);
-        createFormerTeammateHistory.createHistoryForUpdate(formerTeammate,"ASHS BOT", "Transition du status de suivi du SMS");
+        if(oldContactStatus != newContactStatus) {
+            createFormerTeammateHistory.createHistoryForUpdate(formerTeammate, "ASHS BOT", "Mise à jour du status d'envoi du SMS. Transition du status du contact vers -> %s".formatted(newContactStatus.getLabel().toUpperCase()));
+        }
     }
 
     /**
