@@ -1,3 +1,7 @@
 <mat-chip-set>
-  <mat-chip  [matTooltip]="statusSignal() | contactStatusDetail" >{{ statusSignal() | contactStatus | uppercase }}</mat-chip>
+  <mat-chip
+    [class]="'status-' + statusSignal().toLowerCase().replace('_', '-')"
+    [matTooltip]="statusSignal() | contactStatusDetail" >
+    {{ statusSignal() | contactStatus | uppercase }}
+  </mat-chip>
 </mat-chip-set>

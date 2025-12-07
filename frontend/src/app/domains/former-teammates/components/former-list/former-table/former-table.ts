@@ -22,6 +22,7 @@ import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {RouterLink} from '@angular/router';
 import {ContactStatusChip} from '@app/shared/components/contact-status-chip/contact-status-chip';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-former-table',
@@ -44,6 +45,7 @@ import {ContactStatusChip} from '@app/shared/components/contact-status-chip/cont
     RouterLink,
     ContactStatusChip,
     MatNoDataRow,
+    DatePipe,
 
   ],
   templateUrl: './former-table.html',
@@ -69,9 +71,9 @@ export class FormerTable {
     const breakpointObserver =  toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
     this.columnsToDisplayedSignal = computed(() => {
       if(breakpointObserver()?.matches) {
-        return ['firstName', 'lastName', 'phone'];
+        return ['firstName', 'lastName', 'status'];
       } else {
-        return ['gender',  'lastName','firstName', 'phone', 'status','view'];
+        return ['gender',  'lastName','firstName', 'phone','generation', 'status','view'];
       }
     })
 
@@ -79,7 +81,7 @@ export class FormerTable {
 
 
     effect(() => {
-      this.dataSource.data = this.filterFormerTeammates();
+      this.dataSource.data = this.filterFormerTeammates().sort(this.compareBirthDates());
       console.log('Mise à jour de la table')
     });
     effect(() => {
@@ -89,4 +91,10 @@ export class FormerTable {
   }
 
 
+  private compareBirthDates() {
+    return (a: FormerTeammate, b:FormerTeammate) => {
+      // On compare les chaînes directement. Si undefined, on utilise une chaîne vide pour éviter le crash.
+      return (b.birthDate ?? '').localeCompare(a.birthDate ?? '');
+    };
+  }
 }

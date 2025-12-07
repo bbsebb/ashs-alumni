@@ -1,0 +1,65 @@
+@use '@angular/material' as mat;
+
+// --- SUBMITTED (Gris / Neutre) ---
+.status-submitted {
+  @include mat.chips-overrides((
+    elevated-container-color: #ECEFF1, // Blue Grey 50
+    label-text-color: #263238, // Blue Grey 900
+    outline-color: #263238
+  ));
+}
+
+// --- UNREACHABLE (Rouge / Erreur) ---
+.status-unreachable {
+  @include mat.chips-overrides((
+    elevated-container-color: #FFEBEE, // Red 50
+    label-text-color: #B71C1C, // Red 900
+    outline-color: #B71C1C
+  ));
+}
+
+// --- SENDING (Bleu / En cours) ---
+.status-sending {
+  @include mat.chips-overrides((
+    elevated-container-color: #E3F2FD, // Blue 50
+    label-text-color: #0D47A1, // Blue 900
+    outline-color: #0D47A1
+  ));
+}
+
+// --- WAITING (Orange / Attente) ---
+.status-waiting {
+  @include mat.chips-overrides((
+    elevated-container-color: #FFF3E0, // Orange 50
+    label-text-color: #E65100, // Orange 900
+    outline-color: #E65100
+  ));
+}
+
+// --- PENDING (Orange / Attente) ---
+.status-pending {
+  @include mat.chips-overrides((
+    elevated-container-color: #FFF3E0, // Idem Waiting
+    label-text-color: #E65100,
+    outline-color: #E65100
+  ));
+}
+
+// --- VALIDATED (Vert / Succès) ---
+.status-validated {
+  @include mat.chips-overrides((
+    elevated-container-color: #E8F5E9, // Green 50
+    label-text-color: #1B5E20, // Green 900
+    outline-color: #1B5E20
+  ));
+}
+
+// --- NOT_REQUESTED (Grisé et barré) ---
+.status-not-requested {
+  text-decoration: line-through;
+  @include mat.chips-overrides((
+    elevated-container-color: #FAFAFA, // Grey 50
+    label-text-color: #9E9E9E, // Grey 500
+    outline-color: #BDBDBD  // Grey 400
+  ));
+}
