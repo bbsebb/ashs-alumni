@@ -7,7 +7,7 @@ public enum ContactStatus {
     NOT_REQUESTED("Non demandé"),
     UNREACHABLE("Injoignable"),
     SENDING("Envoi en cours"),
-    WAITING("En attente");
+    WAITING("Lien envoyé [arrivé]");
 
     private final String label;
 
