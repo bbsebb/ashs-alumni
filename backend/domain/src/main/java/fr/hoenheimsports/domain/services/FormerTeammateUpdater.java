@@ -11,7 +11,6 @@ import fr.hoenheimsports.domain.services.validations.FormerTeammateUniquenessVal
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Service de mise à jour du statut de contact des anciens coéquipiers.
@@ -54,27 +53,6 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
         this.uniquenessValidationService = uniquenessValidationService;
     }
 
-    /**
-     * Met à jour le statut de contact d'un ancien coéquipier.
-     *
-     * <p>Cette méthode recherche l'ancien coéquipier par son identifiant,
-     * met à jour son statut de contact et sauvegarde la modification.
-     * Si l'entité n'est pas trouvée, la méthode retourne null.</p>
-     *
-     * <p>La mise à jour utilise la méthode {@code withContactStatus} qui
-     * crée une nouvelle instance immutable de FormerTeammate avec le
-     * nouveau statut, préservant l'intégrité des données.</p>
-     *
-     * @param formerTeammateId l'identifiant de l'ancien coéquipier à mettre à jour
-     * @param newStatus le nouveau statut de contact à appliquer
-     * @return l'ancien coéquipier avec le statut mis à jour, ou null si non trouvé
-     */
-    @Override
-    public FormerTeammate updateContactStatus(UUID formerTeammateId, ContactStatus newStatus) {
-        return formerTeammateRepository.findById(formerTeammateId)
-                .map(formerTeammate -> updateContactStatus(formerTeammate, newStatus))
-                .orElse(null);
-    }
 
     /**
      * Met à jour un ancien coéquipier avec un nouveau statut de contact.
