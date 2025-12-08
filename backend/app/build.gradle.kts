@@ -29,6 +29,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.12")
     implementation("com.github.loki4j:loki-logback-appender:2.0.1")
+    implementation("org.keycloak:keycloak-admin-client:26.0.7")
     // MapStruct
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")

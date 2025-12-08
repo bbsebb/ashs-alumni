@@ -49,7 +49,12 @@ server:
 
 # Logging configuration
 
-
+keycloak:
+  auth-server-url: ${KC_AUTH_SERVER_URL:http://localhost:8079}
+  realm: ${KC_REALM:ashs-alumni}
+  client-id: ${KC_CLIENT_ID:ashs-alumni-backend}
+  credentials:
+    secret: ${KC_CLIENT_SECRET}
 
 twilio:
   account-sid: ${TWILIO_ACCOUNT_SID}
