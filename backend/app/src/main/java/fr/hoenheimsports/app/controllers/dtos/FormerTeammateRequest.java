@@ -22,6 +22,8 @@ public record FormerTeammateRequest(
         String email,
         @Past(message = "La date de naissance doit être dans le passé")
         LocalDate birthDate,
-        List<Role> roles
+        List<Role> roles,
+        @NotBlank(message = "Le prénom est obligatoire")
+        String password
 ) {
 }

@@ -5,6 +5,7 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.mappers.FormerTeammateMapper;
 import fr.hoenheimsports.app.services.FormerTeammateService;
 import fr.hoenheimsports.app.services.SecurityContextService;
+import fr.hoenheimsports.app.services.UserRegistrationService;
 import fr.hoenheimsports.domain.FormerTeammateRetriever;
 import fr.hoenheimsports.domain.api.*;
 import jakarta.validation.Valid;
@@ -32,12 +33,13 @@ public class FormerTeammateController {
     private final ResendSMSToFormerTeammate SMSToFormerTeammateSender;
     private final ValidateFormerTeammate formerTeammateValidator;
     private final MarkAsNotRequestedFormerTeammate formerTeammateNotRequestedMarker;
+    private final UserRegistrationService userRegistrationService;
 
     public FormerTeammateController(RegisterFormerTeammate formerTeammateRegistrar, EditFormerTeammate formerTeammateEditor,
                                     FormerTeammateRetriever formerTeammateRetriever,
                                     FormerTeammateMapper formerTeammateMapper,
                                     FormerTeammateService formerTeammateService,
-                                    SecurityContextService securityContextService, RemoveFormerTeammate formerTeammateRemover, ResendSMSToFormerTeammate SMSToFormerTeammateSender, ValidateFormerTeammate formerTeammateValidator, MarkAsNotRequestedFormerTeammate formerTeammateNotRequestedMarker) {
+                                    SecurityContextService securityContextService, RemoveFormerTeammate formerTeammateRemover, ResendSMSToFormerTeammate SMSToFormerTeammateSender, ValidateFormerTeammate formerTeammateValidator, MarkAsNotRequestedFormerTeammate formerTeammateNotRequestedMarker, UserRegistrationService userRegistrationService) {
         this.formerTeammateRegistrar = formerTeammateRegistrar;
         this.formerTeammateEditor = formerTeammateEditor;
         this.formerTeammateRetriever = formerTeammateRetriever;
@@ -48,6 +50,7 @@ public class FormerTeammateController {
         this.SMSToFormerTeammateSender = SMSToFormerTeammateSender;
         this.formerTeammateValidator = formerTeammateValidator;
         this.formerTeammateNotRequestedMarker = formerTeammateNotRequestedMarker;
+        this.userRegistrationService = userRegistrationService;
     }
 
     @PostMapping()
@@ -118,7 +121,8 @@ public class FormerTeammateController {
     @Transactional
     public ResponseEntity<FormerTeammateResponse> validateFormerTeammate(@PathVariable String code,@RequestBody @Valid FormerTeammateRequest formerTeammateRequest) {
         log.debug("Validating former teammate {}", formerTeammateRequest);
-        var validateFormerTeammateRequest = formerTeammateMapper.toValidateRequest(code,formerTeammateRequest);
+        var kcUserId = userRegistrationService.registerUser(formerTeammateRequest.email(),formerTeammateRequest.password(),formerTeammateRequest.firstName(),formerTeammateRequest.lastName());
+        var validateFormerTeammateRequest = formerTeammateMapper.toValidateRequest(code,formerTeammateRequest,kcUserId);
         var formerTeammate = formerTeammateValidator.valideFormerTeammate(validateFormerTeammateRequest);
         log.debug("Former teammate {} validated", formerTeammate);
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));

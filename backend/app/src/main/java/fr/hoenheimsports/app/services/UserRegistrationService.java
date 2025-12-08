@@ -1,6 +1,5 @@
 package fr.hoenheimsports.app.services;
 
-import fr.hoenheimsports.app.controllers.dtos.UserRegistrationRequest;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -23,11 +22,11 @@ public class UserRegistrationService {
     @Value("${keycloak.realm}")
     private String realm;
 
-    public String registerUser(UserRegistrationRequest userDto) {
+    public String registerUser(String email, String password,String firstName,String lastName) {
         UserRepresentation user = new UserRepresentation();
-        user.setEmail(userDto.email());
-        user.setFirstName(userDto.firstName());
-        user.setLastName(userDto.lastName());
+        user.setEmail(email);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setEnabled(true);
 
 
@@ -35,7 +34,7 @@ public class UserRegistrationService {
         // Définition du mot de passe
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
-        credential.setValue(userDto.password());
+        credential.setValue(password);
         credential.setTemporary(false);
         user.setCredentials(Collections.singletonList(credential));
 

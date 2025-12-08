@@ -2,6 +2,8 @@ package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateModificationRequest;
+import fr.hoenheimsports.domain.api.commands.UpdateFormerTeammateRequest;
+import fr.hoenheimsports.domain.api.commands.ValidateFormerTeammateRequest;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.Phone;
@@ -97,19 +99,30 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
 
 
     @Override
-    public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest) {
+    public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, UpdateFormerTeammateRequest updateFormerTeammateRequest) {
+        var updatedEntity = this.prepareUpdatedEntity(oldFormerTeammate, updateFormerTeammateRequest);
+        return formerTeammateRepository.save(updatedEntity);
+    }
+
+    @Override
+    public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, ValidateFormerTeammateRequest updateFormerTeammateRequest) {
+        var updatedEntity = this.prepareUpdatedEntity(oldFormerTeammate, updateFormerTeammateRequest)
+                .withContactKcUserId(updateFormerTeammateRequest.kcUserID());
+        return formerTeammateRepository.save(updatedEntity);
+    }
+
+
+    private FormerTeammate prepareUpdatedEntity(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest) {
         if (!hasAnyFieldChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
             return oldFormerTeammate;
         }
 
 
         // Le téléphone étant masqué pour l'utilisateur, s'il n'y a pas de changement, on doit reprendre le numéro non masqué existant en base de donnée.
-        String newPhone;
-        if(hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
-            newPhone = updateFormerTeammateRequest.newPhone();
-        } else {
-            newPhone = oldFormerTeammate.phone().map(Phone::getRawValue).orElse(null);
-        }
+        String newPhone = hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)
+                ? updateFormerTeammateRequest.newPhone()
+                : oldFormerTeammate.phone().map(Phone::getRawValue).orElse(null);
+
         var updatedFormerTeammate = FormerTeammate.builder()
                 .id(oldFormerTeammate.id())
                 .gender(updateFormerTeammateRequest.newGender())
@@ -122,19 +135,23 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
                 .status(oldFormerTeammate.status())
                 .code(oldFormerTeammate.code())
                 .build();
+
+        // Si le nom ou le prénom ont été modifiés, on vérifie leur unicité
+        boolean nameChanged = !oldFormerTeammate.firstName().equalsIgnoreCase(updatedFormerTeammate.firstName())
+                || !oldFormerTeammate.lastName().equalsIgnoreCase(updatedFormerTeammate.lastName());
+
         //Si le nom ou le prénom ont été modifié, on vérifie leur unicité
-        if(!oldFormerTeammate.firstName().equalsIgnoreCase(updatedFormerTeammate.firstName()) || !oldFormerTeammate.lastName().equalsIgnoreCase(updatedFormerTeammate.lastName())) {
+        if(nameChanged) {
             uniquenessValidationService.validateNameUniqueness(updatedFormerTeammate.firstName(), updatedFormerTeammate.lastName());
         }
         if(hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
             uniquenessValidationService.validatePhoneUniqueness(updatedFormerTeammate.phone().map(Phone::getRawValue).orElse(null));
         }
-
-
-        return formerTeammateRepository.save(updatedFormerTeammate);
+        return updatedFormerTeammate;
     }
 
     private boolean hasAnyFieldChanged(FormerTeammate old, FormerTeammateModificationRequest update) {
+
         return !old.firstName().equalsIgnoreCase(update.newFirstName())
                 || !old.lastName().equalsIgnoreCase(update.newLastName())
                 || !old.gender().equals(update.newGender())
@@ -142,6 +159,7 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
                 || !old.email().equals(Optional.ofNullable(update.newEmail()))
                 || !old.birthDate().equals(Optional.ofNullable(update.newBirthDate()))
                 || !old.roles().equals(update.roles());
+
     }
 
     /**

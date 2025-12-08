@@ -36,7 +36,8 @@ public record FormerTeammate(
         Optional<LocalDate> birthDate,
         List<Role> roles,
         ContactStatus status,
-        String code
+        String code,
+        Optional<String> kcUserID
 ) {
 
     private static final FieldValidationService validationService = new FieldValidationService();
@@ -57,7 +58,7 @@ public record FormerTeammate(
         validationService.validateRequiredField(birthDate, "birthDate");
         validationService.validateRequiredField(status, "status");
         validationService.validateRequiredStringField(code, "code");
-
+        validationService.validateRequiredField(kcUserID, "kcUserID");
         // Ensure that the roles list is never null
         roles = List.copyOf(validationService.validateListField(roles));
     }
@@ -73,7 +74,11 @@ public record FormerTeammate(
      */
     public FormerTeammate withContactStatus(ContactStatus newStatus) {
         validationService.validateRequiredField(newStatus, "newStatus");
-        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus, code);
+        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus, code, kcUserID);
+    }
+
+    public FormerTeammate withContactKcUserId(String newKcUserId) {
+        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, status, code, Optional.ofNullable(newKcUserId));
     }
 
     /**
@@ -100,6 +105,7 @@ public record FormerTeammate(
         private List<Role> roles = new ArrayList<>();
         private ContactStatus status;
         private String code;
+        private String kcUserId;
 
         private Builder() {
         }
@@ -223,6 +229,19 @@ public record FormerTeammate(
         }
 
         /**
+         * Sets the kcUserId of the former teammate.
+         *
+         * @param kcUserId the code
+         * @return this builder instance for method chaining
+         */
+        public Builder kcUserId(String kcUserId) {
+            this.kcUserId = kcUserId;
+            return this;
+        }
+
+
+
+        /**
          * Builds a new FormerTeammate instance with validation.
          * Validates that all required fields are set before creating the instance.
          *
@@ -240,7 +259,7 @@ public record FormerTeammate(
 
             return new FormerTeammate(id, firstName, lastName, gender, 
                     Optional.ofNullable(phone), Optional.ofNullable(email), Optional.ofNullable(birthDate),
-                    List.copyOf(roles), status,code);
+                    List.copyOf(roles), status,code,Optional.ofNullable(kcUserId));
         }
 
     }

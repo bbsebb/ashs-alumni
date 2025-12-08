@@ -73,7 +73,7 @@ public interface FormerTeammateMapper {
         );
     }
 
-    default ValidateFormerTeammateRequest toValidateRequest(String code, FormerTeammateRequest formerTeammateRequest) {
+    default ValidateFormerTeammateRequest toValidateRequest(String code, FormerTeammateRequest formerTeammateRequest,String kcUserID) {
         var formerTeammateRegistrationRequest = toRegistrationRequest(formerTeammateRequest);
         return new ValidateFormerTeammateRequest(
                 formerTeammateRegistrationRequest.firstName(),
@@ -83,7 +83,8 @@ public interface FormerTeammateMapper {
                 formerTeammateRegistrationRequest.email(),
                 formerTeammateRegistrationRequest.birthDate(),
                 formerTeammateRegistrationRequest.roles(),
-                code.trim().toUpperCase()
+                code.trim().toUpperCase(),
+                kcUserID
         );
     }
 }

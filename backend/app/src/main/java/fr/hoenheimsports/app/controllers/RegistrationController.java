@@ -16,7 +16,7 @@ public class RegistrationController {
     private final UserRegistrationService registrationService;
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserRegistrationRequest userDto) {
-        var _ = registrationService.registerUser(userDto);
+        var _ = registrationService.registerUser(userDto.email(), userDto.password(), userDto.firstName(), userDto.lastName());
         return ResponseEntity.ok("Utilisateur créé avec succès");
     }
 }
