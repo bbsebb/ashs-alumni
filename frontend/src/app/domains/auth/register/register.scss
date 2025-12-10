@@ -1,0 +1,24 @@
+:host{
+  display: block;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+
+  mat-button-toggle-group {
+    align-self: center;
+  }
+
+
+
+  #action {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+

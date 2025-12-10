@@ -1,0 +1,39 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="formRegister">
+<h3>Enregistrements de votre compte</h3>
+  <mat-form-field>
+    <mat-label>Email</mat-label>
+    <input formControlName="email" matInput required type="email">
+    @if(formRegister.get('email')?.hasError('required')) {
+      <mat-error>L'email est requis</mat-error>
+    }
+    @if(formRegister.get('email')?.hasError('email')) {
+      <mat-error>Format d'email invalide</mat-error>
+    }
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Mot de passe</mat-label>
+    <input formControlName="password" matInput required type="password">
+    <mat-error>Le mot de passe est requis</mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>confirmation du mot de passe</mat-label>
+    <input formControlName="passwordConfirmation" matInput required type="password">
+    <mat-error>La confirmation est requise</mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Prénom</mat-label>
+    <input formControlName="firstName" matInput required>
+    <mat-error>Le prénom est requis</mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Nom</mat-label>
+    <input formControlName="lastName" matInput required>
+    <mat-error>Le nom est requis</mat-error>
+  </mat-form-field>
+  <div id="action">
+    <app-back-button link='/former-teammates'/>
+    <button mat-button type="submit" [disabled]="isLoading()">
+       S'enregistrer
+    </button>
+  </div>
+  </form>
