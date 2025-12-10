@@ -1,6 +1,8 @@
 package fr.hoenheimsports.app.controllers;
 
+import fr.hoenheimsports.app.exceptions.AuthException;
 import fr.hoenheimsports.app.exceptions.ParticipantAlreadyExistsException;
+import fr.hoenheimsports.app.exceptions.UserAlreadyExistsException;
 import fr.hoenheimsports.domain.exceptions.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,8 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
         SMS_HISTORY_NOT_FOUND("https://api.hoenheimsports.fr/errors/sms-history-not-found"),
         FORMER_TEAMMATE_NOT_FOUND("https://api.hoenheimsports.fr/errors/former-teammate-not-found"),
         FORMER_TEAMMATE_NOT_REQUESTED("https://api.hoenheimsports.fr/errors/former-teammate-not-requested"),
+        USER_ALREADY_EXISTS("https://api.hoenheimsports.fr/errors/user-already-exists"),
+        AUTH_ERROR("https://api.hoenheimsports.fr/errors/auth-error"),
         SMS_LIMIT_EXCEEDED("https://api.hoenheimsports.fr/errors/sms-limit-exceeded"),
         RUNTIME("https://api.hoenheimsports.fr/errors/runtime"),
         INTERNAL("https://api.hoenheimsports.fr/errors/internal");
@@ -258,6 +262,34 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 ex.getMessage()
         );
         problemDetail.setType(ErrorType.SMS_LIMIT_EXCEEDED.getUri());
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ProblemDetail handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        String title = "L'utilisateur existe déjà";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage()
+        );
+        problemDetail.setType(ErrorType.USER_ALREADY_EXISTS.getUri());
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ProblemDetail handleAuthException(AuthException ex) {
+        String title = "Erreur inconnue lors de l'authentification";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Une erreur d'exécution inattendue s'est produite !"
+        );
+        problemDetail.setType(ErrorType.AUTH_ERROR.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
