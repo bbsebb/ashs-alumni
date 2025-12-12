@@ -44,7 +44,7 @@
   }
   <div id="action">
     <app-back-button link='/former-teammates'/>
-    <button mat-button type="submit" [disabled]="isSubmitting()">
+    <button mat-button type="submit" [disabled]="isSubmitting() || formRegister.invalid">
        Créer son compte
     </button>
   </div>
