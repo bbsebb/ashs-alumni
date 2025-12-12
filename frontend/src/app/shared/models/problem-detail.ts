@@ -20,6 +20,8 @@ export type type =
   "https://api.hoenheimsports.fr/errors/former-teammate-not-found"|
   "https://api.hoenheimsports.fr/errors/sms-limit-exceeded"|
   "https://api.hoenheimsports.fr/errors/former-teammate-not-requested"|
+  "https://api.hoenheimsports.fr/errors/auth-error" |
+  "https://api.hoenheimsports.fr/errors/user-already-exists" |
   "https://api.hoenheimsports.fr/errors/runtime"|
   "https://api.hoenheimsports.fr/errors/internal";
 

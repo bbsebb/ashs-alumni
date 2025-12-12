@@ -53,6 +53,9 @@ public class FormerTeammateEntity {
     @Column(name = "code", nullable = false, unique = true)
     String code;
 
+    @Column(name = "kc_user_id", unique = true)
+    UUID kcUserId;
+
 
     @OneToMany(mappedBy = "formerTeammate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SMSHistoryEntity> smsHistory;

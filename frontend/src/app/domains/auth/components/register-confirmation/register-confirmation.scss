@@ -1,0 +1,15 @@
+@use '@angular/material' as mat;;
+
+:host {
+  display: block;
+  max-width: 500px;
+  margin: 32px auto;
+}
+
+mat-card {
+  @include mat.card-overrides((
+    outlined-container-color: var(--mat-sys-surface-variant),
+
+  ));
+}
+

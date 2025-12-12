@@ -18,7 +18,8 @@ export class NotificationService {
   }
 */
 
-  showError(error:ProblemDetail,defaultMessage: string) {
+  showError(error:ProblemDetail,defaultMessage?: string) {
+    defaultMessage = defaultMessage || 'Une erreur est survenue';
     const message = createMessageFromProblemDetail(error,defaultMessage);
     this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'error',0))
   }
@@ -89,6 +90,12 @@ function createMessageFromProblemDetail(error:ProblemDetail,defaultMessage:strin
       message = createMessage(error.title,error.detail);
       break;
     case 'https://api.hoenheimsports.fr/errors/former-teammate-not-requested':
+      message = createMessage(error.title,error.detail);
+      break;
+    case 'https://api.hoenheimsports.fr/errors/user-already-exists':
+      message = createMessage(error.title,error.detail);
+      break;
+    case 'https://api.hoenheimsports.fr/errors/auth-error':
       message = createMessage(error.title,error.detail);
       break;
     case 'https://api.hoenheimsports.fr/errors/runtime':

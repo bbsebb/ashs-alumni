@@ -1,5 +1,5 @@
 @if (isLoading()) {
-  <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+  <mat-progress-bar mode="indeterminate" ></mat-progress-bar>
 } @else if (hasError()) {
   <mat-card appearance="outlined">
     <mat-card-header>
@@ -23,7 +23,7 @@
           <app-participant-card [participant]="participant"></app-participant-card>
         } @empty {
           <div class="participants-empty">
-            <mat-icon color="primary">info</mat-icon>
+            <mat-icon>info</mat-icon>
             <span>Aucun participant</span>
           </div>
         }

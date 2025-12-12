@@ -4,21 +4,8 @@ import fr.hoenheimsports.domain.api.commands.FormerTeammateModificationRequest;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 
-import java.util.UUID;
-
 public interface UpdateFormerTeammate {
-    /**
-     * Met à jour le statut de contact d'un ancien coéquipier.
-     *
-     * <p>Cette méthode permet de modifier uniquement le statut de contact
-     * d'un FormerTeammate existant, typiquement suite à une validation
-     * par SMS ou un changement d'état dans le processus de validation.</p>
-     *
-     * @param formerTeammateId l'identifiant de l'ancien coéquipier à mettre à jour
-     * @param newStatus le nouveau statut de contact à appliquer
-     * @return l'ancien coéquipier avec le statut mis à jour, ou null si non trouvé
-     */
-    FormerTeammate updateContactStatus(UUID formerTeammateId, ContactStatus newStatus);
+
 
     /**
      * Met à jour un ancien coéquipier avec un nouveau statut de contact.
@@ -34,5 +21,7 @@ public interface UpdateFormerTeammate {
     FormerTeammate updateContactStatus(FormerTeammate formerTeammate, ContactStatus newStatus);
 
     FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest);
+
+
 
 }

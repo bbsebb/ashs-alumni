@@ -5,6 +5,7 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.mappers.FormerTeammateMapper;
 import fr.hoenheimsports.app.services.FormerTeammateService;
 import fr.hoenheimsports.app.services.SecurityContextService;
+import fr.hoenheimsports.app.services.KeycloakAuthService;
 import fr.hoenheimsports.domain.FormerTeammateRetriever;
 import fr.hoenheimsports.domain.api.*;
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ public class FormerTeammateController {
     private final ValidateFormerTeammate formerTeammateValidator;
     private final MarkAsNotRequestedFormerTeammate formerTeammateNotRequestedMarker;
 
+
     public FormerTeammateController(RegisterFormerTeammate formerTeammateRegistrar, EditFormerTeammate formerTeammateEditor,
                                     FormerTeammateRetriever formerTeammateRetriever,
                                     FormerTeammateMapper formerTeammateMapper,
@@ -48,6 +50,7 @@ public class FormerTeammateController {
         this.SMSToFormerTeammateSender = SMSToFormerTeammateSender;
         this.formerTeammateValidator = formerTeammateValidator;
         this.formerTeammateNotRequestedMarker = formerTeammateNotRequestedMarker;
+
     }
 
     @PostMapping()

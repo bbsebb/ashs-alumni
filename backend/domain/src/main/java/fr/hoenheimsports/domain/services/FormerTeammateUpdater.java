@@ -9,7 +9,6 @@ import fr.hoenheimsports.domain.services.validations.FormerTeammateUniquenessVal
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Service de mise à jour du statut de contact des anciens coéquipiers.
@@ -52,27 +51,6 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
         this.uniquenessValidationService = uniquenessValidationService;
     }
 
-    /**
-     * Met à jour le statut de contact d'un ancien coéquipier.
-     *
-     * <p>Cette méthode recherche l'ancien coéquipier par son identifiant,
-     * met à jour son statut de contact et sauvegarde la modification.
-     * Si l'entité n'est pas trouvée, la méthode retourne null.</p>
-     *
-     * <p>La mise à jour utilise la méthode {@code withContactStatus} qui
-     * crée une nouvelle instance immutable de FormerTeammate avec le
-     * nouveau statut, préservant l'intégrité des données.</p>
-     *
-     * @param formerTeammateId l'identifiant de l'ancien coéquipier à mettre à jour
-     * @param newStatus le nouveau statut de contact à appliquer
-     * @return l'ancien coéquipier avec le statut mis à jour, ou null si non trouvé
-     */
-    @Override
-    public FormerTeammate updateContactStatus(UUID formerTeammateId, ContactStatus newStatus) {
-        return formerTeammateRepository.findById(formerTeammateId)
-                .map(formerTeammate -> updateContactStatus(formerTeammate, newStatus))
-                .orElse(null);
-    }
 
     /**
      * Met à jour un ancien coéquipier avec un nouveau statut de contact.
@@ -98,18 +76,23 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
 
     @Override
     public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest) {
+        var updatedEntity = this.prepareUpdatedEntity(oldFormerTeammate, updateFormerTeammateRequest);
+        return formerTeammateRepository.save(updatedEntity);
+    }
+
+
+
+    private FormerTeammate prepareUpdatedEntity(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest) {
         if (!hasAnyFieldChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
             return oldFormerTeammate;
         }
 
 
         // Le téléphone étant masqué pour l'utilisateur, s'il n'y a pas de changement, on doit reprendre le numéro non masqué existant en base de donnée.
-        String newPhone;
-        if(hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
-            newPhone = updateFormerTeammateRequest.newPhone();
-        } else {
-            newPhone = oldFormerTeammate.phone().map(Phone::getRawValue).orElse(null);
-        }
+        String newPhone = hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)
+                ? updateFormerTeammateRequest.newPhone()
+                : oldFormerTeammate.phone().map(Phone::getRawValue).orElse(null);
+
         var updatedFormerTeammate = FormerTeammate.builder()
                 .id(oldFormerTeammate.id())
                 .gender(updateFormerTeammateRequest.newGender())
@@ -122,19 +105,23 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
                 .status(oldFormerTeammate.status())
                 .code(oldFormerTeammate.code())
                 .build();
+
+        // Si le nom ou le prénom ont été modifiés, on vérifie leur unicité
+        boolean nameChanged = !oldFormerTeammate.firstName().equalsIgnoreCase(updatedFormerTeammate.firstName())
+                || !oldFormerTeammate.lastName().equalsIgnoreCase(updatedFormerTeammate.lastName());
+
         //Si le nom ou le prénom ont été modifié, on vérifie leur unicité
-        if(!oldFormerTeammate.firstName().equalsIgnoreCase(updatedFormerTeammate.firstName()) || !oldFormerTeammate.lastName().equalsIgnoreCase(updatedFormerTeammate.lastName())) {
+        if(nameChanged) {
             uniquenessValidationService.validateNameUniqueness(updatedFormerTeammate.firstName(), updatedFormerTeammate.lastName());
         }
         if(hasPhoneChanged(oldFormerTeammate, updateFormerTeammateRequest)) {
             uniquenessValidationService.validatePhoneUniqueness(updatedFormerTeammate.phone().map(Phone::getRawValue).orElse(null));
         }
-
-
-        return formerTeammateRepository.save(updatedFormerTeammate);
+        return updatedFormerTeammate;
     }
 
     private boolean hasAnyFieldChanged(FormerTeammate old, FormerTeammateModificationRequest update) {
+
         return !old.firstName().equalsIgnoreCase(update.newFirstName())
                 || !old.lastName().equalsIgnoreCase(update.newLastName())
                 || !old.gender().equals(update.newGender())
@@ -142,6 +129,7 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
                 || !old.email().equals(Optional.ofNullable(update.newEmail()))
                 || !old.birthDate().equals(Optional.ofNullable(update.newBirthDate()))
                 || !old.roles().equals(update.roles());
+
     }
 
     /**

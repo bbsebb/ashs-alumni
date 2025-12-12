@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {NotificationService} from '@app/shared/services/notification';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
@@ -46,13 +46,7 @@ export class FormerValidation {
   constructor() {
     // Initialize the identifier from route parameters
     this.code = toSignal(this.getCodeFromRoute(), {requireSync: true});
-
     this.loadedResource = this.formerTeammatesStore.getFormerTeammateByCode(this.code());
-
-
-    effect(() => {
-      console.log('Loaded resource:', this.loadedResource.error());
-    });
     this.hasError = computed(() => !!this.loadedResource.error());
     this.isLoading = this.loadedResource.isLoading;
 
@@ -120,11 +114,11 @@ export class FormerValidation {
    * @returns Callback function to handle the updated contact
    */
   private handleSuccess(): (formValue: FormerTeammate) => void {
-    return (_: FormerTeammate) => {
+    return (formerTeammate: FormerTeammate) => {
       this.isSubmitting.set(false);
       this.showSuccessNotification();
       // Navigate to the success page to propose next steps
-      void this.router.navigate(['/former-teammates/validated']);
+      void this.router.navigate(['/register', formerTeammate.id]);
     }
   }
 
