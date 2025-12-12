@@ -11,6 +11,7 @@ import {
 } from '@app/domains/former-teammates/components/former-validation-success/former-validation-success';
 import {Event} from '@app/domains/event/components/event';
 import {Register} from '@app/domains/auth/components/register/register';
+import {RegisterConfirmation} from '@app/domains/auth/components/register-confirmation/register-confirmation';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/former-teammates', pathMatch: 'full'},
@@ -22,6 +23,7 @@ export const routes: Routes = [
   {path: 'former-teammates/validated', component: FormerValidationSuccess},
   {path: 'former-teammates/:id', component: FormerCard},
   {path: 'register', component: Register},
+  {path: 'register/confirmation', component: RegisterConfirmation},
   {path: 'register/:id', component: Register},
   {path: 'error', component: NotFound},
   {path: '**', component: NotFound}

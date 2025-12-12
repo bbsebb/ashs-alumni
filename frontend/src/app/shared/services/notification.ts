@@ -18,7 +18,8 @@ export class NotificationService {
   }
 */
 
-  showError(error:ProblemDetail,defaultMessage: string) {
+  showError(error:ProblemDetail,defaultMessage?: string) {
+    defaultMessage = defaultMessage || 'Une erreur est survenue';
     const message = createMessageFromProblemDetail(error,defaultMessage);
     this.snackBar.openFromComponent<Notification,string>(Notification, buildNotificationConfig(message,'error',0))
   }

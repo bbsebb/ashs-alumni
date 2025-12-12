@@ -37,9 +37,14 @@
     <input formControlName="lastName" matInput required>
     <mat-error>Le nom est requis</mat-error>
   </mat-form-field>
+  @if (isSubmitting()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else {
+    <mat-divider/>
+  }
   <div id="action">
     <app-back-button link='/former-teammates'/>
-    <button mat-button type="submit" [disabled]="isLoading()">
+    <button mat-button type="submit" [disabled]="isSubmitting()">
        Créer son compte
     </button>
   </div>
