@@ -19,6 +19,7 @@ public record FormerTeammateResponse(
         LocalDate birthDate,
         List<Role> roles,
         ContactStatus status,
+        UUID kcUserId,
         List<FormerTeammateHistoryResponse> formerTeammateHistories,
         List<SMSHistoryResponse> SMSHistories
 ) {

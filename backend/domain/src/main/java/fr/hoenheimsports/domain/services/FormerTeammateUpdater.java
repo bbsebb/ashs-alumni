@@ -2,8 +2,6 @@ package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.annotations.DomainService;
 import fr.hoenheimsports.domain.api.commands.FormerTeammateModificationRequest;
-import fr.hoenheimsports.domain.api.commands.UpdateFormerTeammateRequest;
-import fr.hoenheimsports.domain.api.commands.ValidateFormerTeammateRequest;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.Phone;
@@ -77,17 +75,11 @@ public class FormerTeammateUpdater implements UpdateFormerTeammate {
 
 
     @Override
-    public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, UpdateFormerTeammateRequest updateFormerTeammateRequest) {
+    public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest) {
         var updatedEntity = this.prepareUpdatedEntity(oldFormerTeammate, updateFormerTeammateRequest);
         return formerTeammateRepository.save(updatedEntity);
     }
 
-    @Override
-    public FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, ValidateFormerTeammateRequest updateFormerTeammateRequest) {
-        var updatedEntity = this.prepareUpdatedEntity(oldFormerTeammate, updateFormerTeammateRequest)
-                .withContactKcUserId(updateFormerTeammateRequest.kcUserID());
-        return formerTeammateRepository.save(updatedEntity);
-    }
 
 
     private FormerTeammate prepareUpdatedEntity(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest) {

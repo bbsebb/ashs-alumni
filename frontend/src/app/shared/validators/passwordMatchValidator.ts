@@ -7,7 +7,7 @@ export const passwordMatchValidator: ValidatorFn = (
   control: AbstractControl
 ): ValidationErrors | null => {
   const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
+  const confirmPassword = control.get('passwordConfirmation');
 
   // Si l'un des contrôles n'existe pas ou n'a pas été touché (facultatif mais bonne pratique)
   if (!password || !confirmPassword) {

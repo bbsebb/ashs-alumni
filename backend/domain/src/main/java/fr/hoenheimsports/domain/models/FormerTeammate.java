@@ -37,7 +37,7 @@ public record FormerTeammate(
         List<Role> roles,
         ContactStatus status,
         String code,
-        Optional<String> kcUserID
+        Optional<UUID> kcUserId
 ) {
 
     private static final FieldValidationService validationService = new FieldValidationService();
@@ -58,7 +58,7 @@ public record FormerTeammate(
         validationService.validateRequiredField(birthDate, "birthDate");
         validationService.validateRequiredField(status, "status");
         validationService.validateRequiredStringField(code, "code");
-        validationService.validateRequiredField(kcUserID, "kcUserID");
+        validationService.validateRequiredField(kcUserId, "kcUserId");
         // Ensure that the roles list is never null
         roles = List.copyOf(validationService.validateListField(roles));
     }
@@ -74,11 +74,11 @@ public record FormerTeammate(
      */
     public FormerTeammate withContactStatus(ContactStatus newStatus) {
         validationService.validateRequiredField(newStatus, "newStatus");
-        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus, code, kcUserID);
+        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, newStatus, code, kcUserId);
     }
 
-    public FormerTeammate withContactKcUserId(String newKcUserId) {
-        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, status, code, Optional.ofNullable(newKcUserId));
+    public FormerTeammate withContactKcUserId(UUID newKcUserId) {
+        return new FormerTeammate(id, firstName, lastName, gender, phone, email, birthDate, roles, status, code, Optional.of(newKcUserId));
     }
 
     /**
@@ -105,7 +105,7 @@ public record FormerTeammate(
         private List<Role> roles = new ArrayList<>();
         private ContactStatus status;
         private String code;
-        private String kcUserId;
+        private UUID kcUserId;
 
         private Builder() {
         }
@@ -234,7 +234,7 @@ public record FormerTeammate(
          * @param kcUserId the code
          * @return this builder instance for method chaining
          */
-        public Builder kcUserId(String kcUserId) {
+        public Builder kcUserId(UUID kcUserId) {
             this.kcUserId = kcUserId;
             return this;
         }

@@ -15,7 +15,6 @@ public record ValidateFormerTeammateRequest(
         String newEmail,
         LocalDate newBirthDate,
         List<Role> roles,
-        String formerTeammateCode,
-        String kcUserID
+        String formerTeammateCode
 ) implements FormerTeammateModificationRequest{
 }

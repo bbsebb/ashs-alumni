@@ -1,7 +1,6 @@
 package fr.hoenheimsports.domain.services;
 
-import fr.hoenheimsports.domain.api.commands.UpdateFormerTeammateRequest;
-import fr.hoenheimsports.domain.api.commands.ValidateFormerTeammateRequest;
+import fr.hoenheimsports.domain.api.commands.FormerTeammateModificationRequest;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 
@@ -21,9 +20,8 @@ public interface UpdateFormerTeammate {
      */
     FormerTeammate updateContactStatus(FormerTeammate formerTeammate, ContactStatus newStatus);
 
-    FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, UpdateFormerTeammateRequest updateFormerTeammateRequest);
+    FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, FormerTeammateModificationRequest updateFormerTeammateRequest);
 
-    FormerTeammate updateFormerTeammate(FormerTeammate oldFormerTeammate, ValidateFormerTeammateRequest updateFormerTeammateRequest);
 
 
 }

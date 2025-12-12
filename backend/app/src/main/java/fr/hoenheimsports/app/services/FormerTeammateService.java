@@ -61,6 +61,7 @@ public class FormerTeammateService {
                 formerTeammateResponse.birthDate(),
                 formerTeammateResponse.roles(),
                 formerTeammateResponse.status(),
+                formerTeammateResponse.kcUserId(),
                 formerTeammateHistoryResponses,
                 smsHistoryResponses
         );

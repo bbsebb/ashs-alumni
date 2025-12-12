@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="formRegister">
-<h3>Enregistrements de votre compte</h3>
+<h3>Créer son compte</h3>
   <mat-form-field>
     <mat-label>Email</mat-label>
     <input formControlName="email" matInput required type="email">
@@ -10,6 +10,7 @@
       <mat-error>Format d'email invalide</mat-error>
     }
   </mat-form-field>
+  <ng-container formGroupName="passwords">
   <mat-form-field>
     <mat-label>Mot de passe</mat-label>
     <input formControlName="password" matInput required type="password">
@@ -18,8 +19,14 @@
   <mat-form-field>
     <mat-label>confirmation du mot de passe</mat-label>
     <input formControlName="passwordConfirmation" matInput required type="password">
-    <mat-error>La confirmation est requise</mat-error>
+    @if(formRegister.get('passwords.passwordConfirmation')?.hasError('required')) {
+      <mat-error>La confirmation est requise</mat-error>
+    }
+    @if(formRegister.get('passwords.passwordConfirmation')?.hasError('passwordMismatch')) {
+      <mat-error>Les mots de passe ne correspondent pas.</mat-error>
+    }
   </mat-form-field>
+  </ng-container>
   <mat-form-field>
     <mat-label>Prénom</mat-label>
     <input formControlName="firstName" matInput required>
@@ -33,7 +40,7 @@
   <div id="action">
     <app-back-button link='/former-teammates'/>
     <button mat-button type="submit" [disabled]="isLoading()">
-       S'enregistrer
+       Créer son compte
     </button>
   </div>
   </form>

@@ -54,7 +54,7 @@ public class FormerTeammateEntity {
     String code;
 
     @Column(name = "kc_user_id", unique = true)
-    String kcUserId;
+    UUID kcUserId;
 
 
     @OneToMany(mappedBy = "formerTeammate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
