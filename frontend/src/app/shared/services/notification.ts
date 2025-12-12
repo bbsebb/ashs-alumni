@@ -92,6 +92,12 @@ function createMessageFromProblemDetail(error:ProblemDetail,defaultMessage:strin
     case 'https://api.hoenheimsports.fr/errors/former-teammate-not-requested':
       message = createMessage(error.title,error.detail);
       break;
+    case 'https://api.hoenheimsports.fr/errors/user-already-exists':
+      message = createMessage(error.title,error.detail);
+      break;
+    case 'https://api.hoenheimsports.fr/errors/auth-error':
+      message = createMessage(error.title,error.detail);
+      break;
     case 'https://api.hoenheimsports.fr/errors/runtime':
       message = createMessage(error.title,error.detail);
       break;

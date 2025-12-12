@@ -3,6 +3,8 @@ package fr.hoenheimsports.app.services;
 import fr.hoenheimsports.app.exceptions.AuthException;
 import fr.hoenheimsports.app.exceptions.UserWithEmailAlreadyExistsException;
 import fr.hoenheimsports.app.exceptions.UserWithUsernameAlreadyExistsException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,12 +31,7 @@ public class KeycloakAuthService {
     private String redirectUri;
     @Value("${keycloak.frontend-client-id}")
     private String clientId;
-/*    @Value("${keycloak.client-id}")
-    private String clientId;
-    @Value("${keycloak.auth-server-url}")
-    private String serverUrl;
-    @Value("${keycloak.credentials.secret}")
-    private String clientSecret;*/
+
 
     public String registerUser(String email, String password,String firstName,String lastName) {
         UserRepresentation user = new UserRepresentation();
@@ -77,10 +73,11 @@ public class KeycloakAuthService {
                 }
             } else {
                 log.error("Erreur Keycloak inconnue. Status: {} - Body: {}", response.getStatus(), response.readEntity(String.class));
-                throw new AuthenticationException("Erreur lors de la création Keycloak: " + response.getStatus());
+                throw new AuthException("Erreur lors de la création Keycloak: " + response.getStatus());
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ProcessingException | WebApplicationException e) {
+            log.error("Erreur technique lors de l'appel à Keycloak (create user)", e);
+            throw new AuthException("Impossible de créer l'utilisateur pour le moment (Keycloak indisponible ou erreur réseau).");
         }
     }
 
@@ -102,38 +99,5 @@ public class KeycloakAuthService {
         }
     }
 
-/*    // 1. LOGIN : Récupérer le Token via RestClient (API Token Keycloak)
-    public Map<String, Object> login(String username, String password) {
-        RestClient restClient = RestClient.create();
-
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", clientId);
-        formData.add("client_secret", clientSecret);
-        formData.add("username", username);
-        formData.add("password", password);
-        formData.add("grant_type", "password"); // Flow : Resource Owner Password
-
-        String tokenEndpoint = serverUrl + "/realms/" + realm + "/protocol/openid-connect/token";
-
-        return restClient.post()
-                .uri(tokenEndpoint)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(formData)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    if (response.getStatusCode().value() == 401) {
-                        throw new AuthException("Identifiants incorrects (Nom d'utilisateur ou mot de passe invalide).");
-                    }
-                    if (response.getStatusCode().value() == 400) {
-                        // Keycloak renvoie 400 pour "Account disabled", "Account not verified", etc.
-                        throw new AuthException("Compte désactivé ou requête invalide.");
-                    }
-                    throw new AuthException("Erreur d'authentification Keycloak : " + response.getStatusCode());
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    throw new AuthException("Le serveur d'authentification est indisponible temporairement.");
-                })
-                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
-    }*/
 
 }

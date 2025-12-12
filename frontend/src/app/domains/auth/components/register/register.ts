@@ -10,6 +10,7 @@ import {MatDivider} from '@angular/material/list';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {NotificationService} from '@app/shared/services/notification';
 import {Router} from '@angular/router';
+import {ProblemDetail} from '@app/shared/models/problem-detail';
 
 @Component({
   selector: 'app-register',
@@ -91,8 +92,8 @@ export class Register {
           this.isSubmitting.set(false);
         },
         error: (err) => {
-          this.notificationService.showError(err.error);
-
+          console.error(err.error as ProblemDetail);
+          this.notificationService.showError(err.error as ProblemDetail);
           this.isSubmitting.set(false);
         }
       })
