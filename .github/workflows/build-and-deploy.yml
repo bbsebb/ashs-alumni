@@ -176,9 +176,7 @@ jobs:
           OAUTH2_JWK_SET_URI=${{ vars.OAUTH2_JWK_SET_URI }}
           KC_AUTH_SERVER_URL=${{ vars.KC_AUTH_SERVER_URL }}
           KC_REALM=${{ vars.KC_REALM }}
-          KC_CLIENT_ID=${{ vars.KC_CLIENT_ID }}
           KC_FRONTEND_CLIENT_ID=${{ vars.KC_FRONTEND_CLIENT_ID }}
-          KC_CLIENT_SECRET=${{ secrets.KC_CLIENT_SECRET }}
           KC_REDIRECT_URL=${{ vars.KC_REDIRECT_URL }}
           
           # Mail
