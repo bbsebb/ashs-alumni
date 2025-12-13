@@ -5,7 +5,6 @@ import fr.hoenheimsports.app.controllers.dtos.FormerTeammateResponse;
 import fr.hoenheimsports.app.mappers.FormerTeammateMapper;
 import fr.hoenheimsports.app.services.FormerTeammateService;
 import fr.hoenheimsports.app.services.SecurityContextService;
-import fr.hoenheimsports.app.services.KeycloakAuthService;
 import fr.hoenheimsports.domain.FormerTeammateRetriever;
 import fr.hoenheimsports.domain.api.*;
 import jakarta.validation.Valid;
@@ -97,6 +96,19 @@ public class FormerTeammateController {
         log.debug("SMS resent to former teammate {}", formerTeammate);
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
     }
+
+    @PostMapping("/resend-sms")
+    @Transactional
+    public ResponseEntity<List<FormerTeammateResponse>> resendSmsForAllWaitingFormerTeammates() {
+        log.debug("Resending SMS to all waiting former teammates");
+        var formerTeammates = SMSToFormerTeammateSender.resendSMSForAllWaitingFormerTeammates(securityContextService.getCurrentContext());
+        log.debug("SMS resent to {} former teammates", formerTeammates.size());
+        return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponses(formerTeammates));
+    }
+
+
+
+
 
     @PostMapping("/{id}/not_requested")
     @Transactional

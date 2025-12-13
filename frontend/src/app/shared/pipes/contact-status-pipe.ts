@@ -21,7 +21,7 @@ export class ContactStatusPipe implements PipeTransform {
       case 'SENDING':
         return 'Envoi en cours';
       case 'WAITING':
-        return 'Arrivé'
+        return 'Reçu'
       default:
         return status;
     }

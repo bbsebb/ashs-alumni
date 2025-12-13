@@ -2,12 +2,13 @@ package fr.hoenheimsports.domain.models;
 
 public enum ContactStatus {
     SUBMITTED("Soumis"),
+    @Deprecated
     PENDING("En attente"),
     VALIDATED("Validé"),
     NOT_REQUESTED("Non demandé"),
     UNREACHABLE("Injoignable"),
     SENDING("Envoi en cours"),
-    WAITING("Lien envoyé [arrivé]");
+    WAITING("SMS reçu");
 
     private final String label;
 

@@ -59,3 +59,4 @@ frontend/.karma/
 tmp/
 temp/
 
+/utils/temp.sql

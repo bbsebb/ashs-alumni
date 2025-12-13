@@ -8,7 +8,6 @@ import fr.hoenheimsports.domain.exceptions.SMSHistoryRepositoryException;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.SMSHistory;
-import fr.hoenheimsports.domain.models.SMSStatus;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 
@@ -155,13 +154,7 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
 
     /**
      * Met à jour le statut de contact de l'ancien coéquipier en fonction du statut du SMS.
-     * 
-     * <p>Les règles de mise à jour sont les suivantes :</p>
-     * <ul>
-     *   <li>Si le SMS est {@link SMSStatus#DELIVERED} → {@link ContactStatus#PENDING}</li>
-     *   <li>Si le SMS a échoué → {@link ContactStatus#UNREACHABLE}</li>
-     *   <li>Dans tous les autres cas → {@link ContactStatus#SUBMITTED}</li>
-     * </ul>
+     *
      * 
      * @param formerTeammate l'ancien coéquipier à mettre à jour
      * @param updatedSmsHistory l'historique SMS mis à jour contenant le nouveau statut

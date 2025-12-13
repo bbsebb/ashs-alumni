@@ -5,10 +5,12 @@ import fr.hoenheimsports.domain.api.ResendSMSToFormerTeammate;
 import fr.hoenheimsports.domain.api.commands.ContextDetails;
 import fr.hoenheimsports.domain.exceptions.CurrentUserMissingException;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateNotFoundException;
+import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.services.HandleSMSValidation;
 import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
+import java.util.List;
 import java.util.UUID;
 @UseCase
 public class SMSToFormerTeammateSender implements ResendSMSToFormerTeammate {
@@ -33,5 +35,17 @@ public class SMSToFormerTeammateSender implements ResendSMSToFormerTeammate {
             formerTeammate = handleSMSValidation.handleValidationBySMS(formerTeammate, context.currentUser().orElseThrow().username());
         }
         return formerTeammate;
+    }
+
+    @Override
+    public List<FormerTeammate> resendSMSForAllWaitingFormerTeammates(ContextDetails currentContext) {
+        if(!currentContext.hasRole("ADMIN")) {
+            throw new CurrentUserMissingException("Vous n'avez pas les autorisations requises");
+        }
+        return formerTeammateRepository.findAllActiveFormerTeammates().stream()
+                .filter(formerTeammate -> formerTeammate.status() == ContactStatus.PENDING)
+                .map(formerTeammate -> resendSMS(formerTeammate.id(), currentContext))
+                .toList();
+
     }
 }
