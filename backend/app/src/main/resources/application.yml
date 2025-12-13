@@ -54,6 +54,7 @@ keycloak:
   realm: ${KC_REALM:ashs-alumni}
   client-id: ${KC_CLIENT_ID:ashs-alumni-backend}
   frontend-client-id: ${KC_FRONTEND_CLIENT_ID:angular-frontend}
+  redirect-url: ${KC_REDIRECT_URL:http://localhost:4200/*}
   credentials:
     secret: ${KC_CLIENT_SECRET}
 

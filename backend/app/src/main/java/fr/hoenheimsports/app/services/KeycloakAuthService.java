@@ -27,7 +27,7 @@ public class KeycloakAuthService {
     private final Keycloak keycloak;
     @Value("${keycloak.realm}")
     private String realm;
-    @Value("${app.frontend.redirect-url:http://localhost:4200/event-registration}")
+    @Value("${keycloak.redirect-url:http://localhost:4200/event-registration}")
     private String redirectUri;
     @Value("${keycloak.frontend-client-id}")
     private String clientId;

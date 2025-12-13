@@ -1,0 +1,1 @@
+TRUNCATE TABLE public.former_teammate_entity_roles, public.sms_history, public.former_teammate_history_entity_roles_at_time, public.former_teammate_history_entity, public.former_teammate_entity, public.participant RESTART IDENTITY CASCADE;
