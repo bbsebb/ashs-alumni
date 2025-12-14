@@ -34,7 +34,7 @@ public class SendSMS implements SMSSender {
     public SMSHistory sendSMS(String message, String phoneNumber, UUID formerTeammateId) {
         try {
             log.debug("Sending SMS to {} with message {} to {}", phoneNumber, message, formerTeammateId);
-            var callbackUri = buildCallbackUri(formerTeammateId);
+            var callbackUri = buildCallbackUri();
             log.debug("Using callback URI {}", callbackUri);
             var response = Message.creator(new PhoneNumber(phoneNumber), new PhoneNumber(twilioConfig.getPhoneNumber()), message)
                     .setStatusCallback(callbackUri)
@@ -58,10 +58,10 @@ public class SendSMS implements SMSSender {
         }
     }
 
-    private URI buildCallbackUri(UUID formerTeammateId) {
+    private URI buildCallbackUri() {
         return UriComponentsBuilder.fromUriString(twilioConfig.getWebhookUrl())
                 .path("/api/webhooks/twilio/status")
-                .queryParam("formerTeammateId", formerTeammateId.toString())
+//                .queryParam("formerTeammateId", formerTeammateId.toString())
                 .build()
                 .toUri();
     }

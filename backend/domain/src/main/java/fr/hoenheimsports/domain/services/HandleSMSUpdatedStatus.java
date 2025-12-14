@@ -1,7 +1,7 @@
 package fr.hoenheimsports.domain.services;
 
-import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
+import fr.hoenheimsports.domain.api.commands.SMSStatusDetails;
 
 public interface HandleSMSUpdatedStatus {
-    void handleSMSStatusUpdated(SMSUpdatedStatusDetails command);
+    void handleSMSStatusUpdated(SMSStatusDetails command);
 }

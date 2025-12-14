@@ -1,7 +1,7 @@
 package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.annotations.DomainService;
-import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
+import fr.hoenheimsports.domain.api.commands.SMSStatusDetails;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateNotFoundException;
 import fr.hoenheimsports.domain.exceptions.FormerTeammateRepositoryException;
 import fr.hoenheimsports.domain.exceptions.SMSHistoryRepositoryException;
@@ -12,7 +12,6 @@ import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 import fr.hoenheimsports.domain.spi.SMSHistoryRepository;
 
 import java.time.Instant;
-import java.util.UUID;
 
 /**
  * Service de gestion des mises à jour de statut des SMS.
@@ -66,22 +65,22 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      *   <li>Sauvegarde des modifications</li>
      * </ol>
      * 
-     * @param smsUpdatedStatusDetails la commande contenant les informations de mise à jour du statut SMS
+     * @param smsStatusDetails la commande contenant les informations de mise à jour du statut SMS
      * @throws SMSHistoryRepositoryException si l'historique SMS n'est pas trouvé
      * @throws FormerTeammateRepositoryException si l'ancien coéquipier n'est pas trouvé
      * @throws NullPointerException si la commande est null
      */
     @Override
-    public void handleSMSStatusUpdated(SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
-        var smsHistory = retrieveSMSHistory(smsUpdatedStatusDetails);
+    public void handleSMSStatusUpdated(SMSStatusDetails smsStatusDetails) {
+        var smsHistory = retrieveSMSHistory(smsStatusDetails);
 
-        if (smsHistory.status() == smsUpdatedStatusDetails.smsStatusUpdate().smsStatus()) {
+        if (smsHistory.status() == smsStatusDetails.smsStatus()) {
             return;
         }
 
-        var formerTeammate = retrieveFormerTeammate(smsUpdatedStatusDetails);
+        var formerTeammate = findFormerTeammate(smsHistory);
         var oldContactStatus = formerTeammate.status();
-        var updatedSmsHistory = addSMSHistoryWithStatus(smsHistory, smsUpdatedStatusDetails);
+        var updatedSmsHistory = addSMSHistoryWithStatus(smsHistory, smsStatusDetails);
         var updatedFormerTeammate = updateFormerTeammateContactStatus(formerTeammate, updatedSmsHistory);
         var newContactStatus = updatedFormerTeammate.status();
 
@@ -93,32 +92,26 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
         }
     }
 
-    /**
-     * Récupère l'historique SMS à partir de son identifiant externe.
-     * 
-     * @param smsUpdatedStatusDetails la commande contenant l'identifiant externe du SMS
-     * @return l'historique SMS correspondant
-     * @throws SMSHistoryRepositoryException si aucun historique SMS n'est trouvé avec cet identifiant
-     */
-    private SMSHistory retrieveSMSHistory(SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
-        return smsHistoryRepository.findByExternalID(smsUpdatedStatusDetails.smsStatusUpdate().externalSmsId())
-                .orElseThrow(() -> new SMSHistoryRepositoryException(
-                        "L'historique des sms n'a pas été trouvé avec l'id : %s".formatted(smsUpdatedStatusDetails.smsStatusUpdate().externalSmsId())));
+    private FormerTeammate findFormerTeammate(SMSHistory smsHistory) {
+        return formerTeammateRepository.findById(smsHistory.formerTeammateId())
+                .orElseThrow(() -> new FormerTeammateNotFoundException(
+                        "Le contact n'a pas été trouvé avec l'id %s".formatted(smsHistory.formerTeammateId())));
     }
 
     /**
-     * Récupère l'ancien coéquipier à partir de son identifiant.
+     * Récupère l'historique SMS à partir de son identifiant externe.
      * 
-     * @param smsUpdatedStatusDetails la commande contenant l'identifiant de l'ancien coéquipier
-     * @return l'ancien coéquipier correspondant
-     * @throws FormerTeammateRepositoryException si aucun ancien coéquipier n'est trouvé avec cet identifiant
-     * @throws IllegalArgumentException si l'identifiant n'est pas un UUID valide
+     * @param smsStatusDetails la commande contenant l'identifiant externe du SMS
+     * @return l'historique SMS correspondant
+     * @throws SMSHistoryRepositoryException si aucun historique SMS n'est trouvé avec cet identifiant
      */
-    private FormerTeammate retrieveFormerTeammate(SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
-        return formerTeammateRepository.findById(UUID.fromString(smsUpdatedStatusDetails.formerTeammateReference().formerTeammateId()))
-                .orElseThrow(() -> new FormerTeammateNotFoundException(
-                        "Le contact n'a pas été trouvé avec l'id %s".formatted(smsUpdatedStatusDetails.formerTeammateReference().formerTeammateId())));
+    private SMSHistory retrieveSMSHistory(SMSStatusDetails smsStatusDetails) {
+        return smsHistoryRepository.findByExternalID(smsStatusDetails.externalSmsId())
+                .orElseThrow(() -> new SMSHistoryRepositoryException(
+                        "L'historique des sms n'a pas été trouvé avec l'id : %s".formatted(smsStatusDetails.externalSmsId())));
     }
+
+
 
     /**
      * Met à jour l'historique SMS avec le nouveau statut et les informations d'erreur si nécessaire.
@@ -127,17 +120,17 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
      * contenant le code d'erreur et le message d'erreur provenant de la commande.</p>
      * 
      * @param originalSmsHistory l'historique SMS original à mettre à jour
-     * @param smsUpdatedStatusDetails la commande contenant le nouveau statut et les informations d'erreur
+     * @param smsStatusDetails la commande contenant le nouveau statut et les informations d'erreur
      * @return l'historique SMS mis à jour avec le nouveau statut et éventuellement un message d'erreur
      */
-    private SMSHistory addSMSHistoryWithStatus(SMSHistory originalSmsHistory, SMSUpdatedStatusDetails smsUpdatedStatusDetails) {
+    private SMSHistory addSMSHistoryWithStatus(SMSHistory originalSmsHistory, SMSStatusDetails smsStatusDetails) {
 
         var newSmsHistory = SMSHistory.builder()
                 .id(originalSmsHistory.id())
                 .updatedAt(Instant.now())
                 .formerTeammateId(originalSmsHistory.formerTeammateId())
                 .externalId(originalSmsHistory.externalId())
-                .status(smsUpdatedStatusDetails.smsStatusUpdate().smsStatus())
+                .status(smsStatusDetails.smsStatus())
                 .message(originalSmsHistory.message())
                 .sentAt(originalSmsHistory.sentAt())
                 .phoneNumber(originalSmsHistory.phoneNumber())
@@ -146,7 +139,7 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
 
         if (newSmsHistory.hasFailed()) {
             newSmsHistory = newSmsHistory.withErrorMessage(
-                    "Erreur de type %s : %s".formatted(smsUpdatedStatusDetails.smsStatusUpdate().errorCode(), smsUpdatedStatusDetails.smsStatusUpdate().errorMessage()));
+                    "Erreur de type %s : %s".formatted(smsStatusDetails.errorCode(), smsStatusDetails.errorMessage()));
         }
 
         return newSmsHistory;

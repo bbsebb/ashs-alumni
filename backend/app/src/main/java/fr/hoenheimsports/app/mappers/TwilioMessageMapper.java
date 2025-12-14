@@ -2,7 +2,7 @@ package fr.hoenheimsports.app.mappers;
 
 import com.twilio.rest.api.v2010.account.Message;
 import fr.hoenheimsports.app.controllers.dtos.TwilioWebhookRequest;
-import fr.hoenheimsports.domain.api.commands.SMSUpdatedStatusDetails;
+import fr.hoenheimsports.domain.api.commands.SMSStatusDetails;
 import fr.hoenheimsports.domain.models.SMSHistory;
 import fr.hoenheimsports.domain.models.SMSStatus;
 import fr.hoenheimsports.domain.spi.IdGenerator;
@@ -34,16 +34,13 @@ public class TwilioMessageMapper {
                 .build();
     }
 
-    public SMSUpdatedStatusDetails toSMSUpdatedStatusCommand(TwilioWebhookRequest request, String formerTeammateId) {
-        SMSUpdatedStatusDetails.SMSStatusUpdate smsStatusUpdate = new SMSUpdatedStatusDetails.SMSStatusUpdate(
+    public SMSStatusDetails toSMSUpdatedStatusCommand(TwilioWebhookRequest request) {
+        return new SMSStatusDetails(
                 request.MessageSid(),
                 mapTwilioStatusToSMSStatus(Message.Status.forValue(request.MessageStatus())),
                 request.ErrorMessage(),
                 request.ErrorCode()
         );
-        SMSUpdatedStatusDetails.FormerTeammateReference formerTeammateReference =
-                new SMSUpdatedStatusDetails.FormerTeammateReference(formerTeammateId);
-        return new SMSUpdatedStatusDetails(smsStatusUpdate, formerTeammateReference);
     }
 
     private SMSStatus mapTwilioStatusToSMSStatus(Message.Status twilioStatus) {
