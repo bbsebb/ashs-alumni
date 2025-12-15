@@ -78,7 +78,7 @@ public class FormerTeammateRepositoryStub implements FormerTeammateRepository {
 
     @Override
     public Optional<FormerTeammate> findByPhone(String phoneString) {
-        var phone = new Phone(phoneString);
+        var phone = new Phone(phoneString,false,List.of());
         return storage.values().stream()
                 .filter(formerTeammate -> hasMatchingPhone(formerTeammate, phone))
                 .findFirst();

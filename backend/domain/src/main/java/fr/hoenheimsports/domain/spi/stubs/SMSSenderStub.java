@@ -59,7 +59,7 @@ public class SMSSenderStub implements SMSSender {
     
     public boolean hasSentSMSTo(String phoneNumber) {
         return sentSMSHistory.stream()
-                .anyMatch(sms -> sms.phoneNumber().value().equals(phoneNumber));
+                .anyMatch(sms -> sms.phoneNumber().phoneNumber().equals(phoneNumber));
     }
     
     public boolean hasSentSMSWith(String message) {

@@ -78,4 +78,6 @@ public class FormerTeammateService {
                 .map(this::buildFormerTeammateResponse)
                 .toList();
     }
+
+
 }

@@ -31,8 +31,11 @@ public class FormerTeammateEntity {
     @Enumerated(EnumType.ORDINAL)
     Gender gender;
 
-    @Column(name = "phone")
-    String phone;
+    @Column(name = "phone_number")
+    String phoneNumber;
+
+    @OneToOne
+    Phone phone;
 
     @Column(name = "email")
     String email;

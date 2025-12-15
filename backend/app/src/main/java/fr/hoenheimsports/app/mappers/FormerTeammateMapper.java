@@ -36,10 +36,12 @@ public interface FormerTeammateMapper {
     FormerTeammateResponse toResponse(FormerTeammate formerTeammate);
 
 
+    @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "smsHistory", ignore = true)
     @Mapping(target = "formerTeammateHistory", ignore = true)
-    @Mapping(target = "phone" , expression = "java(optionalPhoneToString(formerTeammate.phone()))")
+    @Mapping(target = "phone" , expression = "java(map(formerTeammate.phone()))")
     FormerTeammateEntity toEntity(FormerTeammate formerTeammate);
+
 
     FormerTeammate toModel(FormerTeammateEntity formerTeammateEntity);
 
@@ -47,6 +49,8 @@ public interface FormerTeammateMapper {
     default <T> T map(Optional<T> optional) {
         return optional.orElse(null);
     }
+
+
 
 
     default String optionalPhoneToString(Optional<Phone> optionalPhone) {

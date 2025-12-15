@@ -17,7 +17,7 @@ public interface FormerTeammateEntityRepository extends JpaRepository<FormerTeam
      * (excluant ceux avec un HistoryAction.REMOVED)
      */
     @Query("SELECT DISTINCT f FROM FormerTeammateEntity f " +
-            "WHERE f.phone = :phone " +
+            "WHERE f.phoneNumber = :phone " +
             "AND NOT EXISTS (" +
             "    SELECT 1 FROM FormerTeammateHistoryEntity h " +
             "    WHERE h.formerTeammateId = f.id " +

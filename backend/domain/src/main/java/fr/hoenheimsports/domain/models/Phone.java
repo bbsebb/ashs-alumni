@@ -3,14 +3,16 @@ package fr.hoenheimsports.domain.models;
 import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
 import fr.hoenheimsports.domain.services.validations.PhoneValidationService;
 
+import java.util.List;
+
 /**
- * Represents a phone number value object.
+ * Represents a phone number phoneNumber object.
  * This record encapsulates phone number information with validation for international format.
  * The phone number must follow the E.164 international format (+[country code][national number]).
  *
- * @param value The phone number as a string in international format
+ * @param phoneNumber The phone number as a string in international format
  */
-public record Phone(String value) {
+public record Phone(String phoneNumber, boolean isBlackListed, List<SMSHistory> smsHistory) {
 
     private static final PhoneValidationService validationService = new PhoneValidationService();
 
@@ -20,11 +22,11 @@ public record Phone(String value) {
      * @throws InvalidPhoneNumberException if the phone number is null, empty, or doesn't match international format
      */
     public Phone {
-        value = validationService.validateAndNormalize(value);
+        phoneNumber = validationService.validateAndNormalize(phoneNumber);
     }
 
     /**
-     * Returns the phone number value a masked format for privacy protection.
+     * Returns the phone number phoneNumber a masked format for privacy protection.
      *
      * @return the phone number as a string without spaces or dashes
      */
@@ -43,34 +45,34 @@ public record Phone(String value) {
      * @return the masked phone number
      */
     public String toMaskedFormat() {
-        if (value.length() < 7) {
+        if (phoneNumber.length() < 7) {
             // Si le numéro est trop court, masquer tout sauf l'indicatif pays
-            return value.substring(0, Math.min(3, value.length())) + "***";
+            return phoneNumber.substring(0, Math.min(3, phoneNumber.length())) + "***";
         }
 
         // Extraire les 3 derniers chiffres
-        String lastThree = value.substring(value.length() - 3);
+        String lastThree = phoneNumber.substring(phoneNumber.length() - 3);
 
         // Garder tout le début sauf les 3 derniers chiffres (moins les 3 étoiles)
-        String visiblePrefix = value.substring(0, value.length() - 6);
+        String visiblePrefix = phoneNumber.substring(0, phoneNumber.length() - 6);
 
         return visiblePrefix + "***" + lastThree;
     }
 
     /**
-     * Returns the raw phone number value for internal system use.
+     * Returns the raw phone number phoneNumber for internal system use.
      * This method should only be used when the complete phone number is required
      * for operations like SMS sending or database storage.
      *
-     * @return the complete phone number value
+     * @return the complete phone number phoneNumber
      */
     public String getRawValue() {
-        return value;
+        return phoneNumber;
     }
 
 
     /**
-     * Creates a Phone instance from a string value.
+     * Creates a Phone instance from a string phoneNumber.
      * This method provides a more explicit way to create a Phone object.
      *
      * @param phoneNumber the phone number string in international format
@@ -78,7 +80,7 @@ public record Phone(String value) {
      * @throws InvalidPhoneNumberException if the phone number is null, empty, or invalid format
      */
     public static Phone of(String phoneNumber) {
-        return new Phone(phoneNumber);
+        return new Phone(phoneNumber, true, List.of() );
     }
 
     /**

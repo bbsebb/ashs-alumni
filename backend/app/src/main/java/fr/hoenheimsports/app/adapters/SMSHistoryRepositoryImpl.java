@@ -52,7 +52,7 @@ public class SMSHistoryRepositoryImpl implements SMSHistoryRepository {
         log.debug("Updating existing entity {}", entity);
         // Met à jour seulement les champs modifiables, pas la relation formerTeammate
         entity.setFormerTeammateId(smsHistory.formerTeammateId());
-        entity.setPhoneNumber(smsHistory.phoneNumber().value());
+        entity.setPhoneNumber(smsHistory.phoneNumber().phoneNumber());
         entity.setMessage(smsHistory.message());
         entity.setStatus(smsHistory.status());
         entity.setSentAt(smsHistory.sentAt());

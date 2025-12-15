@@ -25,6 +25,9 @@ public class SMSHistoryEntity {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE})
+    private Phone phone;
+
     @Column(nullable = false)
     private String message;
 
