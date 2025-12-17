@@ -43,7 +43,7 @@ public class SMSToFormerTeammateSender implements ResendSMSToFormerTeammate {
             throw new CurrentUserMissingException("Vous n'avez pas les autorisations requises");
         }
         return formerTeammateRepository.findAllActiveFormerTeammates().stream()
-                .filter(formerTeammate -> formerTeammate.status() == ContactStatus.PENDING)
+                .filter(formerTeammate -> formerTeammate.status() == ContactStatus.WAITING || formerTeammate.status() == ContactStatus.SENDING)
                 .map(formerTeammate -> resendSMS(formerTeammate.id(), currentContext))
                 .toList();
 

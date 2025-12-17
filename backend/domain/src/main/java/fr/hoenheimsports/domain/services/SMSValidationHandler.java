@@ -2,10 +2,7 @@ package fr.hoenheimsports.domain.services;
 
 import fr.hoenheimsports.domain.SMSHistoryRetriever;
 import fr.hoenheimsports.domain.annotations.DomainService;
-import fr.hoenheimsports.domain.exceptions.FormerTeammateForbiddenByStatusException;
-import fr.hoenheimsports.domain.exceptions.InvalidPhoneNumberException;
-import fr.hoenheimsports.domain.exceptions.SMSDeliveryException;
-import fr.hoenheimsports.domain.exceptions.SMSLimitExceededException;
+import fr.hoenheimsports.domain.exceptions.*;
 import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.SMSHistory;
@@ -104,6 +101,9 @@ public class SMSValidationHandler implements HandleSMSValidation{
     public FormerTeammate handleValidationBySMS(FormerTeammate formerTeammate, String updatedBy) {
         if(formerTeammate.status() == ContactStatus.NOT_REQUESTED) {
             throw new FormerTeammateForbiddenByStatusException("Le contact ne souhaite plus être sollicité.");
+        }
+        if(formerTeammate.status() == ContactStatus.VALIDATED) {
+            throw new FormerTeammateFinalStatusException("Le contact a déjà était validé, vous ne pouvait plus envoyé de sms de validation sans changer le numéro de téléphone du contact");
         }
         if(formerTeammate.code() == null) {
             throw new SMSDeliveryException("Le code d'envoi du SMS est indisponible.");

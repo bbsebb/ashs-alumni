@@ -40,6 +40,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
         SMS_HISTORY_NOT_FOUND("https://api.hoenheimsports.fr/errors/sms-history-not-found"),
         FORMER_TEAMMATE_NOT_FOUND("https://api.hoenheimsports.fr/errors/former-teammate-not-found"),
         FORMER_TEAMMATE_NOT_REQUESTED("https://api.hoenheimsports.fr/errors/former-teammate-not-requested"),
+        FORMER_TEAMMATE_FINAL_STATUS("https://api.hoenheimsports.fr/errors/former-teammate-final-status"),
         USER_ALREADY_EXISTS("https://api.hoenheimsports.fr/errors/user-already-exists"),
         AUTH_ERROR("https://api.hoenheimsports.fr/errors/auth-error"),
         SMS_LIMIT_EXCEEDED("https://api.hoenheimsports.fr/errors/sms-limit-exceeded"),
@@ -176,6 +177,20 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 ex.getMessage()
         );
         problemDetail.setType(ErrorType.FORMER_TEAMMATE_NOT_REQUESTED.getUri());
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(FormerTeammateFinalStatusException.class)
+    public ProblemDetail handleFormerTeammateFinalStatusException(FormerTeammateFinalStatusException ex) {
+        String title = "Le contact est déjà validé";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage()
+        );
+        problemDetail.setType(ErrorType.FORMER_TEAMMATE_FINAL_STATUS.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
