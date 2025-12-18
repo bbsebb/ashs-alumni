@@ -156,6 +156,12 @@ public class SMSUpdatedStatusHandler implements HandleSMSUpdatedStatus {
     private FormerTeammate updateFormerTeammateContactStatus(FormerTeammate formerTeammate, SMSHistory updatedSmsHistory) {
 
         ContactStatus newContactStatus = this.SMSStatusToContactStatusMapper.map(updatedSmsHistory.status());
+        if(formerTeammate.status() == ContactStatus.VALIDATED || formerTeammate.status() == ContactStatus.NOT_REQUESTED) {
+            return formerTeammate;
+        }
+        if(formerTeammate.status() == ContactStatus.WAITING &&  newContactStatus == ContactStatus.SENDING) {
+            return formerTeammate;
+        }
         return formerTeammate.withContactStatus(newContactStatus);
 
     }

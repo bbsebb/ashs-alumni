@@ -32,8 +32,8 @@ public class FormerTeammateValidator implements ValidateFormerTeammate {
         if(!updatedFormerTeammateToValidate.equals(formerTeammateToValidate)) {
             formerTeammateHistoryCreator.createHistoryForUpdate(updatedFormerTeammateToValidate,updatedBy,"Mise à jour des informations du contact");
         }
-        var updatedAndValidedFormerTeammate =  updateFormerTeammate.updateContactStatus(updatedFormerTeammateToValidate, ContactStatus.VALIDATED);
-        formerTeammateHistoryCreator.createHistoryForUpdate(updatedAndValidedFormerTeammate,updatedBy,"Transition du status vers → VALIDÉ : le contact a validé ses informations");
-        return updatedAndValidedFormerTeammate;
+        updatedFormerTeammateToValidate =  updateFormerTeammate.updateContactStatus(updatedFormerTeammateToValidate, ContactStatus.VALIDATED);
+        formerTeammateHistoryCreator.createHistoryForUpdate(updatedFormerTeammateToValidate,updatedBy,"Transition du status vers → VALIDÉ : le contact a validé ses informations");
+        return updatedFormerTeammateToValidate;
     }
 }
