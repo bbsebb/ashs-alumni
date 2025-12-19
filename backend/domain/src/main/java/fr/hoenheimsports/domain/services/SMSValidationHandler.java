@@ -124,32 +124,35 @@ public class SMSValidationHandler implements HandleSMSValidation{
                 .map(phone -> smsHistoryRetriever.findAllSMSHistoryByPhoneNumber(phone).size())
                 .orElse(0);
 
-
+        boolean isExceedingLimit = smsHistoriesCount >= SMS_SEND_LIMIT;
         var sms_validation_history =
                 switch (smsHistoriesCount) {
                     case 0 -> SMS_VALIDATION_MESSAGE_0;
                     case 1 -> SMS_VALIDATION_MESSAGE_1;
-                    case 2 -> SMS_VALIDATION_MESSAGE_2;
-                    default -> {
-                        var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, ContactStatus.UNREACHABLE);
-                        recordStatusChangeHistory(updatedFormerTeammate, updatedBy, formerTeammate.status(), updatedFormerTeammate.status());
-                        throw new SMSLimitExceededException("Limite d'envoi de SMS dépassée : %d envois effectués sur un maximum de %d autorisés".formatted(smsHistoriesCount, SMS_SEND_LIMIT));
-                    }
+                    default -> SMS_VALIDATION_MESSAGE_2;
                 };
+        if(!isExceedingLimit) {
+            var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(
+                    formerTeammate.phone().orElseThrow().getRawValue(),
+                    sms_validation_history.formatted(formerTeammate.code()),
+                    formerTeammate.id()
+            );
 
-        var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(
-                formerTeammate.phone().orElseThrow().getRawValue(),
-                sms_validation_history.formatted(formerTeammate.code()),
-                formerTeammate.id()
-        );
+            var newStatus = determineNewStatus(smsHistory);
+            var previousStatus = formerTeammate.status();
+            var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, newStatus);
 
-        var newStatus = determineNewStatus(smsHistory);
-        var previousStatus = formerTeammate.status();
-        var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, newStatus);
-
-        recordStatusChangeHistory(updatedFormerTeammate, updatedBy, previousStatus, newStatus);
-
-        return updatedFormerTeammate;
+            recordStatusChangeHistory(updatedFormerTeammate, updatedBy, previousStatus, newStatus);
+            return updatedFormerTeammate;
+        } else {
+            // Ici, isExceedingLimit est forcément TRUE
+            if(formerTeammate.status() != ContactStatus.UNREACHABLE) {
+                var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, ContactStatus.UNREACHABLE);
+                recordStatusChangeHistory(updatedFormerTeammate, updatedBy, formerTeammate.status(), updatedFormerTeammate.status());
+                return updatedFormerTeammate;
+            }
+            throw new SMSLimitExceededException("Limite d'envoi de SMS dépassée : %d envois effectués sur un maximum de %d autorisés".formatted(smsHistoriesCount, SMS_SEND_LIMIT));
+        }
     }
 
     /**
