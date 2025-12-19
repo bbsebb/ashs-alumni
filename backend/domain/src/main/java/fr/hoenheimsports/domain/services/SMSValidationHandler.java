@@ -41,11 +41,22 @@ import fr.hoenheimsports.domain.models.SMSHistory;
  */
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
-    private static final String SMS_VALIDATION_MESSAGE = """
-            Bonjour, c'est Sébastien Burckhardt (+33638937416). Un ancien de la SM1/SF1 de Hoenheim t'a ajouté à l'annuaire.
-            Merci de valider ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s
-            Tu pourras ensuite t'inscrire à la soirée des anciens le samedi 10 janvier 2026.
-            Si erreur, merci de l'indiquer en réponse; pour ne plus etre contacté, réponds STOP.
+    private static final String SMS_VALIDATION_MESSAGE_0 = """
+                Hello ! C’est Sébastien Burckhardt. Un ancien de la SM1/SF1 t'a ajouté à l'annuaire de Hoenheim. \
+                Merci de valider ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s \
+                Tu pourras ensuite t'inscrire à la soirée des anciens du 10/01/26. Une fois validé, tu ne recevras plus de relance.\
+                Si erreur, réponds-moi ; pour stopper : STOP.
+            """;
+    private static final String SMS_VALIDATION_MESSAGE_1 = """
+                Salut, c’est Sébastien. Je n'ai pas encore ta validation pour l'annuaire SM1/SF1 de Hoenheim.\
+                Peux-tu cliquer ici pour m'aider à finaliser la liste ? https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
+                C'est rapide, ça m'aide beaucoup et ça coupe automatiquement les prochains SMS de rappel. Merci d'avance ! STOP pour stopper.
+            """;
+    private static final String SMS_VALIDATION_MESSAGE_2 = """
+                Hello, dernière relance de Sébastien. J’ai besoin de ton aide pour boucler l’annuaire SM1/SF1\
+                et l'organisation de la soirée du 10 janvier. Clique juste ici pour valider ton contact\
+                : https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
+                Une fois fait, tu sors de la liste de diffusion et je ne t'embête plus ! Merci pour le coup de main. STOP pour stopper.
             """;
     private static final int SMS_SEND_LIMIT = 3;
     private final UpdateFormerTeammate updateFormerTeammate;
@@ -109,17 +120,26 @@ public class SMSValidationHandler implements HandleSMSValidation{
             throw new SMSDeliveryException("Le code d'envoi du SMS est indisponible.");
         }
 
-        int SMSHistoriesCount = formerTeammate.phone()
+        int smsHistoriesCount = formerTeammate.phone()
                 .map(phone -> smsHistoryRetriever.findAllSMSHistoryByPhoneNumber(phone).size())
                 .orElse(0);
 
-        if(SMSHistoriesCount > SMS_SEND_LIMIT -1) {
-            throw new SMSLimitExceededException("Limite d'envoi de SMS dépassée : %d envois effectués sur un maximum de %d autorisés".formatted(SMSHistoriesCount, SMS_SEND_LIMIT));
-        }
+
+        var sms_validation_history =
+                switch (smsHistoriesCount) {
+                    case 0 -> SMS_VALIDATION_MESSAGE_0;
+                    case 1 -> SMS_VALIDATION_MESSAGE_1;
+                    case 2 -> SMS_VALIDATION_MESSAGE_2;
+                    default -> {
+                        var updatedFormerTeammate = updateFormerTeammate.updateContactStatus(formerTeammate, ContactStatus.UNREACHABLE);
+                        recordStatusChangeHistory(updatedFormerTeammate, updatedBy, formerTeammate.status(), updatedFormerTeammate.status());
+                        throw new SMSLimitExceededException("Limite d'envoi de SMS dépassée : %d envois effectués sur un maximum de %d autorisés".formatted(smsHistoriesCount, SMS_SEND_LIMIT));
+                    }
+                };
 
         var smsHistory = sendSMSToValidateFormerTeammate.sendSMS(
                 formerTeammate.phone().orElseThrow().getRawValue(),
-                SMS_VALIDATION_MESSAGE.formatted(formerTeammate.code()),
+                sms_validation_history.formatted(formerTeammate.code()),
                 formerTeammate.id()
         );
 
