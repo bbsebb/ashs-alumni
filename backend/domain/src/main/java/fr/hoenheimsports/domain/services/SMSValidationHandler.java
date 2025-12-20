@@ -42,22 +42,21 @@ import fr.hoenheimsports.domain.models.SMSHistory;
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
     private static final String SMS_VALIDATION_MESSAGE_0 = """
-                Hello ! C’est Sébastien Burckhardt. Un ancien de la SM1/SF1 t'a ajouté à l'annuaire de Hoenheim. \
-                Merci de valider ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s \
-                Tu pourras ensuite t'inscrire à la soirée des anciens du 10/01/26. Une fois validé, tu ne recevras plus de relance.\
-                Si erreur, réponds-moi ; pour stopper : STOP.
-            """;
+                Bonjour, c'est Sébastien Burckhardt (+33638937416). Un ancien de la SM1/SF1 de Hoenheim t'a ajouté à l'annuaire du club.\
+                Peux-tu m'aider à le compléter en validant ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
+                Tu pourras ensuite t'inscrire à la soirée des anciens du 10/01/26. Merci ! Réponds STOP pour ne plus être contacté.
+            """.strip();
     private static final String SMS_VALIDATION_MESSAGE_1 = """
-                Salut, c’est Sébastien. Je n'ai pas encore ta validation pour l'annuaire SM1/SF1 de Hoenheim.\
-                Peux-tu cliquer ici pour m'aider à finaliser la liste ? https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
-                C'est rapide, ça m'aide beaucoup et ça coupe automatiquement les prochains SMS de rappel. Merci d'avance ! STOP pour stopper.
-            """;
+                Salut, c’est Sébastien. J'ai besoin d'un petit coup de main pour finaliser l’annuaire des anciens de Hoenheim.\
+                Peux-tu prendre 10 secondes pour confirmer tes infos ? https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
+                Ta validation m'aide énormément pour préparer la soirée et retrouver tout le monde. Merci d'avance ! STOP pour stopper.
+            """.strip();
     private static final String SMS_VALIDATION_MESSAGE_2 = """
-                Hello, dernière relance de Sébastien. J’ai besoin de ton aide pour boucler l’annuaire SM1/SF1\
-                et l'organisation de la soirée du 10 janvier. Clique juste ici pour valider ton contact\
-                : https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
-                Une fois fait, tu sors de la liste de diffusion et je ne t'embête plus ! Merci pour le coup de main. STOP pour stopper.
-            """;
+                Hello, c’est Sébastien. Ceci est mon dernier message pour l’annuaire de la SM1/SF1.\
+                J’aimerais vraiment que tu y figures, cela m'aide à finaliser la soirée du 10/01/26.\
+                Dernière chance pour valider ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
+                Merci pour ton aide et peut-être à bientôt ! STOP pour stopper.
+            """.strip();
     private static final int SMS_SEND_LIMIT = 3;
     private final UpdateFormerTeammate updateFormerTeammate;
     private final SendSMSToValidateFormerTeammate sendSMSToValidateFormerTeammate;
