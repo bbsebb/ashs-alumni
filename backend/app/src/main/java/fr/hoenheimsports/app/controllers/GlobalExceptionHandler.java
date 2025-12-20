@@ -44,6 +44,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
         USER_ALREADY_EXISTS("https://api.hoenheimsports.fr/errors/user-already-exists"),
         AUTH_ERROR("https://api.hoenheimsports.fr/errors/auth-error"),
         SMS_LIMIT_EXCEEDED("https://api.hoenheimsports.fr/errors/sms-limit-exceeded"),
+        SMS_WAIT_PERIOD("https://api.hoenheimsports.fr/errors/sms-wait-period"),
         RUNTIME("https://api.hoenheimsports.fr/errors/runtime"),
         INTERNAL("https://api.hoenheimsports.fr/errors/internal");
 
@@ -277,6 +278,21 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler  {
                 ex.getMessage()
         );
         problemDetail.setType(ErrorType.SMS_LIMIT_EXCEEDED.getUri());
+        problemDetail.setTitle(title);
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+
+    @ExceptionHandler(SMSWaitPeriodException.class)
+    public ProblemDetail handleSMSWaitPeriodException(SMSWaitPeriodException ex) {
+        String title = "Anti SPAM";
+        log.error(title, ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.TOO_MANY_REQUESTS,
+                ex.getMessage()
+        );
+        problemDetail.setType(ErrorType.SMS_WAIT_PERIOD.getUri());
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;

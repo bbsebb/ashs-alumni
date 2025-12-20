@@ -7,6 +7,8 @@ import fr.hoenheimsports.domain.models.ContactStatus;
 import fr.hoenheimsports.domain.models.FormerTeammate;
 import fr.hoenheimsports.domain.models.SMSHistory;
 
+import java.time.Instant;
+
 /**
  * Service de gestion de la validation par SMS des anciens coéquipiers.
  *
@@ -41,6 +43,7 @@ import fr.hoenheimsports.domain.models.SMSHistory;
  */
 @DomainService
 public class SMSValidationHandler implements HandleSMSValidation{
+    private static final int SMS_WAIT_PERIOD = 5;
     private static final String SMS_VALIDATION_MESSAGE_0 = """
                 Bonjour, c'est Sébastien Burckhardt (+33638937416). Un ancien de la SM1/SF1 de Hoenheim t'a ajouté à l'annuaire du club.\
                 Peux-tu m'aider à le compléter en validant ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
@@ -119,9 +122,23 @@ public class SMSValidationHandler implements HandleSMSValidation{
             throw new SMSDeliveryException("Le code d'envoi du SMS est indisponible.");
         }
 
+        Instant fiveDaysAgo = Instant.now().minus(SMS_WAIT_PERIOD, java.time.temporal.ChronoUnit.DAYS);
+        formerTeammate.phone()
+                .map(smsHistoryRetriever::findAllSMSHistoryByPhoneNumber)
+                .flatMap(list -> list.stream()
+                        .map(SMSHistory::sentAt)
+                        .max(Instant::compareTo))
+                .ifPresent(lastSentDate -> {
+                    if (lastSentDate.isAfter(fiveDaysAgo)) {
+                        throw new SMSWaitPeriodException("Un SMS a déjà été envoyé il y a moins de 5 jours (le %s)".formatted(lastSentDate));
+                    }
+                });
+
+
         int smsHistoriesCount = formerTeammate.phone()
                 .map(phone -> smsHistoryRetriever.findAllSMSHistoryByPhoneNumber(phone).size())
                 .orElse(0);
+
 
         boolean isExceedingLimit = smsHistoriesCount >= SMS_SEND_LIMIT;
         var sms_validation_history =

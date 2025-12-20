@@ -89,6 +89,9 @@ function createMessageFromProblemDetail(error:ProblemDetail,defaultMessage:strin
     case 'https://api.hoenheimsports.fr/errors/sms-limit-exceeded':
       message = createMessage(error.title,error.detail);
       break;
+    case 'https://api.hoenheimsports.fr/errors/sms-wait-period':
+      message = createMessage(error.title,error.detail);
+      break;
     case 'https://api.hoenheimsports.fr/errors/former-teammate-not-requested':
       message = createMessage(error.title,error.detail);
       break;
