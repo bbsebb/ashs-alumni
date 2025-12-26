@@ -50,15 +50,15 @@ public class SMSValidationHandler implements HandleSMSValidation{
                 Tu pourras ensuite t'inscrire à la soirée des anciens du 10/01/26. Merci ! Réponds STOP pour ne plus être contacté.
             """.strip();
     private static final String SMS_VALIDATION_MESSAGE_1 = """
-                Salut, c’est Sébastien. J'ai besoin d'un petit coup de main pour finaliser l’annuaire des anciens de Hoenheim.\
+                Salut, c'est Sébastien. J'ai besoin d'un petit coup de main pour finaliser l'annuaire des anciens de Hoenheim.\
                 Peux-tu prendre 10 secondes pour confirmer tes infos ? https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
                 Ta validation m'aide énormément pour préparer la soirée et retrouver tout le monde. Merci d'avance ! STOP pour stopper.
             """.strip();
     private static final String SMS_VALIDATION_MESSAGE_2 = """
-                Hello, c’est Sébastien. Ceci est mon dernier message pour l’annuaire de la SM1/SF1.\
-                J’aimerais vraiment que tu y figures, cela m'aide à finaliser la soirée du 10/01/26.\
+                Hello, c'est Sébastien. Ceci est mon dernier message pour l'annuaire de la SM1/SF1.\
+                J'aimerais vraiment que tu y figures, et ensuite, si tu veux, tu pourras t'inscrire à la soiree du 10/01/26 \
                 Dernière chance pour valider ton contact ici : https://alumni.hoenheimsports.fr/former-teammates/validate/%s\
-                Merci pour ton aide et peut-être à bientôt ! STOP pour stopper.
+                Merci pour ton aide et peut-être à bientôt !.
             """.strip();
     private static final int SMS_SEND_LIMIT = 3;
     private final UpdateFormerTeammate updateFormerTeammate;
