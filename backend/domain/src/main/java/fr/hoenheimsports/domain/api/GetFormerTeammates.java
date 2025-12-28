@@ -4,6 +4,7 @@ import fr.hoenheimsports.domain.models.FormerTeammate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface GetFormerTeammates {
     List<FormerTeammate> findAllFormerTeammates();
@@ -11,4 +12,6 @@ public interface GetFormerTeammates {
     FormerTeammate findByCode(String code);
 
     Optional<FormerTeammate> findByPhone(String phone);
+
+    FormerTeammate findById(UUID id);
 }

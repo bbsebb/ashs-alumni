@@ -271,4 +271,23 @@ export class FormerCard {
       }
     });
   }
+
+  protected onValidate() {
+    const formerTeammate = this.formerTeammateSignal();
+    // Defensive check to ensure teammate exists before attempting deletion
+    if (!formerTeammate) {
+      console.warn('the teammate is undefined');
+      return;
+    }
+
+    this.formerTeammatesStore.handleValidate(formerTeammate.id)
+      .subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Le contact a été validé');
+      },
+      error: (err) => {
+        this.notificationService.showError(err.error as ProblemDetail,'Une erreur est survenue. Veuillez réessayer plus tard.');
+      }
+    });
+  }
 }

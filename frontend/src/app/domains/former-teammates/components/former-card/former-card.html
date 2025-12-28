@@ -97,6 +97,9 @@
             Non sollicité
           </button>
           }
+          <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="onValidate()" [disabled]="isDeleting()">
+            Valider
+          </button>
           <button mat-button *kaHasRoles="['ADMIN'],checkRealm:true" (click)="onDelete()" [disabled]="isDeleting()">
             Supprimer
           </button>

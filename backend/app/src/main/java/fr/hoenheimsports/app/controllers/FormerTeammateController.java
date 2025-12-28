@@ -134,8 +134,17 @@ public class FormerTeammateController {
     public ResponseEntity<FormerTeammateResponse> validateFormerTeammate(@PathVariable String code,@RequestBody @Valid FormerTeammateRequest formerTeammateRequest) {
         log.debug("Validating former teammate {}", formerTeammateRequest);
         var validateFormerTeammateRequest = formerTeammateMapper.toValidateRequest(code,formerTeammateRequest);
-        var formerTeammate = formerTeammateValidator.valideFormerTeammate(validateFormerTeammateRequest);
+        var formerTeammate = formerTeammateValidator.valideFormerTeammateByCode(validateFormerTeammateRequest);
         log.debug("Former teammate {} validated", formerTeammate);
+        return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
+    }
+
+    @PutMapping("/{id}/validate")
+    @Transactional
+    public ResponseEntity<FormerTeammateResponse> validateFormerTeammate(@PathVariable String id) {
+        log.debug("Validating former teammate by id {}", id);
+        var formerTeammate = formerTeammateValidator.valideFormerTeammateById(id,securityContextService.getCurrentContext());
+        log.debug("Former teammate {} validated by id", formerTeammate);
         return ResponseEntity.ok(formerTeammateService.buildFormerTeammateResponse(formerTeammate));
     }
 

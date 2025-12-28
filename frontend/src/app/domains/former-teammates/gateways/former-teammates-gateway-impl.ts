@@ -13,6 +13,7 @@ import {environment} from '@environments/environment';
   providedIn: 'root'
 })
 export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
+
   markFormerTeammateAsNotRequested(id: Readonly<UUID>): Observable<FormerTeammate> {
     return this.httpClient.post<FormerTeammate>(`${environment.apiUrl}/former-teammates/${id}/not_requested`, null);
   }
@@ -36,6 +37,10 @@ export class FormerTeammatesGatewayImpl implements FormerTeammatesGateway {
 
   validateFormerTeammate(updateFormerTeammate: UpdateFormerTeammate,code: UUID): Observable<FormerTeammate> {
     return this.httpClient.put<FormerTeammate>(`${environment.apiUrl}/former-teammates/validate/${code}`, updateFormerTeammate)
+  }
+
+  validateFormerTeammateById(id: Readonly<UUID>): Observable<FormerTeammate> {
+    return this.httpClient.put<FormerTeammate>(`${environment.apiUrl}/former-teammates/${id}/validate`,null);
   }
 
   deleteFormerTeammate(formerTeammateId: UUID): Observable<void> {

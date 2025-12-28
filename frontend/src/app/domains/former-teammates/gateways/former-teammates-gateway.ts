@@ -24,6 +24,8 @@ export interface FormerTeammatesGateway {
 
   resendSMS(id: Readonly<UUID>): Observable<FormerTeammate>;
   markFormerTeammateAsNotRequested(id: Readonly<UUID>): Observable<FormerTeammate>;
+
+  validateFormerTeammateById(id: Readonly<UUID>): Observable<FormerTeammate>;
 }
 
 export const FORMER_TEAMMATES_GATEWAY = new InjectionToken<FormerTeammatesGateway>('FormerTeammatesGateway');

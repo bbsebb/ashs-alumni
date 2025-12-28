@@ -8,6 +8,7 @@ import fr.hoenheimsports.domain.spi.FormerTeammateRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @UseCase
 public class FormerTeammateRetriever implements GetFormerTeammates {
@@ -35,6 +36,11 @@ public class FormerTeammateRetriever implements GetFormerTeammates {
     @Override
     public Optional<FormerTeammate> findByPhone(String phone) {
         return this.formerTeammateRepository.findByPhone(phone);
+    }
+
+    @Override
+    public FormerTeammate findById(UUID id) {
+        return this.formerTeammateRepository.findById(id).orElseThrow(() -> new FormerTeammateNotFoundException("Le id est invalide ou inconnu"));
     }
 
 }

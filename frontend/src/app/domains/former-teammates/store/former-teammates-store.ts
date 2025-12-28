@@ -1,4 +1,4 @@
-import {computed, effect, inject, Injectable, ResourceRef} from '@angular/core';
+import {computed, effect, inject, Injectable} from '@angular/core';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
@@ -6,7 +6,6 @@ import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/c
 import {Observable, tap} from 'rxjs';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
 import {HttpResourceRef} from '@angular/common/http';
-import {Form} from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -79,4 +78,11 @@ export class FormerTeammatesStore {
       tap(() => this.formerTeammatesResource.reload()) //TODO: reload only if the formerTeammate is the one that was updated
     );
   }
+
+    handleValidate(id: Readonly<UUID>): Observable<FormerTeammate> {
+    return this.formerTeammatesGateway.validateFormerTeammateById(id).pipe(
+      tap(() => this.formerTeammatesResource.reload())
+    )
+
+    }
 }
