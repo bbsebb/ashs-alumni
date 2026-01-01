@@ -17,7 +17,7 @@ export class ContactStatusDetailPipe implements PipeTransform {
       case 'NOT_REQUESTED':
         return 'Ne souhaite plus être contacté';
       case 'UNREACHABLE':
-        return 'Téléphone non fourni ou erroné. En attente de nouveau contact.';
+        return 'Téléphone non fourni ou erroné ou plusieurs tentatives sans réponse. En attente de nouveau contact.';
       case 'SENDING':
         return 'Le sms est en cours d\'envoi mais non reçu par le destinataire.';
       case 'WAITING':
