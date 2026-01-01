@@ -4,7 +4,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection
 } from '@angular/core';
-import {provideRouter, withComponentInputBinding} from '@angular/router';
+import {provideRouter, TitleStrategy, withComponentInputBinding} from '@angular/router';
 
 import {routes} from './app.routes';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
@@ -21,6 +21,7 @@ import {
 } from 'keycloak-angular';
 import {environment} from '@environments/environment';
 import {FormerTeammatesGatewayImpl} from '@app/domains/former-teammates/gateways/former-teammates-gateway-impl';
+import {TemplatePageTitleStrategy} from '@app/core/services/template-page-title-strategy';
 
 registerLocaleData(localeFr);
 
@@ -36,6 +37,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,withComponentInputBinding()),
+    { provide: TitleStrategy, useClass: TemplatePageTitleStrategy },
     provideKeycloak({
       config: {
         url: environment.keycloak.url,

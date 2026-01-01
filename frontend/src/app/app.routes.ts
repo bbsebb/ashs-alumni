@@ -14,17 +14,42 @@ import {Register} from '@app/domains/auth/components/register/register';
 import {RegisterConfirmation} from '@app/domains/auth/components/register-confirmation/register-confirmation';
 
 export const routes: Routes = [
-  {path: '', redirectTo: '/former-teammates', pathMatch: 'full'},
-  {path: 'event-registration', component: Event},
-  {path: 'former-teammates', component: FormerList},
-  {path: 'former-teammates/create', component: FormerCreate},
-  {path: 'former-teammates/edit/:id', component: FormerUpdate},
-  {path: 'former-teammates/validate/:code', component: FormerValidation},
-  {path: 'former-teammates/validated', component: FormerValidationSuccess},
-  {path: 'former-teammates/:id', component: FormerCard},
-  {path: 'register', component: Register},
-  {path: 'register/confirmation', component: RegisterConfirmation},
-  {path: 'register/:id', component: Register},
-  {path: 'error', component: NotFound},
-  {path: '**', component: NotFound}
+  { path: '', redirectTo: '/former-teammates', pathMatch: 'full' },
+
+  // Groupe : Événements
+  {
+    path: 'event-registration',
+    title: 'Événement',
+    children: [
+      { path: '', component: Event }
+    ]
+  },
+
+  // Groupe : Anciens coéquipiers
+  {
+    path: 'former-teammates',
+    title: 'Anciens coéquipiers',
+    children: [
+      { path: '', component: FormerList },
+      { path: 'create', component: FormerCreate, title: 'Ajouter' },
+      { path: 'edit/:id', component: FormerUpdate, title: 'Modifier' },
+      { path: 'validate/:code', component: FormerValidation, title: 'Validation' },
+      { path: 'validated', component: FormerValidationSuccess, title: 'Confirmation' },
+      { path: ':id', component: FormerCard, title: 'Details' },
+    ]
+  },
+
+  // Groupe : Inscription
+  {
+    path: 'register',
+    title: 'Inscription',
+    children: [
+      { path: '', component: Register },
+      { path: 'confirmation', component: RegisterConfirmation, title: 'Confirmation' },
+      { path: ':id', component: Register, title: 'Détails' },
+    ]
+  },
+
+  { path: 'error', component: NotFound, title: 'Erreur' },
+  { path: '**', component: NotFound, title: 'Page non trouvée' }
 ];
