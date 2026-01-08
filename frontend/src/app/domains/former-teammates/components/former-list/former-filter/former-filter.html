@@ -1,6 +1,17 @@
-<mat-expansion-panel>
+<mat-expansion-panel
+  [expanded]="panelOpen()"
+  (opened)="panelOpen.set(true)"
+  (closed)="panelOpen.set(false)">
+
   <mat-expansion-panel-header>
     <mat-panel-title> Filtres </mat-panel-title>
+
+    <!-- On utilise hasActiveFilters() pour le bouton reset -->
+    @if (hasActiveFilters()) {
+      <button mat-icon-button (click)="$event.stopPropagation(); resetFilters()" title="Réinitialiser les filtres">
+        <mat-icon>filter_alt_off</mat-icon>
+      </button>
+    }
   </mat-expansion-panel-header>
 
 <form [formGroup]="formFilter" class="filters" >

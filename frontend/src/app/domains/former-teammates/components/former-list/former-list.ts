@@ -1,4 +1,4 @@
-import {Component, computed, inject, ResourceRef, signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, ResourceRef} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatSortModule} from '@angular/material/sort';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
@@ -12,9 +12,11 @@ import {MatFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
-import {RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
 import {LoadingComponent} from '@app/shared/components/loading/loading';
+import {Gender} from '@app/domains/former-teammates/models/gender';
+import {ContactStatus} from '@app/domains/former-teammates/models/contact-status';
 
 @Component({
   selector: 'app-former-list',
@@ -35,19 +37,26 @@ import {LoadingComponent} from '@app/shared/components/loading/loading';
   styleUrl: './former-list.scss'
 })
 export class FormerList {
-
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly queryParams = toSignal(this.route.queryParamMap);
+  private readonly store = inject(FormerTeammatesStore);
   // Injected services
-  readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined> = inject(FormerTeammatesStore).formerTeammatesResourceRef;
+  readonly formerTeammatesResource: ResourceRef<FormerTeammate[] | undefined> = this.store.formerTeammatesResourceRef;
   readonly breakpointObserver = toSignal(inject(BreakpointObserver).observe([Breakpoints.XSmall]));
 
   // Table configuration
   readonly filteredFormerTeammates = this.filterData();
 
   // Signals
-  private readonly formerTeammatesFilterSignal: WritableSignal<FormerTeammatesFilter> = signal({
-    gender: [],
-    contactStatus: [],
-    searchByName: ''
+  readonly formerTeammatesFilterSignal = computed<FormerTeammatesFilter>(() => {
+    const params = this.queryParams();
+
+    return {
+      gender: (params?.getAll('gender') ?? []) as Gender[],
+      contactStatus: (params?.getAll('contactStatus') ?? []) as ContactStatus[],
+      searchByName: params?.get('searchByName') ?? ''
+    };
   });
 
   /**
@@ -56,6 +65,14 @@ export class FormerList {
    * et la configuration de la pagination et du tri.
    */
   constructor() {
+    // 2. Restauration au chargement initial :
+    // Si l'URL est vide mais que le store a des données, on les remet dans l'URL
+    const params = inject(ActivatedRoute).snapshot.queryParamMap;
+    const savedFilter = this.store.filterState();
+
+    if (params.keys.length === 0 && (savedFilter.gender.length > 0 || savedFilter.contactStatus.length > 0 || savedFilter.searchByName)) {
+      this.applyFiltersToUrl(savedFilter);
+    }
   }
 
   /**
@@ -77,7 +94,20 @@ export class FormerList {
   }
 
   filterChange($event: FormerTeammatesFilter) {
-    this.formerTeammatesFilterSignal.set($event)
+    this.store.filterState.set($event);
+    this.applyFiltersToUrl($event);
+  }
+
+  private applyFiltersToUrl(filter: FormerTeammatesFilter) {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        gender: filter.gender.length ? filter.gender : null,
+        contactStatus: filter.contactStatus.length ? filter.contactStatus : null,
+        searchByName: filter.searchByName || null
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   /**

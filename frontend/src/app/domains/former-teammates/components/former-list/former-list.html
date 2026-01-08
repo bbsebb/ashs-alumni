@@ -8,7 +8,7 @@
   <app-load-error></app-load-error>
 } @else if (formerTeammatesResource.hasValue()) {
   <menu>
-    <app-former-filter (filterChange)="filterChange($event)"/>
+    <app-former-filter [formerTeammatesFilterSignal]="formerTeammatesFilterSignal()"  (filterChange)="filterChange($event)"/>
     <button
       [class.floating-button]="breakpointObserver()?.matches"
       matFab

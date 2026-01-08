@@ -1,4 +1,4 @@
-import {computed, effect, inject, Injectable} from '@angular/core';
+import {computed, effect, inject, Injectable, signal} from '@angular/core';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {FORMER_TEAMMATES_GATEWAY} from '@app/domains/former-teammates/gateways/former-teammates-gateway';
 import {UUID} from '@app/shared/types/uuid';
@@ -6,6 +6,7 @@ import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/c
 import {Observable, tap} from 'rxjs';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
 import {HttpResourceRef} from '@angular/common/http';
+import {FormerTeammatesFilter} from '@app/domains/former-teammates/components/former-list/former-filter/former-filter';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,11 @@ import {HttpResourceRef} from '@angular/common/http';
 export class FormerTeammatesStore {
   private readonly formerTeammatesResource: HttpResourceRef<FormerTeammate[] | undefined>;
   private formerTeammatesGateway = inject(FORMER_TEAMMATES_GATEWAY)
-
+  readonly filterState = signal<FormerTeammatesFilter>({
+    gender: [],
+    contactStatus: [],
+    searchByName: ''
+  });
   constructor() {
     this.formerTeammatesResource = this.formerTeammatesGateway.getFormerTeammates();
     effect(() => {
