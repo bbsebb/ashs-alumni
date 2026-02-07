@@ -8,7 +8,7 @@ import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-t
 import {AuthGatewayImpl} from '@app/domains/auth/gateways/auth-gateway-impl';
 import {MatDivider} from '@angular/material/list';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {NotificationService} from '@app/shared/services/notification';
+import {NotificationService} from '@app/shared/services/notification-service';
 import {Router} from '@angular/router';
 import {ProblemDetail} from '@app/shared/models/problem-detail';
 

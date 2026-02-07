@@ -1,5 +1,5 @@
 import {Component, computed, inject, signal} from '@angular/core';
-import {NotificationService} from '@app/shared/services/notification';
+import {NotificationService} from '@app/shared/services/notification-service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {toSignal} from '@angular/core/rxjs-interop';

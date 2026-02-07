@@ -7,7 +7,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
 import {UUID} from '@app/shared/types/uuid';
 import {UpdateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/updateFormerTeammate';
-import {NotificationService} from '@app/shared/services/notification';
+import {NotificationService} from '@app/shared/services/notification-service';
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
 import {LoadErrorComponent} from '@app/shared/components/load-error/load-error';
 import {LoadingComponent} from '@app/shared/components/loading/loading';

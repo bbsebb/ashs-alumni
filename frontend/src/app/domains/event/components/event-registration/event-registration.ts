@@ -6,7 +6,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {EventStore} from '@app/domains/event/stores/event-store';
 import {ParticipantRequest} from '@app/domains/event/dtos/participant-request';
-import {NotificationService} from '@app/shared/services/notification';
+import {NotificationService} from '@app/shared/services/notification-service';
 import {ProblemDetail} from '@app/shared/models/problem-detail';
 import {AuthenticationService} from '@app/shared/services/authentication';
 import {MatCheckbox} from '@angular/material/checkbox';

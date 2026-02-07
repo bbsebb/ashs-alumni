@@ -17,7 +17,7 @@ import {RolePipe} from '@app/shared/pipes/role-pipe';
 import {BackButton} from '@app/shared/components/back-button/back-button';
 import {MatButton} from '@angular/material/button';
 import {HasRolesDirective} from 'keycloak-angular';
-import {NotificationService} from '@app/shared/services/notification';
+import {NotificationService} from '@app/shared/services/notification-service';
 import {DialogService} from '@app/shared/services/dialog';
 import {EMPTY, filter, switchMap} from 'rxjs';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';

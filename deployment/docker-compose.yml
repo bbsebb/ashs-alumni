@@ -54,7 +54,7 @@ services:
     image: ghcr.io/bbsebb/alumni_ashs-frontend:main
     container_name: alumni-frontend
     ports:
-      - "4202:80" # Le Dockerfile frontend expose le port 80 via Nginx
+      - "4203:80" # Le Dockerfile frontend expose le port 80 via Nginx
     depends_on:
       - backend
     restart: unless-stopped

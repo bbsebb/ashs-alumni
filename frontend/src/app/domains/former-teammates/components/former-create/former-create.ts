@@ -2,7 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import {FormerForm, FormerTeammateFormValue} from '@app/domains/former-teammates/components/former-form/former-form';
 import {FormerTeammatesStore} from '@app/domains/former-teammates/store/former-teammates-store';
 import {FormerTeammate} from '@app/domains/former-teammates/models/former-teammates';
-import {NotificationService} from '@app/shared/services/notification';
+import {NotificationService} from '@app/shared/services/notification-service';
 import {Router} from '@angular/router';
 import {CreateFormerTeammate} from '@app/domains/former-teammates/dto/payloads/createFormerTeammate';
 import {FormerTeammateMapper} from '@app/domains/former-teammates/service/former-teammate-mapper';
